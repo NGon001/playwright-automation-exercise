@@ -6,6 +6,8 @@ export class HomePage{
     readonly deleteButtonLocator: Locator;
     readonly logoutButtonLocator: Locator;
     readonly logedInTextLocator: Locator;
+    readonly contactUsButtonLocator: Locator;
+    readonly featuredItemsTextLocator: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -13,6 +15,8 @@ export class HomePage{
         this.deleteButtonLocator = this.page.getByRole("link",{name: " Delete Account"});
         this.logoutButtonLocator = this.page.getByRole('link', { name: 'Logout' });
         this.logedInTextLocator = this.page.getByText('Logged in as', { exact: false });
+        this.contactUsButtonLocator = this.page.getByRole('link', { name: 'Contact us' });
+        this.featuredItemsTextLocator = this.page.getByText('Features Items');
     }
 
     async goto(){
@@ -21,6 +25,10 @@ export class HomePage{
 
     async gotoSignUpAndLoginPage(){
         await this.signUpAndLoginPageLocator.click();
+    }
+
+    async gotoContactUsPage(){
+        await this.contactUsButtonLocator.click();
     }
 
     async checkLoggedInName(name){
@@ -35,6 +43,7 @@ export class HomePage{
     }
 
     async checkHomePageLoad(){
+        await expect(await this.featuredItemsTextLocator).toBeVisible();
         await expect(await this.signUpAndLoginPageLocator).toBeVisible();
     }
 
@@ -181,5 +190,70 @@ export class AccountDeletePage{
 
     async clickContinueButton(){
         await this.continueButtonLocator.click();
+    }
+}
+
+export class ContactUsPage{
+    readonly page: Page;
+    readonly getInTouchTextLocator: Locator;
+    readonly nameFieldLocator: Locator;
+    readonly emailFieldLocator: Locator;
+    readonly subjectFieldLocator: Locator;
+    readonly messageFieldLocator: Locator;
+    readonly submitButtonLocator: Locator;
+    readonly chooseFileButtonLocator: Locator;
+    readonly successMessageLocator: Locator;
+    readonly returnHomeButtonLocator: Locator;
+
+    constructor(page: Page){
+        this.page = page;
+        this.getInTouchTextLocator = this.page.getByText('Get In Touch');
+        this.nameFieldLocator = this.page.getByPlaceholder('Name',{ exact: true });
+        this.emailFieldLocator = this.page.getByPlaceholder('Email',{ exact: true });
+        this.subjectFieldLocator = this.page.getByPlaceholder('Subject',{ exact: true });
+        this.messageFieldLocator = this.page.getByPlaceholder('Your Message Here',{ exact: true });
+        this.submitButtonLocator = this.page.getByRole('button', { name: 'Submit' });
+        this.chooseFileButtonLocator = this.page.getByRole('button', { name: 'Choose File' });
+        this.successMessageLocator = this.page.locator('.status.alert.alert-success');
+        this.returnHomeButtonLocator = this.page.locator("#form-section").getByRole('link', { name: ' Home' });
+    }
+
+    async checkGetInTouchText(){
+        await expect(await this.getInTouchTextLocator).toBeVisible();
+    }
+
+    async fillContactUsForm(name, email, subject, message, filePath) {
+        await this.nameFieldLocator.fill(name.join(' '));
+        await this.emailFieldLocator.fill(email);
+        await this.subjectFieldLocator.fill(subject);
+        await this.messageFieldLocator.fill(message);
+        if (filePath) {
+            await this.chooseFileButtonLocator.setInputFiles(filePath);
+        }
+    }
+
+async clickSubmitButton() {
+    // Attach dialog handler before clicking the submit button
+    this.page.on('dialog', async dialog => {
+        await expect(dialog.type()).toBe('confirm');
+        await expect(dialog.message()).toBe('Press OK to proceed!');
+        
+        // Introduce a small delay to avoid Playwright auto-dismiss timing
+        await new Promise(resolve => setTimeout(resolve, 500));  // 500ms delay
+        
+        await dialog.accept(); // Accept the alert
+    });
+
+    // Click the submit button, which triggers the dialog
+    await this.submitButtonLocator.click();
+}
+
+
+    async checkSuccessMessage() {
+        await expect(await this.successMessageLocator).toBeVisible();
+    }
+
+    async clickReturnHomeButton() {
+        await this.returnHomeButtonLocator.click();
     }
 }

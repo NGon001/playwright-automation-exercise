@@ -188,3 +188,41 @@ test('Test Case 5: Register User with existing email', async ({ homePage, signUp
 
   await signUp_LoginPage.checkExistedDataMessage();
 });
+
+/*
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click on 'Contact Us' button
+5. Verify 'GET IN TOUCH' is visible
+6. Enter name, email, subject and message
+7. Upload file
+8. Click 'Submit' button
+9. Click OK button
+10. Verify success message 'Success! Your details have been submitted successfully.' is visible
+11. Click 'Home' button and verify that landed to home page successfully
+ */
+
+test('Test Case 6: Contact Us Form', async ({ homePage, contactUsPage }) => {
+  //data
+  const name = ['Max', 'Petrov'];
+  const email = process.env.VALID_EMAIL || '';
+  const subject = 'Test Subject';
+  const message = 'This is a test message.';
+  const filePath = './README.md';
+
+  //goto
+  await homePage.goto();
+  await homePage.gotoContactUsPage();
+  await contactUsPage.checkGetInTouchText();
+
+  //fill contact us form
+  await contactUsPage.fillContactUsForm(name,email,subject,message,filePath);
+  await contactUsPage.clickSubmitButton();
+
+  //verify success message
+  await contactUsPage.checkSuccessMessage();
+  await contactUsPage.clickReturnHomeButton();
+
+  await homePage.checkHomePageLoad();
+});

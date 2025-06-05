@@ -1,5 +1,5 @@
 import {test as baseTest} from '@playwright/test';
-import { HomePage, SignUp_LoginPage, SignUpPage, AccountCreatedPage, AccountDeletePage} from './pom';
+import { HomePage, SignUp_LoginPage, SignUpPage, AccountCreatedPage, AccountDeletePage,ContactUsPage} from './pom';
 
 
 type MyFixtures = {
@@ -8,6 +8,7 @@ type MyFixtures = {
     signUpPage: SignUpPage;
     accountCreatedPage: AccountCreatedPage;
     accountDeletePage: AccountDeletePage;
+    contactUsPage: ContactUsPage;
 }
 
 export const test = baseTest.extend<MyFixtures>({
@@ -26,6 +27,9 @@ export const test = baseTest.extend<MyFixtures>({
     accountDeletePage: async({page}, use) =>{
         await use(new AccountDeletePage(page));
     },
+    contactUsPage: async({page}, use) =>{
+        await use(new ContactUsPage(page));
+    }
 });
 
 export {expect} from '@playwright/test';
