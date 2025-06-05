@@ -1,9 +1,7 @@
-// @ts-check
-import { test, expect } from '@playwright/test';
+import { test } from '../Helper/base.ts';
 import {generateRandomEmail} from '../Helper/tools.ts';
 import dotenv from 'dotenv';
 dotenv.config();
-
 
 /*
 1. Launch browser
@@ -25,7 +23,7 @@ dotenv.config();
 17. Click 'Delete Account' button
 18. Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button */
 
-test('Test Case 1: Register User', async ({ page }) => {
+test('Test Case 1: Register User', async ({ homePage, signUp_LoginPage,signUpPage,accountCreatedPage,accountDeletePage }) => {
   //data
   const Title = 'Mr.';
   const name = ['Max', 'Petrov'];
@@ -44,49 +42,29 @@ test('Test Case 1: Register User', async ({ page }) => {
   const mobileNumber = '1234567890';
 
   //goto
-  await page.goto("/");
-  await page.getByRole('link', { name: 'Signup / Login' }).click();
-  await expect(await page.getByText('New User Signup!')).toBeVisible();
+  await homePage.goto();
+  await homePage.gotoSignUpAndLoginPage();
+  await signUp_LoginPage.checksignUpText();
 
   //Fill signup form
-  const signupForm = await page.locator('form[action="/signup"]');
-  await signupForm.getByPlaceholder('Name').fill(name[0]);
-  await signupForm.getByPlaceholder('Email Address').fill(email);
-  await signupForm.getByRole('button', { name: 'Signup' }).click();
+  await signUp_LoginPage.fillStartSignUpForm(name,email);
+  await signUp_LoginPage.clickSignUpButton();
 
-  //Fill detailed signup form
-  await expect(page.getByText('Enter Account Information')).toBeVisible();
-  await expect(await page.locator("#name").getAttribute('value')).toBe(name[0]);
-  await expect(await page.locator("#email").getAttribute('value')).toBe(email);
-  await page.getByRole('radio', { name: Title }).check();
-  await page.locator('#password').fill(password);
-  await page.locator('#days').selectOption({ label: BirthDay });
-  await page.locator('#months').selectOption({ label: BirthMonth });
-  await page.locator('#years').selectOption({ label: BirthYear });
-  await page.getByRole('checkbox', { name: 'Sign up for our newsletter!' }).check();
-  await page.getByRole('checkbox', { name: 'Receive special offers from our partners!' }).check();
-  await page.locator('#first_name').fill(name[0]);
-  await page.locator('#last_name').fill(name[1]);
-  await page.locator('#company').fill(companyName);
-  await page.locator('#address1').fill(Address);
-  await page.locator('#address2').fill(Address2);
-  await page.getByRole('combobox', { name: 'Country' }).selectOption({ label: Country });
-  await page.locator('#state').fill(State);
-  await page.locator('#city').fill(City);
-  await page.locator('#zipcode').fill(Zipcode);
-  await page.locator('#mobile_number').fill(mobileNumber);
-  await page.getByRole('button', { name: 'Create Account' }).click();
+  //Fill detailed signup formr
+  await signUpPage.checkDataInForm(name,email);
+  await signUpPage.fillSignUpForm(Title,name,password,BirthDay,BirthMonth,BirthYear,companyName,Address,Address2,Country,State,City,Zipcode,mobileNumber);
+  await signUpPage.clickCreateAccountButton();
 
   //verift account was created
-  await expect(await page.getByText('Account Created!')).toBeVisible();
-  await page.getByRole('link', { name: 'Continue' }).click();
-  await expect(await page.getByText(`Logged in as ${name[0]}`)).toBeVisible();
+  await accountCreatedPage.checkAccountCreationMessage();
+  await accountCreatedPage.clickContinueButton();
+  await homePage.checkLoggedInName(name);
 
   //delete account and verify it
-  await page.getByRole("link",{name: " Delete Account"}).click();
-  await expect(await page.getByText('Account Deleted!')).toBeVisible();
-  await page.getByRole('link', { name: 'Continue' }).click();
-  await expect(await page.getByRole('link', { name: 'Signup / Login' })).toBeVisible();
+  await homePage.clickDeleteAccount();
+  await accountDeletePage.checkAccountDeletedMessage();
+  await accountDeletePage.clickContinueButton();
+  await homePage.checkHomePageLoad();
 });
 
 /*
@@ -100,25 +78,23 @@ test('Test Case 1: Register User', async ({ page }) => {
 8. Verify that 'Logged in as username' is visible
 */
 
-test('Test Case 2: Login User with correct email and password', async ({ page }) => {
+test('Test Case 2: Login User with correct email and password', async ({ homePage, signUp_LoginPage }) => {
   //data
   const email = process.env.VALID_EMAIL || '';
   const password = process.env.VALID_PASSWORD || '';
-  const name = 'vlad';
+  const name = ["vlad", "Petrov"];
 
   //goto
-  await page.goto('/');
-  await page.getByRole('link', { name: 'Signup / Login' }).click();
-  await expect(await page.getByText('Login to your account')).toBeVisible();
+  await homePage.goto();
+  await homePage.gotoSignUpAndLoginPage();
+  await signUp_LoginPage.checkLoginText();
 
   //fill login form
-  const loginForm = await page.locator('form[action="/login"]');
-  await loginForm.getByPlaceholder('Email Address').fill(email);
-  await loginForm.getByPlaceholder('Password').fill(password);
-  await loginForm.getByRole('button', { name: 'Login' }).click();
+  await signUp_LoginPage.fillLoginForm(email,password);
+  await signUp_LoginPage.clickLoginButton();
 
   //verify login
-  await expect(await page.getByText(`Logged in as ${name}`)).toBeVisible();
+  await homePage.checkLoggedInName(name);
 });
 
 /*
@@ -132,23 +108,21 @@ test('Test Case 2: Login User with correct email and password', async ({ page })
 8. Verify error 'Your email or password is incorrect!' is visible
  */
 
-test('Test Case 3: Login User with incorrect email and password', async ({ page }) => {
+test('Test Case 3: Login User with incorrect email and password', async ({ homePage, signUp_LoginPage }) => {
   //data
   const email = 'max12341@gmail.com';
   const password = process.env.VALID_PASSWORD || '';
 
   //goto
-  await page.goto('/');
-  await page.getByRole('link', { name: 'Signup / Login' }).click();
-  await expect(page.getByText('Login to your account')).toBeVisible();
+  await homePage.goto();
+  await homePage.gotoSignUpAndLoginPage();
+  await signUp_LoginPage.checkLoginText();
 
   //fill login form
-  const loginForm = await page.locator('form[action="/login"]');
-  await loginForm.getByPlaceholder('Email Address').fill(email);
-  await loginForm.getByPlaceholder('Password').fill(password);
-  await loginForm.getByRole('button', { name: 'Login' }).click();
+  await signUp_LoginPage.fillLoginForm(email,password);
+  await signUp_LoginPage.clickLoginButton();
 
-  await expect(await page.getByText("Your email or password is incorrect!")).toBeVisible();
+  await signUp_LoginPage.checkIncorectDataMessage();
 });
 
 /*
@@ -164,29 +138,27 @@ test('Test Case 3: Login User with incorrect email and password', async ({ page 
 10. Verify that user is navigated to login page
  */
 
-test('Test Case 4: Logout User', async ({ page }) => {
+test('Test Case 4: Logout User', async ({ homePage, signUp_LoginPage }) => {
   //data
   const email = process.env.VALID_EMAIL || '';
   const password = process.env.VALID_PASSWORD || '';
-  const name = 'vlad';
+  const name = ["vlad", "Petrov"];
 
   //goto
-  await page.goto('/');
-  await page.getByRole('link', { name: 'Signup / Login' }).click();
-  await expect(await page.getByText('Login to your account')).toBeVisible();
+  await homePage.goto();
+  await homePage.gotoSignUpAndLoginPage();
+  await signUp_LoginPage.checkLoginText();
 
   //fill login form
-  const loginForm = await page.locator('form[action="/login"]');
-  await loginForm.getByPlaceholder('Email Address').fill(email);
-  await loginForm.getByPlaceholder('Password').fill(password);
-  await loginForm.getByRole('button', { name: 'Login' }).click();
+  await signUp_LoginPage.fillLoginForm(email,password);
+  await signUp_LoginPage.clickLoginButton();
 
   //verify login
-  await expect(await page.getByText(`Logged in as ${name}`)).toBeVisible();
+  await homePage.checkLoggedInName(name);
   
   //logout
-  await page.getByRole('link', { name: 'Logout' }).click();
-  await expect(await page.getByRole('link', { name: 'Signup / Login' })).toBeVisible();
+  await homePage.logout();
+  await homePage.checkHomePageLoad();
 });
 
 /*
@@ -200,22 +172,19 @@ test('Test Case 4: Logout User', async ({ page }) => {
 8. Verify error 'Email Address already exist!' is visible
  */
 
-test('Test Case 5: Register User with existing email', async ({ page }) => {
+test('Test Case 5: Register User with existing email', async ({ homePage, signUp_LoginPage }) => {
   //data
   const name = ['Max', 'Petrov'];
   const email = process.env.VALID_EMAIL || '';
 
   //goto
-  await page.goto("/");
-  await page.getByRole('link', { name: 'Signup / Login' }).click();
-  await expect(await page.getByText('New User Signup!')).toBeVisible();
+  await homePage.goto();
+  await homePage.gotoSignUpAndLoginPage();
+  await signUp_LoginPage.checksignUpText();
 
   //Fill signup form
-  const signupForm = await page.locator('form[action="/signup"]');
-  await signupForm.getByPlaceholder('Name').fill(name[0]);
-  await signupForm.getByPlaceholder('Email Address').fill(email);
-  await signupForm.getByRole('button', { name: 'Signup' }).click();
+  await signUp_LoginPage.fillStartSignUpForm(name,email);
+  await signUp_LoginPage.clickSignUpButton();
 
-  await expect(await page.getByText("Email Address already exist!")).toBeVisible();
+  await signUp_LoginPage.checkExistedDataMessage();
 });
-
