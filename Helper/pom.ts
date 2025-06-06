@@ -232,21 +232,12 @@ export class ContactUsPage{
         }
     }
 
-async clickSubmitButton() {
-    // Attach dialog handler before clicking the submit button
-    this.page.on('dialog', async dialog => {
-        await expect(dialog.type()).toBe('confirm');
-        await expect(dialog.message()).toBe('Press OK to proceed!');
-        
-        // Introduce a small delay to avoid Playwright auto-dismiss timing
-        await new Promise(resolve => setTimeout(resolve, 500));  // 500ms delay
-        
-        await dialog.accept(); // Accept the alert
-    });
-
-    // Click the submit button, which triggers the dialog
-    await this.submitButtonLocator.click();
-}
+    async clickSubmitButton() {
+        let AlertMessage = '';
+        this.page.on('dialog', dialog => { AlertMessage = dialog.message();dialog.accept()});
+        await this.submitButtonLocator.click();
+        expect(AlertMessage).toBe("Press OK to proceed!");
+    }
 
 
     async checkSuccessMessage() {

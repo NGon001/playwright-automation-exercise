@@ -218,6 +218,7 @@ test('Test Case 6: Contact Us Form', async ({ homePage, contactUsPage }) => {
 
   //fill contact us form
   await contactUsPage.fillContactUsForm(name,email,subject,message,filePath);
+  await contactUsPage.page.waitForTimeout(2000);
   await contactUsPage.clickSubmitButton();
 
   //verify success message
