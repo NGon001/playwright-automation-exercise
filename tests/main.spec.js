@@ -43,6 +43,7 @@ test('Test Case 1: Register User', async ({ homePage, signUp_LoginPage,signUpPag
 
   //goto
   await homePage.goto();
+  await homePage.checkHomePageLoad();
   await homePage.gotoSignUpAndLoginPage();
   await signUp_LoginPage.checksignUpText();
 
@@ -86,6 +87,7 @@ test('Test Case 2: Login User with correct email and password', async ({ homePag
 
   //goto
   await homePage.goto();
+  await homePage.checkHomePageLoad();
   await homePage.gotoSignUpAndLoginPage();
   await signUp_LoginPage.checkLoginText();
 
@@ -115,6 +117,7 @@ test('Test Case 3: Login User with incorrect email and password', async ({ homeP
 
   //goto
   await homePage.goto();
+  await homePage.checkHomePageLoad();
   await homePage.gotoSignUpAndLoginPage();
   await signUp_LoginPage.checkLoginText();
 
@@ -158,7 +161,8 @@ test('Test Case 4: Logout User', async ({ homePage, signUp_LoginPage }) => {
   
   //logout
   await homePage.logout();
-  await homePage.checkHomePageLoad();
+  await signUp_LoginPage.checkLoginText();
+  await signUp_LoginPage.checkThatSignUpAndLoginButtonIsVissible();
 });
 
 /*
@@ -179,6 +183,7 @@ test('Test Case 5: Register User with existing email', async ({ homePage, signUp
 
   //goto
   await homePage.goto();
+  await homePage.checkHomePageLoad();
   await homePage.gotoSignUpAndLoginPage();
   await signUp_LoginPage.checksignUpText();
 
@@ -187,4 +192,133 @@ test('Test Case 5: Register User with existing email', async ({ homePage, signUp
   await signUp_LoginPage.clickSignUpButton();
 
   await signUp_LoginPage.checkExistedDataMessage();
+});
+
+/*
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click on 'Contact Us' button
+5. Verify 'GET IN TOUCH' is visible
+6. Enter name, email, subject and message
+7. Upload file
+8. Click 'Submit' button
+9. Click OK button
+10. Verify success message 'Success! Your details have been submitted successfully.' is visible
+11. Click 'Home' button and verify that landed to home page successfully
+ */
+
+test('Test Case 6: Contact Us Form', async ({ homePage, contactUsPage }) => {
+  //data
+  const name = ['Max', 'Petrov'];
+  const email = process.env.VALID_EMAIL || '';
+  const subject = 'Test Subject';
+  const message = 'This is a test message.';
+  const filePath = './README.md';
+
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+  await homePage.gotoContactUsPage();
+  await contactUsPage.checkGetInTouchText();
+
+  //fill contact us form
+  await contactUsPage.fillContactUsForm(name,email,subject,message,filePath);
+  await contactUsPage.page.waitForTimeout(2000);
+  await contactUsPage.clickSubmitButton();
+
+  //verify success message
+  await contactUsPage.checkSuccessMessage();
+  await contactUsPage.clickReturnHomeButton();
+
+  await homePage.checkHomePageLoad();
+});
+
+/*
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click on 'Test Cases' button
+5. Verify user is navigated to test cases page successfully
+*/
+
+test('Test Case 7: Verify Test Cases Page', async ({ homePage,testCasesPage }) => {
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+  await homePage.gotoTestCasesPage();
+
+  await testCasesPage.verifyPageIsVisible();
+});
+
+/*
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click on 'Products' button
+5. Verify user is navigated to ALL PRODUCTS page successfully
+6. The products list is visible
+7. Click on 'View Product' of first product
+8. User is landed to product detail page
+9. Verify that detail detail is visible: product name, category, price, availability, condition, brand
+ */
+
+test('Test Case 8: Verify All Products and product detail page', async ({ homePage, productsPage, productPage }) => {
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+
+  await homePage.gotoProductsPage();
+  await productsPage.checkIfAllProductsTextIsVissible();
+  await productsPage.checkIfProductsExist();
+  await productsPage.clickFirstProductViewProductButton();
+
+  await productPage.verifyThatProductInformationIsVisible();
+});
+
+/*
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click on 'Products' button
+5. Verify user is navigated to ALL PRODUCTS page successfully
+6. Enter product name in search input and click search button
+7. Verify 'SEARCHED PRODUCTS' is visible
+8. Verify all the products related to search are visible
+
+
+// Slightly modified Test Case 9 to strengthen the verification of the product search feature.
+// For each keyword [e.g., "dress", "top", "tshirt"], the test performs a product search.
+// It first checks whether the product names in the search results contain the keyword.
+// If a product's name doesn't match, its link is collected for further validation.
+// The test then opens product detail pages to verify that the product's category includes the keyword.
+// If neither the name nor category matches, the test fails.
+*/
+test('Test Case 9: Search Products', async ({ homePage, productsPage, productPage}) => {
+  //data
+  const productsNames = ["dress","top","tshirt"]; //keyWords
+
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+
+  //go through all productsNames
+  for(const productsName of productsNames){
+    //open ProductsPage
+    await homePage.gotoProductsPage();
+
+    //Verefying page loaded and search products by products name (keyWord)
+    await productsPage.checkIfAllProductsTextIsVissible();
+    await productsPage.searchProducts(productsName);
+    await productsPage.verefyThatProductsSearchComplited();
+
+    //saved links for products when name is not include keyword
+    const productLinks = await productsPage.getLinksOfProductsThatDoNotMatchKeyword(productsName);
+
+    //go through all products links and check if category include keyWord
+    for(const productLink of productLinks){
+      await productsPage.gotoProduct(productLink);
+      await productPage.verifyMatchingCategory(productsName);
+    }
+  }
 });
