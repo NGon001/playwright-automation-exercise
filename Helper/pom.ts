@@ -8,6 +8,9 @@ export class HomePage{
     readonly logedInTextLocator: Locator;
     readonly contactUsButtonLocator: Locator;
     readonly featuredItemsTextLocator: Locator;
+    readonly testCasesButtonLocator: Locator;
+    readonly menuLocator: Locator;
+    readonly productsButtonLocator: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -17,6 +20,9 @@ export class HomePage{
         this.logedInTextLocator = this.page.getByText('Logged in as', { exact: false });
         this.contactUsButtonLocator = this.page.getByRole('link', { name: 'Contact us' });
         this.featuredItemsTextLocator = this.page.getByText('Features Items');
+        this.testCasesButtonLocator = this.page.getByRole("link",{name: "Test Cases"});
+        this.menuLocator = this.page.locator(".col-sm-8");
+        this.productsButtonLocator = this.page.getByRole("link",{name: "Products"});
     }
 
     async goto(){
@@ -42,9 +48,18 @@ export class HomePage{
         await this.deleteButtonLocator.click();
     }
 
+    async gotoTestCasesPage(){
+        const menu = await this.menuLocator;
+        await menu.locator(this.testCasesButtonLocator).click();
+    }
+
     async checkHomePageLoad(){
         await expect(await this.featuredItemsTextLocator).toBeVisible();
         await expect(await this.signUpAndLoginPageLocator).toBeVisible();
+    }
+
+    async gotoProductsPage(){
+        await this.productsButtonLocator.click();
     }
 
     async logout(){
@@ -52,6 +67,146 @@ export class HomePage{
     }
 }
 
+export class ProductsPage{
+    readonly page: Page;
+    readonly allProductsTextLocator: Locator;
+    readonly allProductsItemsLocator: Locator;
+    readonly searchInputLocator: Locator;
+    readonly submitSearchButtonLocator: Locator;
+    readonly searchedProductsTextLocator: Locator;
+
+    constructor(page: Page){
+        this.page = page;
+        this.allProductsTextLocator = this.page.getByText("All Products", {exact: true});
+        this.allProductsItemsLocator = this.page.locator(".features_items .col-sm-4");
+        this.searchInputLocator = this.page.getByPlaceholder("Search Product");
+        this.submitSearchButtonLocator = this.page.locator("#submit_search");
+        this.searchedProductsTextLocator = this.page.getByText("Searched Products");
+    }
+
+    async gotoProduct(link: string){
+        await this.page.goto(link);
+    }
+
+    async checkIfAllProductsTextIsVissible(){
+        await expect(await this.allProductsTextLocator).toBeVisible();
+    }
+
+    async getAllProducts() {
+        return this.allProductsItemsLocator;
+    }
+
+    async checkIfProductsExist() {
+        const products = await this.getAllProducts();
+        await expect(await products.count()).not.toBe(0);
+    }
+
+    async getProductDetailLink(product: Locator){
+        return await product.getByRole("link",{name: "View Product"}).getAttribute("href");
+    }
+
+    async clickViewProductButton(product: Locator){
+        await product.getByRole("link",{name: "View Product"}).click();
+    }
+
+    async clickFirstProductViewProductButton(){
+        const products = await this.getAllProducts();
+        await this.clickViewProductButton(products.nth(0));
+    }
+
+    async verefyThatProductsSearchComplited(){
+        await expect(this.searchedProductsTextLocator).toBeVisible();
+    }
+
+    async searchProducts(productsName: string){
+        await this.searchInputLocator.fill(productsName);
+        await this.submitSearchButtonLocator.click();
+    }
+
+    async checkIfProductNameIsMatchingWithKeyWord(product: Locator,keyWord: string){
+        const productName = await product.locator("p").first().textContent() ?? "";
+        return productName.toLowerCase().includes(keyWord.toLowerCase());
+    }
+
+    async verifyPassedProducts(productCount,expectProductCount){
+        await expect(productCount).toBe(expectProductCount);
+    }
+
+    async getLinksOfProductsThatDoNotMatchKeyword(keyWord: string){
+        const products = await this.getAllProducts();
+        let productsLinksToCheck: string[] = [];
+
+        for(const product of await products.all()){
+            if(!await this.checkIfProductNameIsMatchingWithKeyWord(product,keyWord))
+            {
+                const productDetailLink = await this.getProductDetailLink(product) ?? "";
+                await expect(productDetailLink).not.toBe("");
+                productsLinksToCheck.push(productDetailLink);
+            }
+            else{
+                await expect(this.checkIfProductNameIsMatchingWithKeyWord(product,keyWord)).toBeTruthy();
+            }
+        }
+
+        return productsLinksToCheck;
+    }
+}
+
+export class ProductPage{
+    readonly page: Page;
+    readonly productInformationSectionLocator: Locator;
+
+    constructor(page: Page){
+        this.page = page;
+        this.productInformationSectionLocator = this.page.locator(".product-information");
+    }
+
+    async goBack(){
+        this.page.goBack();
+    }
+
+    private async expectTextNotBeNull(...values: string[]) {
+        for(const value of values){
+            //console.log(`Currennt valueCheck: ${value}`);
+            await expect(value).not.toBe("");
+        }
+    }
+
+    async getProductCategory(){
+        return await this.productInformationSectionLocator.getByText("Category:").textContent() || "";
+    }
+
+    async verifyThatProductInformationIsVisible(){
+        const productName = await this.productInformationSectionLocator.locator("h2").textContent() || "";
+        const productCategoryText = await this.getProductCategory();
+        const productPriceText = await this.productInformationSectionLocator.locator("span span").textContent() || "";
+        const productAvailability = await this.productInformationSectionLocator.locator("p",{hasText: "Availability:"}).textContent() || "";
+        const productBrand = await this.productInformationSectionLocator.locator("p",{hasText: "Brand:"}).textContent() || "";
+        const productCondition = await this.productInformationSectionLocator.locator("p",{hasText: "Condition:"}).textContent() || "";
+
+        await this.expectTextNotBeNull(productName,productCategoryText,productPriceText,productAvailability,productBrand,productCondition);
+    }
+
+    async verifyMatchingCategory(keyWord: string) {
+        const productCategory = await this.getProductCategory();
+        const isMatching = productCategory.toLowerCase().includes(keyWord.toLowerCase());
+        await expect(isMatching).toBeTruthy();
+    }
+}
+
+export class TestCasesPage{
+    readonly page: Page;
+    readonly testCasePageTextCheckLocator: Locator;
+
+    constructor(page: Page){
+        this.page = page;
+        this.testCasePageTextCheckLocator = this.page.getByText("Below is the list of test Cases");
+    }
+
+    async verifyPageIsVisible(){
+        await expect(await this.testCasePageTextCheckLocator).toBeVisible();
+    }
+}
 
 export class SignUp_LoginPage{
     readonly page: Page;
@@ -63,6 +218,7 @@ export class SignUp_LoginPage{
     readonly singUpTextLocator: Locator;
     readonly incorectDataMessageLocator: Locator;
     readonly exestedDataMessageLocator: Locator;
+    readonly signUpAndLoginPageLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -74,6 +230,11 @@ export class SignUp_LoginPage{
         this.singUpTextLocator = this.page.getByText('New User Signup!');
         this.incorectDataMessageLocator = this.page.getByText("Your email or password is incorrect!");
         this.exestedDataMessageLocator = this.page.getByText("Email Address already exist!");
+        this.signUpAndLoginPageLocator = this.page.getByRole('link', { name: 'Signup / Login' });
+    }
+
+    async checkThatSignUpAndLoginButtonIsVissible(){
+        await expect(await this.signUpAndLoginPageLocator).toBeVisible();
     }
 
     async fillStartSignUpForm(fullName, email){
