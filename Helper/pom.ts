@@ -11,6 +11,11 @@ export class HomePage{
     readonly testCasesButtonLocator: Locator;
     readonly menuLocator: Locator;
     readonly productsButtonLocator: Locator;
+    readonly subscriptionTextLocator: Locator;
+    readonly subscriptionEmailInputLocator: Locator;
+    readonly subscribeButtonLocator: Locator;
+    readonly subscribeMessage: Locator;
+    readonly cartButtonLocator: Locator;
 
     constructor(page: Page) {
         this.page = page;
@@ -23,6 +28,11 @@ export class HomePage{
         this.testCasesButtonLocator = this.page.getByRole("link",{name: "Test Cases"});
         this.menuLocator = this.page.locator(".col-sm-8");
         this.productsButtonLocator = this.page.getByRole("link",{name: "Products"});
+        this.subscriptionTextLocator = this.page.getByText("Subscription");
+        this.subscriptionEmailInputLocator = this.page.getByPlaceholder("Your email address");
+        this.subscribeButtonLocator = this.page.locator("#subscribe");
+        this.subscribeMessage = this.page.getByText("You have been successfully subscribed!");
+        this.cartButtonLocator = this.page.getByRole("link",{name: "Cart"});
     }
 
     async goto(){
@@ -65,6 +75,52 @@ export class HomePage{
     async logout(){
        await this.logoutButtonLocator.click();
     }
+
+    async verifySubscriptionText(){
+        await expect(await this.subscriptionTextLocator).toBeVisible();
+    }
+
+    async inputValueToSubscriptionEmailField(email: string){
+        await this.subscriptionEmailInputLocator.fill(email);
+        await this.subscribeButtonLocator.click();
+    }
+
+    async checkSuccesSubscriptionMessage(){
+        await expect(await this.subscribeMessage).toBeVisible();
+    }
+
+    async gotoCart(){
+        await this.cartButtonLocator.click();
+    }
+}
+
+export class CartPage{
+    readonly page: Page;
+    readonly subscriptionTextLocator: Locator;
+    readonly subscriptionEmailInputLocator: Locator;
+    readonly subscribeButtonLocator: Locator;
+    readonly subscribeMessage: Locator;
+
+    constructor(page: Page){
+        this.page = page;
+        this.subscriptionTextLocator = this.page.getByText("Subscription");
+        this.subscriptionEmailInputLocator = this.page.getByPlaceholder("Your email address");
+        this.subscribeButtonLocator = this.page.locator("#subscribe");
+        this.subscribeMessage = this.page.getByText("You have been successfully subscribed!");
+    }
+
+    async verifySubscriptionText(){
+        await expect(await this.subscriptionTextLocator).toBeVisible();
+    }
+
+    async inputValueToSubscriptionEmailField(email: string){
+        await this.subscriptionEmailInputLocator.fill(email);
+        await this.subscribeButtonLocator.click();
+    }
+
+    async checkSuccesSubscriptionMessage(){
+        await expect(await this.subscribeMessage).toBeVisible();
+    }
 }
 
 export class ProductsPage{
@@ -74,6 +130,8 @@ export class ProductsPage{
     readonly searchInputLocator: Locator;
     readonly submitSearchButtonLocator: Locator;
     readonly searchedProductsTextLocator: Locator;
+    readonly cartModelContinueShoppingButton: Locator;
+    readonly cartModelViewCartButton: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -82,6 +140,8 @@ export class ProductsPage{
         this.searchInputLocator = this.page.getByPlaceholder("Search Product");
         this.submitSearchButtonLocator = this.page.locator("#submit_search");
         this.searchedProductsTextLocator = this.page.getByText("Searched Products");
+        this.cartModelContinueShoppingButton = this.page.getByRole("button",{name: "Continue Shopping"});
+        this.cartModelViewCartButton = this.page.getByRole("link",{name: "View Cart"});
     }
 
     async gotoProduct(link: string){
@@ -149,6 +209,30 @@ export class ProductsPage{
         }
 
         return productsLinksToCheck;
+    }
+
+    private async hoverToProduct(product: Locator){
+        await product.hover();
+    }
+
+    private async clickAddToCartInOverlayContent(product: Locator){
+        await this.hoverToProduct(product);
+        const overlayContent = await product.locator(".overlay-content");
+        await overlayContent.locator("a.btn.add-to-cart").click();
+    }
+
+    async addToCartProductByIndex(index){
+        const products = await this.getAllProducts();
+        await expect(await products.count()).not.toBe(0);
+        await this.clickAddToCartInOverlayContent(products.nth(index));
+    }
+
+    async clickContinueShoppingButton(){
+        await this.cartModelContinueShoppingButton.click();
+    }
+
+    async clickViewCartButton(){
+        await this.cartModelViewCartButton.click();
     }
 }
 
