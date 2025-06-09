@@ -38,7 +38,7 @@ export class HomePage{
     }
 
     async goto(){
-        await this.page.goto("/");
+        await this.page.goto("/", { waitUntil: "domcontentloaded" });
     }
 
     async gotoSignUpAndLoginPage(){
@@ -159,7 +159,10 @@ export class ProductsPage{
     readonly viewProductLinkLocator: (product: Locator) => Locator;
     readonly overlayContentLocator: (product: Locator) => Locator;
     readonly overlayContentAddProductButtonLocator: (overlayContent: Locator) => Locator;
-    readonly singleProductHoverLocator: (product: Locator) => Locator;
+    readonly productOverlayHoverLocator: (product: Locator) => Locator;
+    readonly productViewProductButtonLocator: (product: Locator) => Locator;
+    readonly productNameTextLocator: (product: Locator) => Locator;
+    readonly productPriceTextLocator: (product: Locator) => Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -173,7 +176,10 @@ export class ProductsPage{
         this.viewProductLinkLocator = (product: Locator) => product.getByRole("link", { name: "View Product" });
         this.overlayContentLocator = (product: Locator) => product.locator(".overlay-content");
         this.overlayContentAddProductButtonLocator = (overlayContent: Locator) => overlayContent.locator("a.btn.add-to-cart");
-        this.singleProductHoverLocator = (product: Locator) => product.locator(".single-products");
+        this.productOverlayHoverLocator = (product: Locator) => product.locator(".product-overlay");
+        this.productViewProductButtonLocator = (product: Locator) => product.getByRole("link",{name: "View Product"});
+        this.productNameTextLocator = (product: Locator) => product.locator("p").first();
+        this.productPriceTextLocator = (product: Locator) => product.locator("h2").first();
     }
 
     async gotoProduct(link: string){
@@ -194,11 +200,11 @@ export class ProductsPage{
     }
 
     async getProductDetailLink(product: Locator){
-        return await this.viewProductLinkLocator(product).getAttribute("href");
+        return await this.viewProductLinkLocator(await product).getAttribute("href");
     }
 
     async clickViewProductButton(product: Locator){
-        await product.getByRole("link",{name: "View Product"}).click();
+        await this.productViewProductButtonLocator(await product).click();
     }
 
     async clickFirstProductViewProductButton(){
@@ -207,16 +213,20 @@ export class ProductsPage{
     }
 
     async verefyThatProductsSearchComplited(){
-        await expect(this.searchedProductsTextLocator).toBeVisible();
+        await expect(this.searchedProductsTextLocator).toBeVisible({timeout: 500});
     }
 
     async searchProducts(productsName: string){
-        await this.searchInputLocator.fill(productsName);
-        await this.submitSearchButtonLocator.click();
+        await expect(async() =>{
+            await this.searchInputLocator.clear();
+            await this.searchInputLocator.fill(productsName);
+            await this.submitSearchButtonLocator.click();
+            await this.verefyThatProductsSearchComplited();
+        }).toPass();
     }
 
     async checkIfProductNameIsMatchingWithKeyWord(product: Locator,keyWord: string){
-        const productName = await product.locator("p").first().textContent() ?? "";
+        const productName = await this.productNameTextLocator(await product).textContent() ?? "";
         return productName.toLowerCase().includes(keyWord.toLowerCase());
     }
 
@@ -247,8 +257,16 @@ export class ProductsPage{
         await product.hover({ force: true });
     }
 
+
     private async clickAddToCartInOverlayContent(product: Locator){
-        await this.hoverToProduct(await this.singleProductHoverLocator(product));
+        await expect(async() => {
+            await product.scrollIntoViewIfNeeded();
+            await this.hoverToProduct(product);
+            await this.page.waitForTimeout(600);  // 500ms(how long is animation) + small buffer
+            const overlayContent = await this.overlayContentLocator(product);
+            await expect(await this.overlayContentAddProductButtonLocator(overlayContent)).toBeVisible({timeout: 500});
+        }).toPass({timeout: 30000});
+
         const overlayContent = await this.overlayContentLocator(product);
         await this.overlayContentAddProductButtonLocator(overlayContent).click();
     }
@@ -257,8 +275,10 @@ export class ProductsPage{
         const products = await this.getAllProducts();
         await expect(await products.count()).not.toBe(0);
         const product = await products.nth(index);
-        const name = await product.locator("p").first().textContent() ?? "";
-        const priceFloat = await textPriceToFloat(await product.locator("h2").first().textContent() ?? "");
+        const name = await this.productNameTextLocator(await product).textContent() ?? "";
+        const priceFloat = await textPriceToFloat(await this.productPriceTextLocator(await product).textContent() ?? "");
+        await expect(name).not.toBe("");
+        await expect(priceFloat).not.toBe(0 || null || "");
         await this.clickAddToCartInOverlayContent(products.nth(index));
         return {name: name, price: priceFloat};
     }
@@ -279,10 +299,22 @@ export class ProductsPage{
 export class ProductPage{
     readonly page: Page;
     readonly productInformationSectionLocator: Locator;
+    readonly prductInformationSectionCategoryLocator: (productInformationSection: Locator) => Locator;
+    readonly prductInformationSectionPriceLocator: (productInformationSection: Locator) => Locator;
+    readonly prductInformationSectionAvailabilityLocator: (productInformationSection: Locator) => Locator;
+    readonly prductInformationNameLocator: (productInformationSection: Locator) => Locator;
+    readonly prductInformationSectionBrandLocator: (productInformationSection: Locator) => Locator;
+    readonly prductInformationSectionConditionLocator: (productInformationSection: Locator) => Locator;
 
     constructor(page: Page){
         this.page = page;
         this.productInformationSectionLocator = this.page.locator(".product-information");
+        this.prductInformationSectionCategoryLocator = (productInformationSection: Locator) => productInformationSection.getByText("Category:");
+        this.prductInformationSectionPriceLocator = (productInformationSection: Locator) => productInformationSection.locator("span span");
+        this.prductInformationSectionAvailabilityLocator = (productInformationSection: Locator) => productInformationSection.locator("p",{hasText: "Availability:"});
+        this.prductInformationNameLocator = (productInformationSection: Locator) => productInformationSection.locator("h2");
+        this.prductInformationSectionBrandLocator = (productInformationSection: Locator) => productInformationSection.locator("p",{hasText: "Brand:"});
+        this.prductInformationSectionConditionLocator = (productInformationSection: Locator) => productInformationSection.locator("p",{hasText: "Condition:"});
     }
 
     async goBack(){
@@ -291,28 +323,32 @@ export class ProductPage{
 
     private async expectTextNotBeNull(...values: string[]) {
         for(const value of values){
-            //console.log(`Currennt valueCheck: ${value}`);
             await expect(value).not.toBe("");
         }
     }
 
     async getProductCategory(){
-        return await this.productInformationSectionLocator.getByText("Category:").textContent() || "";
+        return await this.prductInformationSectionCategoryLocator(await this.productInformationSectionLocator).textContent() || "";
     }
+
     async getProductPriceText(){
-        return await this.productInformationSectionLocator.locator("span span").textContent() || "";
+        return await this.prductInformationSectionPriceLocator(await this.productInformationSectionLocator).textContent() || "";
     }
+
     async getProductAvailability(){
-        return await this.productInformationSectionLocator.locator("p",{hasText: "Availability:"}).textContent() || "";
+        return await this.prductInformationSectionAvailabilityLocator(await this.productInformationSectionLocator).textContent() || "";
     }
+
     async getProductBrand(){
-        return await this.productInformationSectionLocator.locator("p",{hasText: "Brand:"}).textContent() || "";
+        return await this.prductInformationSectionBrandLocator(await this.productInformationSectionLocator).textContent() || "";
     }
+
     async getProductCondition(){
-        return await this.productInformationSectionLocator.locator("p",{hasText: "Condition:"}).textContent() || "";
+        return await this.prductInformationSectionConditionLocator(await this.productInformationSectionLocator).textContent() || "";
     }
+
     async getProductName(){
-        return await this.productInformationSectionLocator.locator("h2").textContent() || "";
+        return await this.prductInformationNameLocator(await this.productInformationSectionLocator).textContent() || "";
     }
 
     async verifyThatProductInformationIsVisible(){
@@ -358,6 +394,9 @@ export class SignUp_LoginPage{
     readonly incorectDataMessageLocator: Locator;
     readonly exestedDataMessageLocator: Locator;
     readonly signUpAndLoginPageLocator: Locator;
+    readonly FormNameInputLocator: (signUpForm: Locator) => Locator;
+    readonly FormEmailInputLocator: (signUpForm: Locator) => Locator;
+    readonly FormPasswordnputLocator: (signUpForm: Locator) => Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -370,6 +409,9 @@ export class SignUp_LoginPage{
         this.incorectDataMessageLocator = this.page.getByText("Your email or password is incorrect!");
         this.exestedDataMessageLocator = this.page.getByText("Email Address already exist!");
         this.signUpAndLoginPageLocator = this.page.getByRole('link', { name: 'Signup / Login' });
+        this.FormNameInputLocator = (Form: Locator) => Form.getByPlaceholder('Name');
+        this.FormEmailInputLocator = (Form: Locator) => Form.getByPlaceholder('Email Address');
+        this.FormPasswordnputLocator = (Form: Locator) => Form.getByPlaceholder('Password');
     }
 
     async checkThatSignUpAndLoginButtonIsVissible(){
@@ -377,13 +419,13 @@ export class SignUp_LoginPage{
     }
 
     async fillStartSignUpForm(fullName, email){
-        await this.signUpFormLocator.getByPlaceholder('Name').fill(fullName[0]);
-        await this.signUpFormLocator.getByPlaceholder('Email Address').fill(email);
+        await this.FormNameInputLocator(await this.signUpFormLocator).fill(fullName[0]);
+        await this.FormEmailInputLocator(await this.signUpFormLocator).fill(email);
     }
 
     async fillLoginForm(email,password){
-        await this.loginFormLocator.getByPlaceholder('Email Address').fill(email);
-        await this.loginFormLocator.getByPlaceholder('Password').fill(password);
+        await this.FormEmailInputLocator(await this.loginFormLocator).fill(email);
+        await this.FormPasswordnputLocator(await this.loginFormLocator).fill(password);
     }
 
     async checkLoginText(){
@@ -414,38 +456,74 @@ export class SignUpPage{
     readonly nameFieldLocator: Locator;
     readonly emailFieldLocator: Locator;
     readonly createAccountButton:Locator;
+    readonly enterAccountInfTextLocator: Locator;
+    readonly fillFormRadioTitleLocator: (Title: string) => Locator;
+    readonly fillFormPasswordLocator: Locator;
+    readonly fillFormDayOptionLocator: Locator;
+    readonly fillFormMonthOptionLocator: Locator;
+    readonly fillFormYearOptionLocator: Locator;
+    readonly fillFormSignUpNewsletterLocator: Locator;
+    readonly fillFormSignUpOffersLocator: Locator;
+    readonly fillFormFirstNameInputLocator: Locator;
+    readonly fillFormLastNameInputLocator: Locator;
+    readonly fillFormCompanyInputLocator: Locator;
+    readonly fillFormAddress1InputLocator: Locator;
+    readonly fillFormAddress2InputLocator: Locator;
+    readonly fillFormCountryOptionLocator: Locator;
+    readonly fillFormStateInputLocator: Locator;
+    readonly fillFormCityInputLocator: Locator;
+    readonly fillFormZipcodeInputLocator: Locator;
+    readonly fillFormMobileNumberInputLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
         this.nameFieldLocator = this.page.locator("#name");
         this.emailFieldLocator = this.page.locator("#email");
         this.createAccountButton = this.page.getByRole('button', { name: 'Create Account' });
+        this.enterAccountInfTextLocator = this.page.getByText('Enter Account Information');
+        this.fillFormRadioTitleLocator = (Title: string) => this.page.getByRole('radio', { name: Title });
+        this.fillFormPasswordLocator = this.page.locator('#password');
+        this.fillFormDayOptionLocator = this.page.locator('#days');
+        this.fillFormMonthOptionLocator = this.page.locator('#months');
+        this.fillFormYearOptionLocator = this.page.locator('#years');
+        this.fillFormSignUpNewsletterLocator = this.page.getByRole('checkbox', { name: 'Sign up for our newsletter!' });
+        this.fillFormSignUpOffersLocator = this.page.getByRole('checkbox', { name: 'Receive special offers from our partners!' });
+        this.fillFormFirstNameInputLocator = this.page.locator('#first_name');
+        this.fillFormLastNameInputLocator = this.page.locator('#last_name');
+        this.fillFormCompanyInputLocator = this.page.locator('#company');
+        this.fillFormAddress1InputLocator = this.page.locator('#address1');
+        this.fillFormAddress2InputLocator = this.page.locator('#address2');
+        this.fillFormCountryOptionLocator = this.page.getByRole('combobox', { name: 'Country' });
+        this.fillFormStateInputLocator = this.page.locator('#state');
+        this.fillFormCityInputLocator = this.page.locator('#city');
+        this.fillFormZipcodeInputLocator = this.page.locator('#zipcode');
+        this.fillFormMobileNumberInputLocator = this.page.locator('#mobile_number');
     }
 
     async checkDataInForm(fullName, email){
-        await expect(await this.page.getByText('Enter Account Information')).toBeVisible();
+        await expect(await this.enterAccountInfTextLocator).toBeVisible();
         await expect(await this.nameFieldLocator.getAttribute('value')).toBe(fullName[0]);
         await expect(await this.emailFieldLocator.getAttribute('value')).toBe(email);   
     }
 
     async fillSignUpForm(Title,fullName,password,BirthDay,BirthMonth,BirthYear,companyName,Address,Address2,Country,State,City,Zipcode,mobileNumber){
-        await this.page.getByRole('radio', { name: Title }).check();
-        await this.page.locator('#password').fill(password);
-        await this.page.locator('#days').selectOption({ label: BirthDay });
-        await this.page.locator('#months').selectOption({ label: BirthMonth });
-        await this.page.locator('#years').selectOption({ label: BirthYear });
-        await this.page.getByRole('checkbox', { name: 'Sign up for our newsletter!' }).check();
-        await this.page.getByRole('checkbox', { name: 'Receive special offers from our partners!' }).check();
-        await this.page.locator('#first_name').fill(fullName[0]);
-        await this.page.locator('#last_name').fill(fullName[1]);
-        await this.page.locator('#company').fill(companyName);
-        await this.page.locator('#address1').fill(Address);
-        await this.page.locator('#address2').fill(Address2);
-        await this.page.getByRole('combobox', { name: 'Country' }).selectOption({ label: Country });
-        await this.page.locator('#state').fill(State);
-        await this.page.locator('#city').fill(City);
-        await this.page.locator('#zipcode').fill(Zipcode);
-        await this.page.locator('#mobile_number').fill(mobileNumber);
+        await this.fillFormRadioTitleLocator(Title).check();
+        await this.fillFormPasswordLocator.fill(password);
+        await this.fillFormDayOptionLocator.selectOption({ label: BirthDay });
+        await this.fillFormMonthOptionLocator.selectOption({ label: BirthMonth });
+        await this.fillFormYearOptionLocator.selectOption({ label: BirthYear });
+        await this.fillFormSignUpNewsletterLocator.check();
+        await this.fillFormSignUpOffersLocator.check();
+        await this.fillFormFirstNameInputLocator.fill(fullName[0]);
+        await this.fillFormLastNameInputLocator.fill(fullName[1]);
+        await this.fillFormCompanyInputLocator.fill(companyName);
+        await this.fillFormAddress1InputLocator.fill(Address);
+        await this.fillFormAddress2InputLocator.fill(Address2);
+        await this.fillFormCountryOptionLocator.selectOption({ label: Country });
+        await this.fillFormStateInputLocator.fill(State);
+        await this.fillFormCityInputLocator.fill(City);
+        await this.fillFormZipcodeInputLocator.fill(Zipcode);
+        await this.fillFormMobileNumberInputLocator.fill(mobileNumber);
     }
 
     async clickCreateAccountButton(){
