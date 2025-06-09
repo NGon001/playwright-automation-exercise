@@ -1,4 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test";
+import {textPriceToFloat} from "./tools.ts"
 
 export class HomePage{
     readonly page: Page;
@@ -16,6 +17,7 @@ export class HomePage{
     readonly subscribeButtonLocator: Locator;
     readonly subscribeMessage: Locator;
     readonly cartButtonLocator: Locator;
+
 
     constructor(page: Page) {
         this.page = page;
@@ -95,11 +97,16 @@ export class HomePage{
 }
 
 export class CartPage{
+    readonly productPriceTextSelector = ".cart_price p";
+    readonly productQuantityTextSelector = ".cart_quantity button";
+    readonly productNameTextSelector = "h4";
+
     readonly page: Page;
     readonly subscriptionTextLocator: Locator;
     readonly subscriptionEmailInputLocator: Locator;
     readonly subscribeButtonLocator: Locator;
     readonly subscribeMessage: Locator;
+    readonly productsListLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -107,6 +114,7 @@ export class CartPage{
         this.subscriptionEmailInputLocator = this.page.getByPlaceholder("Your email address");
         this.subscribeButtonLocator = this.page.locator("#subscribe");
         this.subscribeMessage = this.page.getByText("You have been successfully subscribed!");
+        this.productsListLocator = this.page.locator("#cart_info_table tbody tr");
     }
 
     async verifySubscriptionText(){
@@ -121,6 +129,22 @@ export class CartPage{
     async checkSuccesSubscriptionMessage(){
         await expect(await this.subscribeMessage).toBeVisible();
     }
+
+    async getProductsList(){
+        return await this.productsListLocator;
+    }
+
+    async checkProductInfoByIndex(index: number, name: string, price: number, quantity: number){
+        const products = await this.getProductsList();
+        const product = await products.nth(index);
+        const productName = await product.locator(this.productNameTextSelector).textContent();
+        const productPrice = await textPriceToFloat(await product.locator(this.productPriceTextSelector).textContent() ?? "");
+        const productQuantity = parseInt(await product.locator(this.productQuantityTextSelector).textContent() ?? "");
+        
+        await expect(productName).toBe(name);
+        await expect(productPrice).toBe(price);
+        await expect(productQuantity).toBe(quantity);
+    }
 }
 
 export class ProductsPage{
@@ -132,6 +156,10 @@ export class ProductsPage{
     readonly searchedProductsTextLocator: Locator;
     readonly cartModelContinueShoppingButton: Locator;
     readonly cartModelViewCartButton: Locator;
+    readonly viewProductLinkLocator: (product: Locator) => Locator;
+    readonly overlayContentLocator: (product: Locator) => Locator;
+    readonly overlayContentAddProductButtonLocator: (overlayContent: Locator) => Locator;
+    readonly singleProductHoverLocator: (product: Locator) => Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -142,6 +170,10 @@ export class ProductsPage{
         this.searchedProductsTextLocator = this.page.getByText("Searched Products");
         this.cartModelContinueShoppingButton = this.page.getByRole("button",{name: "Continue Shopping"});
         this.cartModelViewCartButton = this.page.getByRole("link",{name: "View Cart"});
+        this.viewProductLinkLocator = (product: Locator) => product.getByRole("link", { name: "View Product" });
+        this.overlayContentLocator = (product: Locator) => product.locator(".overlay-content");
+        this.overlayContentAddProductButtonLocator = (overlayContent: Locator) => overlayContent.locator("a.btn.add-to-cart");
+        this.singleProductHoverLocator = (product: Locator) => product.locator(".single-products");
     }
 
     async gotoProduct(link: string){
@@ -162,7 +194,7 @@ export class ProductsPage{
     }
 
     async getProductDetailLink(product: Locator){
-        return await product.getByRole("link",{name: "View Product"}).getAttribute("href");
+        return await this.viewProductLinkLocator(product).getAttribute("href");
     }
 
     async clickViewProductButton(product: Locator){
@@ -212,19 +244,23 @@ export class ProductsPage{
     }
 
     private async hoverToProduct(product: Locator){
-        await product.hover();
+        await product.hover({ force: true });
     }
 
     private async clickAddToCartInOverlayContent(product: Locator){
-        await this.hoverToProduct(product);
-        const overlayContent = await product.locator(".overlay-content");
-        await overlayContent.locator("a.btn.add-to-cart").click();
+        await this.hoverToProduct(await this.singleProductHoverLocator(product));
+        const overlayContent = await this.overlayContentLocator(product);
+        await this.overlayContentAddProductButtonLocator(overlayContent).click();
     }
 
-    async addToCartProductByIndex(index){
+    async addToCartProductByIndex(index): Promise<{ name: string; price: number }> {
         const products = await this.getAllProducts();
         await expect(await products.count()).not.toBe(0);
+        const product = await products.nth(index);
+        const name = await product.locator("p").first().textContent() ?? "";
+        const priceFloat = await textPriceToFloat(await product.locator("h2").first().textContent() ?? "");
         await this.clickAddToCartInOverlayContent(products.nth(index));
+        return {name: name, price: priceFloat};
     }
 
     async clickContinueShoppingButton(){
@@ -233,6 +269,10 @@ export class ProductsPage{
 
     async clickViewCartButton(){
         await this.cartModelViewCartButton.click();
+    }
+
+    async addwait(time){
+        await this.page.waitForTimeout(time); 
     }
 }
 
@@ -259,14 +299,29 @@ export class ProductPage{
     async getProductCategory(){
         return await this.productInformationSectionLocator.getByText("Category:").textContent() || "";
     }
+    async getProductPriceText(){
+        return await this.productInformationSectionLocator.locator("span span").textContent() || "";
+    }
+    async getProductAvailability(){
+        return await this.productInformationSectionLocator.locator("p",{hasText: "Availability:"}).textContent() || "";
+    }
+    async getProductBrand(){
+        return await this.productInformationSectionLocator.locator("p",{hasText: "Brand:"}).textContent() || "";
+    }
+    async getProductCondition(){
+        return await this.productInformationSectionLocator.locator("p",{hasText: "Condition:"}).textContent() || "";
+    }
+    async getProductName(){
+        return await this.productInformationSectionLocator.locator("h2").textContent() || "";
+    }
 
     async verifyThatProductInformationIsVisible(){
-        const productName = await this.productInformationSectionLocator.locator("h2").textContent() || "";
+        const productName = await this.getProductName();
         const productCategoryText = await this.getProductCategory();
-        const productPriceText = await this.productInformationSectionLocator.locator("span span").textContent() || "";
-        const productAvailability = await this.productInformationSectionLocator.locator("p",{hasText: "Availability:"}).textContent() || "";
-        const productBrand = await this.productInformationSectionLocator.locator("p",{hasText: "Brand:"}).textContent() || "";
-        const productCondition = await this.productInformationSectionLocator.locator("p",{hasText: "Condition:"}).textContent() || "";
+        const productPriceText = await this.getProductPriceText();
+        const productAvailability = await this.getProductAvailability();
+        const productBrand = await this.getProductBrand();
+        const productCondition = await this.getProductCondition();
 
         await this.expectTextNotBeNull(productName,productCategoryText,productPriceText,productAvailability,productBrand,productCondition);
     }

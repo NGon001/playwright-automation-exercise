@@ -1,5 +1,5 @@
 import {test as baseTest} from '@playwright/test';
-import { HomePage, SignUp_LoginPage, SignUpPage, AccountCreatedPage, AccountDeletePage,ContactUsPage,TestCasesPage,ProductsPage,ProductPage,CartPage} from './pom';
+import { HomePage, SignUp_LoginPage, SignUpPage, AccountCreatedPage, AccountDeletePage,ContactUsPage,TestCasesPage,ProductsPage,ProductPage,CartPage} from './POM';
 
 
 type MyFixtures = {
