@@ -399,5 +399,13 @@ Test Case 12: Add Products in Cart
 */
 
 test('Test Case 12: Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
-  
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+  await homePage.gotoProductsPage();
+
+  await productsPage.checkIfAllProductsTextIsVissible();
+  await productsPage.addToCartProductByIndex(0);
+  await productsPage.clickContinueShoppingButton();
+  await productsPage.addToCartProductByIndex(1);
+  await productsPage.clickViewCartButton();
 });

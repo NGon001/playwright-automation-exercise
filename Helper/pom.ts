@@ -156,6 +156,7 @@ export class ProductsPage{
     readonly searchedProductsTextLocator: Locator;
     readonly cartModelContinueShoppingButton: Locator;
     readonly cartModelViewCartButton: Locator;
+    readonly productAddToCartTextLocator: Locator;
     readonly viewProductLinkLocator: (product: Locator) => Locator;
     readonly overlayContentLocator: (product: Locator) => Locator;
     readonly overlayContentAddProductButtonLocator: (overlayContent: Locator) => Locator;
@@ -163,6 +164,7 @@ export class ProductsPage{
     readonly productViewProductButtonLocator: (product: Locator) => Locator;
     readonly productNameTextLocator: (product: Locator) => Locator;
     readonly productPriceTextLocator: (product: Locator) => Locator;
+    readonly productImageLocator: (product: Locator) => Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -180,6 +182,8 @@ export class ProductsPage{
         this.productViewProductButtonLocator = (product: Locator) => product.getByRole("link",{name: "View Product"});
         this.productNameTextLocator = (product: Locator) => product.locator("p").first();
         this.productPriceTextLocator = (product: Locator) => product.locator("h2").first();
+        this.productImageLocator = (product: Locator) => product.locator("img");
+        this.productAddToCartTextLocator = this.page.getByText("Your product has been added to cart.");
     }
 
     async gotoProduct(link: string){
@@ -254,21 +258,17 @@ export class ProductsPage{
     }
 
     private async hoverToProduct(product: Locator){
-        await product.hover({ force: true });
+        await product.hover();
     }
 
 
     private async clickAddToCartInOverlayContent(product: Locator){
-        await expect(async() => {
-            await product.scrollIntoViewIfNeeded();
-            await this.hoverToProduct(product);
-            await this.page.waitForTimeout(600);  // 500ms(how long is animation) + small buffer
-            const overlayContent = await this.overlayContentLocator(product);
-            await expect(await this.overlayContentAddProductButtonLocator(overlayContent)).toBeVisible({timeout: 500});
-        }).toPass({timeout: 30000});
-
-        const overlayContent = await this.overlayContentLocator(product);
+        await this.hoverToProduct(await this.productImageLocator(await product));
+        await product.evaluate(e => Promise.all(e.getAnimations({ subtree: true }).map(animation => animation.finished)));
+        const overlayContent = await this.overlayContentLocator(await product);
+        await expect(overlayContent).toBeVisible();
         await this.overlayContentAddProductButtonLocator(overlayContent).click();
+        await expect(this.productAddToCartTextLocator).toBeVisible();
     }
 
     async addToCartProductByIndex(index): Promise<{ name: string; price: number }> {
