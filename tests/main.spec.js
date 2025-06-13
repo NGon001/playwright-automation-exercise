@@ -3,6 +3,14 @@ import {generateRandomEmail} from '../Helper/tools.ts';
 import dotenv from 'dotenv';
 dotenv.config();
 
+test.beforeEach(async ({ context }) => {
+    await context.route("**/*", route => {
+      route.request().url().startsWith("https://googleads.") ?
+      route.abort() : route.continue();
+      return;
+    })
+});
+
 /*
 1. Launch browser
 2. Navigate to url 'http://automationexercise.com'
@@ -294,6 +302,8 @@ test('Test Case 8: Verify All Products and product detail page', async ({ homePa
 // The test then opens product detail pages to verify that the product's category includes the keyword.
 // If neither the name nor category matches, the test fails.
 */
+
+
 test('Test Case 9: Search Products', async ({ homePage, productsPage, productPage}) => {
   //data
   const productsNames = ["dress","top","tshirt"]; //keyWords
@@ -321,4 +331,89 @@ test('Test Case 9: Search Products', async ({ homePage, productsPage, productPag
       await productPage.verifyMatchingCategory(productsName);
     }
   }
+});
+
+
+/*
+Test Case 10: Verify Subscription in home page
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Scroll down to footer
+5. Verify text 'SUBSCRIPTION'
+6. Enter email address in input and click arrow button
+7. Verify success message 'You have been successfully subscribed!' is visible
+*/
+
+test('Test Case 10: Verify Subscription in home page', async ({ homePage }) => {
+  //data
+  const email = process.env.VALID_EMAIL;
+
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+  await homePage.verifySubscriptionText();
+
+  await homePage.inputValueToSubscriptionEmailField(email);
+  await homePage.checkSuccesSubscriptionMessage();
+});
+
+/*
+Test Case 11: Verify Subscription in Cart page
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click 'Cart' button
+5. Scroll down to footer
+6. Verify text 'SUBSCRIPTION'
+7. Enter email address in input and click arrow button
+8. Verify success message 'You have been successfully subscribed!' is visible
+*/
+
+test('Test Case 11: Verify Subscription in Cart page', async ({ homePage,cartPage }) => {
+  //data
+  const email = process.env.VALID_EMAIL;
+
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+
+  await homePage.gotoCart();
+  await cartPage.verifySubscriptionText();
+
+  await cartPage.inputValueToSubscriptionEmailField(email);
+  await cartPage.checkSuccesSubscriptionMessage();
+});
+
+/*
+Test Case 12: Add Products in Cart 
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click 'Products' button
+5. Hover over first product and click 'Add to cart'
+6. Click 'Continue Shopping' button
+7. Hover over second product and click 'Add to cart'
+8. Click 'View Cart' button
+9. Verify both products are added to Cart
+10. Verify their prices, quantity and total price
+*/
+
+test('Test Case 12: Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
+  //data
+  const productQuantity = 1;
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+  await homePage.gotoProductsPage();
+
+  await productsPage.checkIfAllProductsTextIsVissible();
+  await productsPage.checkIfProductsExist();
+  const firstProductInfo = await productsPage.clickProductAddToCartButtonByIndex(0);
+  await productsPage.clickContinueShoppingButton();
+  const secondProductInfo = await productsPage.clickProductAddToCartButtonByIndex(1);
+  await productsPage.clickViewCartButton();
+
+  await cartPage.checkProductInfoByIndex(0,firstProductInfo.name,firstProductInfo.price,productQuantity);
+  await cartPage.checkProductInfoByIndex(1,secondProductInfo.name,secondProductInfo.price,productQuantity);
 });

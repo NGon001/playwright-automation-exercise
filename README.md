@@ -9,6 +9,11 @@ This is a **personal project** created to **practice automation testing** contai
 - GitHub Actions for CI/CD
 
 ---
+## Run tests using the following command:
+```npx playwright test --repeat-each=5 ```
+---
+
+---
 
 ## 🚀 Features Covered
 
@@ -23,6 +28,10 @@ This is a **personal project** created to **practice automation testing** contai
 | ✅ TC7 | Verify Test Cases Page |
 | ✅ TC8 | Verify All Products and product detail page |
 | ✅ TC9 | Search Products |
+| ✅ TC10 | Verify Subscription in home page |
+| ✅ TC11 | Verify Subscription in Cart page |
+| ✅ TC12 | Add Products in Cart |
+=======
 
 
 ## Test Case 1: Register User
@@ -135,5 +144,35 @@ Slightly modified Test Case 9 to strengthen the verification of the product sear
 - The test then opens product detail pages to verify that the product's category includes the keyword.
 - If neither the name nor category matches, the test fails.
 
+## Test Case 10: Verify Subscription in home page
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Scroll down to footer
+5. Verify text 'SUBSCRIPTION'
+6. Enter email address in input and click arrow button
+7. Verify success message 'You have been successfully subscribed!' is visible
+
+## Test Case 11: Verify Subscription in Cart page
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click 'Cart' button
+5. Scroll down to footer
+6. Verify text 'SUBSCRIPTION'
+7. Enter email address in input and click arrow button
+8. Verify success message 'You have been successfully subscribed!' is visible
+
+## Test Case 12: Add Products in Cart 
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click 'Products' button
+5. Hover over first product and click 'Add to cart'
+6. Click 'Continue Shopping' button
+7. Hover over second product and click 'Add to cart'
+8. Click 'View Cart' button
+9. Verify both products are added to Cart
+10. Verify their prices, quantity and total price
 
 ---
