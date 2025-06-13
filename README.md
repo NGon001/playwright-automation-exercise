@@ -31,6 +31,7 @@ This is a **personal project** created to **practice automation testing** contai
 | ✅ TC10 | Verify Subscription in home page |
 | ✅ TC11 | Verify Subscription in Cart page |
 | ✅ TC12 | Add Products in Cart |
+=======
 
 
 ## Test Case 1: Register User
