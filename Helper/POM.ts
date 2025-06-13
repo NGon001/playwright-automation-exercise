@@ -41,6 +41,10 @@ export class HomePage{
         await this.page.goto("/", { waitUntil: "domcontentloaded" });
     }
 
+    async goto(){
+        await this.page.goto("/");
+    }
+
     async gotoSignUpAndLoginPage(){
         await this.signUpAndLoginPageLocator.click();
     }
@@ -209,6 +213,11 @@ export class ProductsPage{
 
     async clickViewProductButton(product: Locator){
         await this.productViewProductButtonLocator(await product).click();
+        return await product.getByRole("link",{name: "View Product"}).getAttribute("href");
+    }
+
+    async clickViewProductButton(product: Locator){
+        await product.getByRole("link",{name: "View Product"}).click();
     }
 
     async clickFirstProductViewProductButton(){
@@ -231,6 +240,16 @@ export class ProductsPage{
 
     async checkIfProductNameIsMatchingWithKeyWord(product: Locator,keyWord: string){
         const productName = await this.productNameTextLocator(await product).textContent() ?? "";
+        await expect(this.searchedProductsTextLocator).toBeVisible();
+    }
+
+    async searchProducts(productsName: string){
+        await this.searchInputLocator.fill(productsName);
+        await this.submitSearchButtonLocator.click();
+    }
+
+    async checkIfProductNameIsMatchingWithKeyWord(product: Locator,keyWord: string){
+        const productName = await product.locator("p").first().textContent() ?? "";
         return productName.toLowerCase().includes(keyWord.toLowerCase());
     }
 
@@ -314,7 +333,6 @@ export class ProductsPage{
         await expect(await this.cartModelViewCartButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
         await this.cartModelViewCartButton(await this.modalContentLocator).click();
     }
-
 }
 
 export class ProductPage{
@@ -379,7 +397,16 @@ export class ProductPage{
         const productAvailability = await this.getProductAvailability();
         const productBrand = await this.getProductBrand();
         const productCondition = await this.getProductCondition();
+        return await this.productInformationSectionLocator.getByText("Category:").textContent() || "";
+    }
 
+    async verifyThatProductInformationIsVisible(){
+        const productName = await this.productInformationSectionLocator.locator("h2").textContent() || "";
+        const productCategoryText = await this.getProductCategory();
+        const productPriceText = await this.productInformationSectionLocator.locator("span span").textContent() || "";
+        const productAvailability = await this.productInformationSectionLocator.locator("p",{hasText: "Availability:"}).textContent() || "";
+        const productBrand = await this.productInformationSectionLocator.locator("p",{hasText: "Brand:"}).textContent() || "";
+        const productCondition = await this.productInformationSectionLocator.locator("p",{hasText: "Condition:"}).textContent() || "";
         await this.expectTextNotBeNull(productName,productCategoryText,productPriceText,productAvailability,productBrand,productCondition);
     }
 
@@ -447,6 +474,13 @@ export class SignUp_LoginPage{
     async fillLoginForm(email,password){
         await this.FormEmailInputLocator(await this.loginFormLocator).fill(email);
         await this.FormPasswordnputLocator(await this.loginFormLocator).fill(password);
+        await this.signUpFormLocator.getByPlaceholder('Name').fill(fullName[0]);
+        await this.signUpFormLocator.getByPlaceholder('Email Address').fill(email);
+    }
+
+    async fillLoginForm(email,password){
+        await this.loginFormLocator.getByPlaceholder('Email Address').fill(email);
+        await this.loginFormLocator.getByPlaceholder('Password').fill(password);
     }
 
     async checkLoginText(){
@@ -523,6 +557,10 @@ export class SignUpPage{
 
     async checkDataInForm(fullName, email){
         await expect(await this.enterAccountInfTextLocator).toBeVisible();
+    }
+
+    async checkDataInForm(fullName, email){
+        await expect(await this.page.getByText('Enter Account Information')).toBeVisible();
         await expect(await this.nameFieldLocator.getAttribute('value')).toBe(fullName[0]);
         await expect(await this.emailFieldLocator.getAttribute('value')).toBe(email);   
     }
@@ -545,6 +583,23 @@ export class SignUpPage{
         await this.fillFormCityInputLocator.fill(City);
         await this.fillFormZipcodeInputLocator.fill(Zipcode);
         await this.fillFormMobileNumberInputLocator.fill(mobileNumber);
+        await this.page.getByRole('radio', { name: Title }).check();
+        await this.page.locator('#password').fill(password);
+        await this.page.locator('#days').selectOption({ label: BirthDay });
+        await this.page.locator('#months').selectOption({ label: BirthMonth });
+        await this.page.locator('#years').selectOption({ label: BirthYear });
+        await this.page.getByRole('checkbox', { name: 'Sign up for our newsletter!' }).check();
+        await this.page.getByRole('checkbox', { name: 'Receive special offers from our partners!' }).check();
+        await this.page.locator('#first_name').fill(fullName[0]);
+        await this.page.locator('#last_name').fill(fullName[1]);
+        await this.page.locator('#company').fill(companyName);
+        await this.page.locator('#address1').fill(Address);
+        await this.page.locator('#address2').fill(Address2);
+        await this.page.getByRole('combobox', { name: 'Country' }).selectOption({ label: Country });
+        await this.page.locator('#state').fill(State);
+        await this.page.locator('#city').fill(City);
+        await this.page.locator('#zipcode').fill(Zipcode);
+        await this.page.locator('#mobile_number').fill(mobileNumber);
     }
 
     async clickCreateAccountButton(){
