@@ -1,3 +1,4 @@
+import { title } from 'process';
 import { test } from '../Helper/base.ts';
 import {generateRandomEmail} from '../Helper/tools.ts';
 import dotenv from 'dotenv';
@@ -416,4 +417,138 @@ test('Test Case 12: Add Products in Cart', async ({ homePage,productsPage,cartPa
 
   await cartPage.checkProductInfoByIndex(0,firstProductInfo.name,firstProductInfo.price,productQuantity);
   await cartPage.checkProductInfoByIndex(1,secondProductInfo.name,secondProductInfo.price,productQuantity);
+});
+
+/*
+Test Case 13: Verify Product quantity in Cart
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click 'View Product' for any product on home page
+5. Verify product detail is opened
+6. Increase quantity to 4
+7. Click 'Add to cart' button
+8. Click 'View Cart' button
+9. Verify that product is displayed in cart page with exact quantity
+*/
+
+test('Test Case 13: Verify Product quantity in Cart', async ({ homePage,productPage,cartPage }) => {
+  //data 
+  const Quantity = 4;
+  const productIndex = 0;
+
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+  const productInfo = await homePage.clickViewProductButtonByIndex(productIndex);
+  
+  await productPage.setQuantity(Quantity);
+  await productPage.clickAddToCartButton();
+  await productPage.clickViewCartButton();
+
+  await cartPage.checkProductInfoByIndex(productIndex,productInfo.name,productInfo.price,Quantity);
+});
+
+/*
+Test Case 14: Place Order: Register while Checkout
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Add products to cart
+5. Click 'Cart' button
+6. Verify that cart page is displayed
+7. Click Proceed To Checkout
+8. Click 'Register / Login' button
+9. Fill all details in Signup and create account
+10. Verify 'ACCOUNT CREATED!' and click 'Continue' button
+11. Verify ' Logged in as username' at top
+12.Click 'Cart' button
+13. Click 'Proceed To Checkout' button
+14. Verify Address Details and Review Your Order
+15. Enter description in comment text area and click 'Place Order'
+16. Enter payment details: Name on Card, Card Number, CVC, Expiration date
+17. Click 'Pay and Confirm Order' button
+18. Verify success message 'Your order has been placed successfully!'
+19. Click 'Delete Account' button
+20. Verify 'ACCOUNT DELETED!' and click 'Continue' button
+*/
+test('Test Case 14: Place Order: Register while Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  //Profile data
+  const Title = 'Mr.';
+  const name = ['Max', 'Petrov'];
+  const email = await generateRandomEmail();
+  const password = 'max123';
+  const BirthDay = '13';
+  const BirthMonth = 'August';
+  const BirthYear = '2005';
+  const Address = '123 Main St';
+  const Address2 = 'Apt 4B';
+  const Country = 'United States';
+  const State = 'California';
+  const City = 'Los Angeles';
+  const Zipcode = '90001';
+  const companyName = 'Test Company';
+  const mobileNumber = '1234567890';
+
+  //Card data
+  const cardName = 'Max Petrov';
+  const cardNumber = '4111111111111111'; // Visa test card number
+  const cardCVC = '123';
+  const cardExpiryMonth = '08';
+  const cardExpiryYear = '2028';
+
+  //product data
+  const productIndex = 0;
+  const Quantity = 1;
+  const descriptionMessage = "This is test description message.";
+
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+  await homePage.gotoProductsPage();
+
+  await productsPage.checkIfAllProductsTextIsVissible();
+  await productsPage.checkIfProductsExist();
+  const ProductInfo = await productsPage.clickProductAddToCartButtonByIndex(productIndex);
+  await productsPage.clickViewCartButton();
+
+  await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
+  await cartPage.clickProcessButton();
+  await cartPage.clickRegisterAndLoginButton();
+
+  //Fill signup form
+  await signUp_LoginPage.fillStartSignUpForm(name,email);
+  await signUp_LoginPage.clickSignUpButton();
+
+  //Fill detailed signup formr
+  await signUpPage.checkDataInForm(name,email);
+  await signUpPage.fillSignUpForm(Title,name,password,BirthDay,BirthMonth,BirthYear,companyName,Address,Address2,Country,State,City,Zipcode,mobileNumber);
+  await signUpPage.clickCreateAccountButton();
+
+  //verift account was created
+  await accountCreatedPage.checkAccountCreationMessage();
+  await accountCreatedPage.clickContinueButton();
+
+  await homePage.verifyHomepAgeItemsLoaded();
+  await homePage.checkLoggedInName(name);
+  await homePage.gotoCart();
+
+  await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
+  await cartPage.clickProcessButton();
+  await cartPage.verifyDeliveryAddress(Title,name,Address,Address2,Country,State,City,Zipcode,companyName,mobileNumber);
+  await cartPage.verifyBillingAddress(Title,name,Address,Address2,Country,State,City,Zipcode,companyName,mobileNumber);
+  await cartPage.clickPlaceOrderButton();
+
+  await paymentPage.verifyPageLoaded();
+  await paymentPage.fillPaymentForm(name,cardNumber,cardCVC,cardExpiryMonth,cardExpiryYear);
+  await paymentPage.clickPayButton();
+  await paymentPage.verifyOrderPlaced();
+  await paymentPage.clickContinueButton();
+
+  //delete account and verify it
+  await homePage.verifyHomepAgeItemsLoaded();
+  await homePage.clickDeleteAccount();
+  await accountDeletePage.checkAccountDeletedMessage();
+  await accountDeletePage.clickContinueButton();
+  await homePage.checkHomePageLoad();
 });
