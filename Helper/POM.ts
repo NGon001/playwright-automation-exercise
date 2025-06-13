@@ -1,5 +1,6 @@
 import { Locator, Page, expect } from "@playwright/test";
-import {textPriceToFloat} from "./tools.ts"
+import {textPriceToFloat, expectAtLeastOneVisible} from "./tools.ts"
+import { count } from "console";
 
 export class HomePage{
     readonly page: Page;
@@ -17,6 +18,10 @@ export class HomePage{
     readonly subscribeButtonLocator: Locator;
     readonly subscribeMessage: Locator;
     readonly cartButtonLocator: Locator;
+    readonly allProductsItemsLocator: Locator;
+    readonly productViewProductButtonLocator: (product: Locator) => Locator;
+    readonly productNameTextLocator: (product: Locator) => Locator;
+    readonly productPriceTextLocator: (product: Locator) => Locator;
 
 
     constructor(page: Page) {
@@ -34,7 +39,11 @@ export class HomePage{
         this.subscriptionEmailInputLocator = this.page.getByPlaceholder("Your email address");
         this.subscribeButtonLocator = this.page.locator("#subscribe");
         this.subscribeMessage = this.page.getByText("You have been successfully subscribed!");
-        this.cartButtonLocator = this.page.getByRole("link",{name: "Cart"});
+        this.cartButtonLocator = this.page.locator('.col-sm-8 a[href="/view_cart"]');
+        this.allProductsItemsLocator = this.page.locator(".features_items .col-sm-4");
+        this.productViewProductButtonLocator = (product: Locator) => product.getByRole("link",{name: "View Product"});
+        this.productNameTextLocator = (product: Locator) => product.locator("p").first();
+        this.productPriceTextLocator = (product: Locator) => product.locator("h2").first();
     }
 
     async goto(){
@@ -47,6 +56,23 @@ export class HomePage{
 
     async gotoContactUsPage(){
         await this.contactUsButtonLocator.click();
+    }
+
+    async getAllProducts() {
+        return this.allProductsItemsLocator;
+    }
+  
+    async clickViewProductButton(product: Locator){
+        await this.productViewProductButtonLocator(product).click();
+    }
+
+    async clickViewProductButtonByIndex(index: number): Promise<{name: string, price: number}>{
+        const products = await this.getAllProducts();
+        const product = await products.nth(index);
+        const productName = await this.productNameTextLocator(product).textContent() ?? "";
+        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
+        await this.clickViewProductButton(product);
+        return {name: productName, price: productPrice};
     }
 
     async checkLoggedInName(name){
@@ -63,6 +89,10 @@ export class HomePage{
     async gotoTestCasesPage(){
         const menu = await this.menuLocator;
         await menu.locator(this.testCasesButtonLocator).click();
+    }
+
+    async verifyHomepAgeItemsLoaded(){
+        await expect(await this.featuredItemsTextLocator).toBeVisible();
     }
 
     async checkHomePageLoad(){
@@ -97,9 +127,6 @@ export class HomePage{
 }
 
 export class CartPage{
-    readonly productPriceTextSelector = ".cart_price p";
-    readonly productQuantityTextSelector = ".cart_quantity button";
-    readonly productNameTextSelector = "h4";
 
     readonly page: Page;
     readonly subscriptionTextLocator: Locator;
@@ -107,6 +134,24 @@ export class CartPage{
     readonly subscribeButtonLocator: Locator;
     readonly subscribeMessage: Locator;
     readonly productsListLocator: Locator;
+    readonly productQuantityTextLocator: (product: Locator) => Locator;
+    readonly productNameTextLocator: (product: Locator) => Locator;
+    readonly productPriceTextLocator: (product: Locator) => Locator;
+    readonly productPriceTotalTextLocator: (product: Locator) => Locator;
+    readonly processToCheckoutButtonLocator: Locator;
+    readonly modalContentLocator: Locator;
+    readonly modalContentRegisterAndLoginButtonLocator: (modalContent: Locator) => Locator;
+    readonly billingFormName: (form: Locator) => Locator;
+    readonly billingFormAddress: (form: Locator) => Locator;
+    readonly billingFormCityStatePostCode: (form: Locator) => Locator;
+    readonly billingFormCountry: (form: Locator) => Locator;
+    readonly billingFormPhoneNumber: (form: Locator) => Locator;
+    readonly deliveryAdressLocator: Locator;
+    readonly billingAdressLocator: Locator;
+    readonly descriptionInputLocator: Locator;
+    readonly placeOrderButtonLocator: Locator;
+    readonly deliveryTextLocator: Locator;
+    readonly productImageLocator: (product: Locator) => Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -115,6 +160,31 @@ export class CartPage{
         this.subscribeButtonLocator = this.page.locator("#subscribe");
         this.subscribeMessage = this.page.getByText("You have been successfully subscribed!");
         this.productsListLocator = this.page.locator("#cart_info_table tbody tr");
+        this.productQuantityTextLocator = (product: Locator) => product.locator(".cart_quantity button");
+        this.productNameTextLocator = (product: Locator) => product.locator("h4");
+        this.productPriceTextLocator = (product: Locator) => product.locator(".cart_price p");
+        this.productPriceTotalTextLocator = (product: Locator) => product.locator(".cart_total_price");
+        this.processToCheckoutButtonLocator = this.page.locator(".btn.btn-default.check_out");
+        this.modalContentLocator = this.page.locator(".modal-content");
+        this.modalContentRegisterAndLoginButtonLocator = (modalContent: Locator) => modalContent.getByRole("link",{name: "Register / Login"});
+        this.billingFormName = (form: Locator) => form.locator(".address_firstname.address_lastname");
+        this.billingFormAddress = (form: Locator) => form.locator(".address_address1.address_address2");
+        this.billingFormCityStatePostCode = (form: Locator) => form.locator(".address_city.address_state_name.address_postcode");
+        this.billingFormCountry = (form: Locator) => form.locator(".address_country_name");
+        this.billingFormPhoneNumber = (form: Locator) => form.locator(".address_phone");
+        this.deliveryAdressLocator = this.page.locator(".address.item.box");
+        this.billingAdressLocator = this.page.locator(".address.alternate_item.box");
+        this.descriptionInputLocator = this.page.locator(".form-control");
+        this.placeOrderButtonLocator = this.page.getByRole("link",{name: "Place Order"});
+        this.productImageLocator = (product: Locator) => product.locator("img");
+        this.deliveryTextLocator = this.page.getByText("Your delivery address");
+    }
+
+    async verifyImageWasLoaded(image: Locator){
+        await expect(await this.page.waitForFunction(
+            (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,
+            await image.elementHandle()
+        )).toBeTruthy();
     }
 
     async verifySubscriptionText(){
@@ -134,16 +204,132 @@ export class CartPage{
         return await this.productsListLocator;
     }
 
+    async clickProcessButton(){
+        const products = await this.getProductsList();
+        await this.verifyImageWasLoaded(await this.productImageLocator(await products.nth(0)));
+        await expect(async() =>{
+            await this.processToCheckoutButtonLocator.click();
+            await expectAtLeastOneVisible(await this.modalContentLocator, await this.deliveryTextLocator);
+        }).toPass();    
+    }
+
+    async clickRegisterAndLoginButton(){
+        await expect(await this.modalContentLocator).toBeVisible();
+        await expect(await this.modalContentRegisterAndLoginButtonLocator(await this.modalContentLocator)).toBeVisible({timeout: 20000});
+        await this.modalContentRegisterAndLoginButtonLocator(await this.modalContentLocator).click();
+    }
+
     async checkProductInfoByIndex(index: number, name: string, price: number, quantity: number){
         const products = await this.getProductsList();
         const product = await products.nth(index);
-        const productName = await product.locator(this.productNameTextSelector).textContent();
-        const productPrice = await textPriceToFloat(await product.locator(this.productPriceTextSelector).textContent() ?? "");
-        const productQuantity = parseInt(await product.locator(this.productQuantityTextSelector).textContent() ?? "");
+        const productName = await this.productNameTextLocator(product).textContent();
+        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
+        const productQuantity = parseInt(await this.productQuantityTextLocator(product).textContent() ?? "");
+        const productPriceTotal = await textPriceToFloat(await this.productPriceTotalTextLocator(product).textContent() ?? "");
         
         await expect(productName).toBe(name);
         await expect(productPrice).toBe(price);
         await expect(productQuantity).toBe(quantity);
+        await expect(productPriceTotal).toBe((productPrice * quantity));
+    }
+
+    async verifyAddressFormInformation(addresForm: Locator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+        const Name = await this.billingFormName(addresForm).textContent();
+        const AddressesLocators = await this.billingFormAddress(addresForm).all();
+        let combinedAddress = '';
+        for (const Address of AddressesLocators) {
+          const text = await Address.textContent();
+          combinedAddress += (text?.trim() ?? '') + ' ';
+        }
+        combinedAddress = combinedAddress.trim();
+        const CityStatePostCode = (await this.billingFormCityStatePostCode(addresForm).textContent())?.replace(/\s+/g, ' ').trim();;
+        const Country = await this.billingFormCountry(addresForm).textContent();
+        const PhoneNumber = await this.billingFormPhoneNumber(addresForm).textContent();
+
+        const expectedName = `${originalTitle} ${originalName.join(' ')}`;
+        const expectedAddress = `${originalCompanyName} ${originalAddress} ${originalAddress2}`;
+        const expectedCityStatePostcode = `${originalCity} ${originalState} ${originalZipcode}`;
+
+        await expect(Name).toBe(expectedName);
+        await expect(combinedAddress).toBe(expectedAddress);
+        await expect(CityStatePostCode).toBe(expectedCityStatePostcode);
+        await expect(Country).toBe(originalCountry);
+        await expect(PhoneNumber).toBe(originalMobileNumber);
+    }
+
+    async verifyDeliveryAddress(originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+        await expect(await this.deliveryAdressLocator).toBeVisible();
+        await this.verifyAddressFormInformation(await this.deliveryAdressLocator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
+    }
+
+    async verifyBillingAddress(originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+        await expect(await this.billingAdressLocator).toBeVisible();
+        await this.verifyAddressFormInformation(await this.billingAdressLocator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
+    }
+
+    async inputDescriptionMessage(message: string){
+        await this.descriptionInputLocator.fill(message);
+    }
+
+    async clickPlaceOrderButton(){
+        await this.placeOrderButtonLocator.click();
+    }
+}
+
+export class PaymentPage{
+    readonly page: Page;
+    readonly paymentTextLocator: Locator;
+    readonly nameOnCardInputLocator: Locator;
+    readonly cardNumberInputLocator: Locator;
+    readonly cardCVCInputLocator: Locator;
+    readonly expiryMonthInputLocator: Locator;
+    readonly expiryYearInputLocator: Locator;
+    readonly payButtonInputLocator: Locator;
+    readonly orderPlacedTextLocator: Locator;
+    readonly continueButtonLocator: Locator;
+    readonly paymentMessageLocator: Locator;
+
+    constructor(page: Page){
+        this.page = page;
+        this.paymentTextLocator = this.page.getByText("Name on Card");
+        this.nameOnCardInputLocator = this.page.locator('input[data-qa="name-on-card"]');
+        this.cardNumberInputLocator = this.page.locator('input[data-qa="card-number"]');
+        this.cardCVCInputLocator = this.page.locator('input[data-qa="cvc"]');
+        this.expiryMonthInputLocator = this.page.locator('input[data-qa="expiry-month"]');
+        this.expiryYearInputLocator = this.page.locator('input[data-qa="expiry-year"]');
+        this.payButtonInputLocator = this.page.getByRole("button",{name: "Pay and Confirm Order"});
+        this.orderPlacedTextLocator = this.page.getByText("Order Placed!");
+        this.continueButtonLocator = this.page.getByRole("link",{name: "Continue"});
+        this.paymentMessageLocator = this.page.getByText("Your order has been placed successfully!");
+    }
+
+    async verifyPageLoaded(){
+        await expect(await this.paymentTextLocator).toBeVisible();
+    }
+
+    async fillPaymentForm(name,cardNumber,CVC,expiryMonth,expiryYear){
+        await this.verifyPageLoaded();
+        await this.nameOnCardInputLocator.fill(name.join(" "));
+        await this.cardNumberInputLocator.fill(cardNumber);
+        await this.cardCVCInputLocator.fill(CVC);
+        await this.expiryMonthInputLocator.fill(expiryMonth);
+        await this.expiryYearInputLocator.fill(expiryYear);
+    }
+
+    async clickPayButton(){
+        await this.payButtonInputLocator.click();
+    }
+
+    async verifyOrderPlaced(){
+        await expect(await this.orderPlacedTextLocator).toBeVisible();
+    }
+
+    async verifyPaymentMessage(){
+        await expect(await this.paymentMessageLocator).toBeVisible();
+    }
+
+    async clickContinueButton(){
+        await this.continueButtonLocator.click();
     }
 }
 
@@ -208,7 +394,7 @@ export class ProductsPage{
     }
 
     async clickViewProductButton(product: Locator){
-        await product.getByRole("link",{name: "View Product"}).click();
+        await this.productViewProductButtonLocator(product).click();
     }
 
     async clickFirstProductViewProductButton(){
@@ -325,6 +511,12 @@ export class ProductPage{
     readonly prductInformationNameLocator: (productInformationSection: Locator) => Locator;
     readonly prductInformationSectionBrandLocator: (productInformationSection: Locator) => Locator;
     readonly prductInformationSectionConditionLocator: (productInformationSection: Locator) => Locator;
+    readonly productInformationSectionQuantityLocator: (productInformationSection: Locator) => Locator;
+    readonly productInformationSectionAddToCartButtonLocator: (productInformationSection: Locator) => Locator;
+    readonly cartModelViewCartButton: (modalContent: Locator) => Locator;
+    readonly modalContentLocator: Locator;
+    readonly cartModelContinueShoppingButton: (modalContent: Locator) => Locator;
+    readonly productImageLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -335,6 +527,12 @@ export class ProductPage{
         this.prductInformationNameLocator = (productInformationSection: Locator) => productInformationSection.locator("h2");
         this.prductInformationSectionBrandLocator = (productInformationSection: Locator) => productInformationSection.locator("p",{hasText: "Brand:"});
         this.prductInformationSectionConditionLocator = (productInformationSection: Locator) => productInformationSection.locator("p",{hasText: "Condition:"});
+        this.productInformationSectionQuantityLocator = (productInformationSection: Locator) => productInformationSection.locator("#quantity");
+        this.productInformationSectionAddToCartButtonLocator = (productInformationSection: Locator) => productInformationSection.getByRole("button",{name: "Add to cart"});
+        this.cartModelViewCartButton = (modalContent: Locator) => modalContent.getByRole("link",{name: "View Cart"});
+        this.modalContentLocator = this.page.locator(".modal-content");
+        this.cartModelContinueShoppingButton = (modalContent: Locator) => modalContent.getByRole("button",{name: "Continue Shopping"});
+        this.productImageLocator = this.page.locator(".col-sm-5 img");
     }
 
     async goBack(){
@@ -345,6 +543,13 @@ export class ProductPage{
         for(const value of values){
             await expect(value).not.toBe("");
         }
+    }
+
+    async verifyImageWasLoaded(image: Locator){
+        await expect(await this.page.waitForFunction(
+            (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,
+            await image.elementHandle()
+        )).toBeTruthy();
     }
 
     async getProductCategory(){
@@ -385,6 +590,33 @@ export class ProductPage{
         const productCategory = await this.getProductCategory();
         const isMatching = productCategory.toLowerCase().includes(keyWord.toLowerCase());
         await expect(isMatching).toBeTruthy();
+    }
+
+    async setQuantity(quantity: number){
+        const quantityInput = await this.productInformationSectionQuantityLocator(await this.productInformationSectionLocator);
+        await quantityInput.clear();
+        await quantityInput.fill(quantity.toString());
+    }
+
+    async clickAddToCartButton(){
+        await this.verifyImageWasLoaded(await this.productImageLocator);
+        await expect(async() =>{
+            await this.productInformationSectionAddToCartButtonLocator(await this.productInformationSectionLocator).click();
+            await expect(await this.modalContentLocator).toBeVisible({ timeout: 1000 });
+        }).toPass();
+        
+    }
+
+    async clickContinueShoppingButton(){
+        await expect(await this.modalContentLocator).toBeVisible();
+        await expect(await this.cartModelContinueShoppingButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
+        await this.cartModelContinueShoppingButton(await this.modalContentLocator).click();
+    }
+
+    async clickViewCartButton(){
+        await expect(await this.modalContentLocator).toBeVisible();
+        await expect(await this.cartModelViewCartButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
+        await this.cartModelViewCartButton(await this.modalContentLocator).click();
     }
 }
 

@@ -1,5 +1,5 @@
 import {test as baseTest} from '@playwright/test';
-import { HomePage, SignUp_LoginPage, SignUpPage, AccountCreatedPage, AccountDeletePage,ContactUsPage,TestCasesPage,ProductsPage,ProductPage,CartPage} from './POM';
+import { HomePage, SignUp_LoginPage, SignUpPage, AccountCreatedPage, AccountDeletePage,ContactUsPage,TestCasesPage,ProductsPage,ProductPage,CartPage, PaymentPage} from './POM';
 
 
 type MyFixtures = {
@@ -13,6 +13,7 @@ type MyFixtures = {
     productsPage :ProductsPage;
     productPage: ProductPage;
     cartPage: CartPage;
+    paymentPage: PaymentPage;
 }
 
 export const test = baseTest.extend<MyFixtures>({
@@ -45,6 +46,9 @@ export const test = baseTest.extend<MyFixtures>({
     },
     cartPage: async({page}, use) =>{
         await use(new CartPage(page));
+    },
+    paymentPage: async({page}, use) =>{
+        await use(new PaymentPage(page));
     },
 });
 
