@@ -4,7 +4,6 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 test.beforeEach(async ({ context }) => {
-    //await context.route('**/*.{png,jpg,jpeg,svg}', route => route.abort());
     await context.route("**/*", route => {
       route.request().url().startsWith("https://googleads.") ?
       route.abort() : route.continue();
@@ -304,6 +303,7 @@ test('Test Case 8: Verify All Products and product detail page', async ({ homePa
 // If neither the name nor category matches, the test fails.
 */
 
+
 test('Test Case 9: Search Products', async ({ homePage, productsPage, productPage}) => {
   //data
   const productsNames = ["dress","top","tshirt"]; //keyWords
@@ -319,8 +319,8 @@ test('Test Case 9: Search Products', async ({ homePage, productsPage, productPag
 
     //Verefying page loaded and search products by products name (keyWord)
     await productsPage.checkIfAllProductsTextIsVissible();
-    await productsPage.addwait(2000);
     await productsPage.searchProducts(productsName);
+    await productsPage.verefyThatProductsSearchComplited();
 
     //saved links for products when name is not include keyword
     const productLinks = await productsPage.getLinksOfProductsThatDoNotMatchKeyword(productsName);
@@ -332,6 +332,7 @@ test('Test Case 9: Search Products', async ({ homePage, productsPage, productPag
     }
   }
 });
+
 
 /*
 Test Case 10: Verify Subscription in home page
@@ -399,13 +400,20 @@ Test Case 12: Add Products in Cart
 */
 
 test('Test Case 12: Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
+  //data
+  const productQuantity = 1;
+  //goto
   await homePage.goto();
   await homePage.checkHomePageLoad();
   await homePage.gotoProductsPage();
 
   await productsPage.checkIfAllProductsTextIsVissible();
-  await productsPage.addToCartProductByIndex(0);
+  await productsPage.checkIfProductsExist();
+  const firstProductInfo = await productsPage.clickProductAddToCartButtonByIndex(0);
   await productsPage.clickContinueShoppingButton();
-  await productsPage.addToCartProductByIndex(1);
+  const secondProductInfo = await productsPage.clickProductAddToCartButtonByIndex(1);
   await productsPage.clickViewCartButton();
+
+  await cartPage.checkProductInfoByIndex(0,firstProductInfo.name,firstProductInfo.price,productQuantity);
+  await cartPage.checkProductInfoByIndex(1,secondProductInfo.name,secondProductInfo.price,productQuantity);
 });

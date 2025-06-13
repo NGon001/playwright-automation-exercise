@@ -154,17 +154,17 @@ export class ProductsPage{
     readonly searchInputLocator: Locator;
     readonly submitSearchButtonLocator: Locator;
     readonly searchedProductsTextLocator: Locator;
-    readonly cartModelContinueShoppingButton: Locator;
-    readonly cartModelViewCartButton: Locator;
+    readonly cartModelContinueShoppingButton: (modalContent: Locator) => Locator;
+    readonly cartModelViewCartButton: (modalContent: Locator) => Locator;
     readonly productAddToCartTextLocator: Locator;
     readonly viewProductLinkLocator: (product: Locator) => Locator;
-    readonly overlayContentLocator: (product: Locator) => Locator;
     readonly overlayContentAddProductButtonLocator: (overlayContent: Locator) => Locator;
     readonly productOverlayHoverLocator: (product: Locator) => Locator;
     readonly productViewProductButtonLocator: (product: Locator) => Locator;
     readonly productNameTextLocator: (product: Locator) => Locator;
     readonly productPriceTextLocator: (product: Locator) => Locator;
     readonly productImageLocator: (product: Locator) => Locator;
+    readonly modalContentLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -173,17 +173,17 @@ export class ProductsPage{
         this.searchInputLocator = this.page.getByPlaceholder("Search Product");
         this.submitSearchButtonLocator = this.page.locator("#submit_search");
         this.searchedProductsTextLocator = this.page.getByText("Searched Products");
-        this.cartModelContinueShoppingButton = this.page.getByRole("button",{name: "Continue Shopping"});
-        this.cartModelViewCartButton = this.page.getByRole("link",{name: "View Cart"});
+        this.cartModelContinueShoppingButton = (modalContent: Locator) => modalContent.getByRole("button",{name: "Continue Shopping"});
+        this.cartModelViewCartButton = (modalContent: Locator) => modalContent.getByRole("link",{name: "View Cart"});
         this.viewProductLinkLocator = (product: Locator) => product.getByRole("link", { name: "View Product" });
-        this.overlayContentLocator = (product: Locator) => product.locator(".overlay-content");
-        this.overlayContentAddProductButtonLocator = (overlayContent: Locator) => overlayContent.locator("a.btn.add-to-cart");
+        this.overlayContentAddProductButtonLocator = (product: Locator) => product.locator(".product-overlay a");
         this.productOverlayHoverLocator = (product: Locator) => product.locator(".product-overlay");
         this.productViewProductButtonLocator = (product: Locator) => product.getByRole("link",{name: "View Product"});
         this.productNameTextLocator = (product: Locator) => product.locator("p").first();
         this.productPriceTextLocator = (product: Locator) => product.locator("h2").first();
         this.productImageLocator = (product: Locator) => product.locator("img");
-        this.productAddToCartTextLocator = this.page.getByText("Your product has been added to cart.");
+        this.productAddToCartTextLocator = this.page.getByText("Your product has been added");
+        this.modalContentLocator = this.page.locator(".modal-content");
     }
 
     async gotoProduct(link: string){
@@ -221,9 +221,9 @@ export class ProductsPage{
     }
 
     async searchProducts(productsName: string){
+        await this.searchInputLocator.clear();
+        await this.searchInputLocator.fill(productsName);
         await expect(async() =>{
-            await this.searchInputLocator.clear();
-            await this.searchInputLocator.fill(productsName);
             await this.submitSearchButtonLocator.click();
             await this.verefyThatProductsSearchComplited();
         }).toPass();
@@ -257,43 +257,64 @@ export class ProductsPage{
         return productsLinksToCheck;
     }
 
-    private async hoverToProduct(product: Locator){
-        await product.hover();
-    }
-
-
-    private async clickAddToCartInOverlayContent(product: Locator){
-        await this.hoverToProduct(await this.productImageLocator(await product));
-        await product.evaluate(e => Promise.all(e.getAnimations({ subtree: true }).map(animation => animation.finished)));
-        const overlayContent = await this.overlayContentLocator(await product);
-        await expect(overlayContent).toBeVisible();
-        await this.overlayContentAddProductButtonLocator(overlayContent).click();
-        await expect(this.productAddToCartTextLocator).toBeVisible();
-    }
-
-    async addToCartProductByIndex(index): Promise<{ name: string; price: number }> {
+    async clickProductAddToCartButtonByIndex(index: number): Promise<{ name: string; price: number }>{
         const products = await this.getAllProducts();
-        await expect(await products.count()).not.toBe(0);
         const product = await products.nth(index);
-        const name = await this.productNameTextLocator(await product).textContent() ?? "";
-        const priceFloat = await textPriceToFloat(await this.productPriceTextLocator(await product).textContent() ?? "");
-        await expect(name).not.toBe("");
-        await expect(priceFloat).not.toBe(0 || null || "");
-        await this.clickAddToCartInOverlayContent(products.nth(index));
-        return {name: name, price: priceFloat};
+        const productImage = await this.productImageLocator(product);
+
+        //Get product data
+        const productName = await this.productNameTextLocator(product).textContent() ?? "";
+        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
+        await expect(productPrice).not.toBe(0 || "");
+
+        //for all images in page
+        /*await this.page.waitForFunction(() => {
+            const images = Array.from(document.images);
+            return images.length === 0 || images.every(img => img.complete && img.naturalWidth > 0);
+        });*/
+        
+        // wait image to load, because it will depend on hover
+        //----
+        await this.page.waitForFunction(
+            (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,
+            await productImage.elementHandle()
+        );
+        //----
+
+        //scroll to element (better then scrollIntoViewIfNeeded, because it will scroll element to the top)
+        //----
+        await this.page.evaluate((element) => {
+             element?.scrollIntoView({ behavior: 'smooth', block: 'start' }); //same as "((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({behavior: 'smooth', block: 'start'});", element);"
+        }, await productImage.elementHandle());
+        //----
+        
+        this.page.waitForTimeout(300);
+
+        await product.hover();
+        await this.page.waitForTimeout(600);
+
+        const overlayContentAddProductButton = await this.overlayContentAddProductButtonLocator(product);
+        await expect(overlayContentAddProductButton).toBeVisible();
+        await expect(overlayContentAddProductButton).toBeInViewport();
+        await expect(await overlayContentAddProductButton.isEnabled()).toBeTruthy();
+        await overlayContentAddProductButton.hover();
+        await overlayContentAddProductButton.click();
+
+        return {name: productName, price: productPrice};
     }
 
     async clickContinueShoppingButton(){
-        await this.cartModelContinueShoppingButton.click();
+        await expect(await this.modalContentLocator).toBeVisible();
+        await expect(await this.cartModelContinueShoppingButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
+        await this.cartModelContinueShoppingButton(await this.modalContentLocator).click();
     }
 
     async clickViewCartButton(){
-        await this.cartModelViewCartButton.click();
+        await expect(await this.modalContentLocator).toBeVisible();
+        await expect(await this.cartModelViewCartButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
+        await this.cartModelViewCartButton(await this.modalContentLocator).click();
     }
 
-    async addwait(time){
-        await this.page.waitForTimeout(time); 
-    }
 }
 
 export class ProductPage{
