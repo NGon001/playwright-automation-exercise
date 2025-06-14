@@ -10,17 +10,8 @@ export async function textPriceToFloat(textPrice: string){
   return match ? parseFloat(match[0].replace(/,/g, '')) : 0;
 }
 
-
-export async function expectAtLeastOneVisible(...locators: Locator[]) {
-  for (const locator of locators) {
-    try {
-      if (await locator.isVisible()) {
-        expect(true).toBe(true);  // pass
-        return;
-      }
-    } catch {
-      // ignore errors if element not found
-    }
+export async function expectTextNotBeNull(...values: string[]) {
+  for(const value of values){
+      await expect(value).not.toBe("");
   }
-  throw new Error('None of the provided elements are visible.');
 }
