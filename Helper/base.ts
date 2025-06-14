@@ -1,6 +1,15 @@
 import {test as baseTest} from '@playwright/test';
-import { HomePage, SignUp_LoginPage, SignUpPage, AccountCreatedPage, AccountDeletePage,ContactUsPage,TestCasesPage,ProductsPage,ProductPage,CartPage, PaymentPage} from './POM';
-
+import { HomePage } from '../pages/HomePage';
+import { SignUp_LoginPage } from '../pages/SignUp_LoginPage';
+import { SignUpPage } from '../pages/SignUpPage';
+import { AccountCreatedPage } from '../pages/AccountCreatedPage';
+import { AccountDeletePage } from '../pages/AccountDeletePage';
+import { ContactUsPage } from '../pages/ContactUsPage';
+import { TestCasesPage } from '../pages/TestCasesPage';
+import { ProductsPage } from '../pages/ProductsPage';
+import { ProductPage } from '../pages/ProductPage';
+import { CartPage } from '../pages/CartPage';
+import { PaymentPage } from '../pages/PaymentPage';
 
 type MyFixtures = {
     homePage: HomePage;

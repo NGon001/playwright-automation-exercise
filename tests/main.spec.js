@@ -1,6 +1,5 @@
-import { title } from 'process';
 import { test } from '../Helper/base.ts';
-import {generateRandomEmail} from '../Helper/tools.ts';
+import { generateRandomEmail } from '../Helper/tools.ts';
 import dotenv from 'dotenv';
 dotenv.config();
 
@@ -54,7 +53,7 @@ test('Test Case 1: Register User', async ({ homePage, signUp_LoginPage,signUpPag
   await homePage.goto();
   await homePage.checkHomePageLoad();
   await homePage.gotoSignUpAndLoginPage();
-  await signUp_LoginPage.checksignUpText();
+  await signUp_LoginPage.checkSignUpText();
 
   //Fill signup form
   await signUp_LoginPage.fillStartSignUpForm(name,email);
@@ -194,7 +193,7 @@ test('Test Case 5: Register User with existing email', async ({ homePage, signUp
   await homePage.goto();
   await homePage.checkHomePageLoad();
   await homePage.gotoSignUpAndLoginPage();
-  await signUp_LoginPage.checksignUpText();
+  await signUp_LoginPage.checkSignUpText();
 
   //Fill signup form
   await signUp_LoginPage.fillStartSignUpForm(name,email);
@@ -280,7 +279,7 @@ test('Test Case 8: Verify All Products and product detail page', async ({ homePa
   await homePage.gotoProductsPage();
   await productsPage.checkIfAllProductsTextIsVissible();
   await productsPage.checkIfProductsExist();
-  await productsPage.clickFirstProductViewProductButton();
+  await productsPage.clickProductViewProductButtonByIndex(0);
 
   await productPage.verifyThatProductInformationIsVisible();
 });
@@ -303,7 +302,6 @@ test('Test Case 8: Verify All Products and product detail page', async ({ homePa
 // The test then opens product detail pages to verify that the product's category includes the keyword.
 // If neither the name nor category matches, the test fails.
 */
-
 
 test('Test Case 9: Search Products', async ({ homePage, productsPage, productPage}) => {
   //data
@@ -334,7 +332,6 @@ test('Test Case 9: Search Products', async ({ homePage, productsPage, productPag
   }
 });
 
-
 /*
 Test Case 10: Verify Subscription in home page
 1. Launch browser
@@ -356,7 +353,7 @@ test('Test Case 10: Verify Subscription in home page', async ({ homePage }) => {
   await homePage.verifySubscriptionText();
 
   await homePage.inputValueToSubscriptionEmailField(email);
-  await homePage.checkSuccesSubscriptionMessage();
+  await homePage.checkSuccessSubscriptionMessage();
 });
 
 /*
@@ -489,9 +486,9 @@ test('Test Case 14: Place Order: Register while Checkout', async ({ homePage,pro
   const Zipcode = '90001';
   const companyName = 'Test Company';
   const mobileNumber = '1234567890';
+  let authorized = false;
 
   //Card data
-  const cardName = 'Max Petrov';
   const cardNumber = '4111111111111111'; // Visa test card number
   const cardCVC = '123';
   const cardExpiryMonth = '08';
@@ -513,7 +510,7 @@ test('Test Case 14: Place Order: Register while Checkout', async ({ homePage,pro
   await productsPage.clickViewCartButton();
 
   await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
-  await cartPage.clickProcessButton();
+  await cartPage.clickProcessButton(authorized);
   await cartPage.clickRegisterAndLoginButton();
 
   //Fill signup form
@@ -528,15 +525,17 @@ test('Test Case 14: Place Order: Register while Checkout', async ({ homePage,pro
   //verift account was created
   await accountCreatedPage.checkAccountCreationMessage();
   await accountCreatedPage.clickContinueButton();
+  authorized = true;
 
-  await homePage.verifyHomepAgeItemsLoaded();
+  await homePage.verifyHomePageItemsLoaded();
   await homePage.checkLoggedInName(name);
   await homePage.gotoCart();
 
   await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
-  await cartPage.clickProcessButton();
+  await cartPage.clickProcessButton(authorized);
   await cartPage.verifyDeliveryAddress(Title,name,Address,Address2,Country,State,City,Zipcode,companyName,mobileNumber);
   await cartPage.verifyBillingAddress(Title,name,Address,Address2,Country,State,City,Zipcode,companyName,mobileNumber);
+  await cartPage.inputDescriptionMessage(descriptionMessage);
   await cartPage.clickPlaceOrderButton();
 
   await paymentPage.verifyPageLoaded();
@@ -546,9 +545,111 @@ test('Test Case 14: Place Order: Register while Checkout', async ({ homePage,pro
   await paymentPage.clickContinueButton();
 
   //delete account and verify it
-  await homePage.verifyHomepAgeItemsLoaded();
+  await homePage.verifyHomePageItemsLoaded();
   await homePage.clickDeleteAccount();
   await accountDeletePage.checkAccountDeletedMessage();
   await accountDeletePage.clickContinueButton();
   await homePage.checkHomePageLoad();
 });
+
+/*
+Test Case 15: Place Order: Register before Checkout
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Verify that home page is visible successfully
+4. Click 'Signup / Login' button
+5. Fill all details in Signup and create account
+6. Verify 'ACCOUNT CREATED!' and click 'Continue' button
+7. Verify ' Logged in as username' at top
+8. Add products to cart
+9. Click 'Cart' button
+10. Verify that cart page is displayed
+11. Click Proceed To Checkout
+12. Verify Address Details and Review Your Order
+13. Enter description in comment text area and click 'Place Order'
+14. Enter payment details: Name on Card, Card Number, CVC, Expiration date
+15. Click 'Pay and Confirm Order' button
+16. Verify success message 'Your order has been placed successfully!'
+17. Click 'Delete Account' button
+18. Verify 'ACCOUNT DELETED!' and click 'Continue' button
+*/
+
+test('Test Case 15: Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  //data
+  const Title = 'Mr.';
+  const name = ['Max', 'Petrov'];
+  const email = await generateRandomEmail();
+  const password = 'max123';
+  const BirthDay = '13';
+  const BirthMonth = 'August';
+  const BirthYear = '2005';
+  const Address = '123 Main St';
+  const Address2 = 'Apt 4B';
+  const Country = 'United States';
+  const State = 'California';
+  const City = 'Los Angeles';
+  const Zipcode = '90001';
+  const companyName = 'Test Company';
+  const mobileNumber = '1234567890';
+  let authorized = false;
+
+  //Card data
+  const cardNumber = '4111111111111111'; // Visa test card number
+  const cardCVC = '123';
+  const cardExpiryMonth = '08';
+  const cardExpiryYear = '2028';
+
+  //product data
+  const productIndex = 0;
+  const Quantity = 1;
+  const descriptionMessage = "This is test description message.";
+
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+  await homePage.gotoSignUpAndLoginPage();
+  await signUp_LoginPage.checkSignUpText();
+
+  //Fill signup form
+  await signUp_LoginPage.fillStartSignUpForm(name,email);
+  await signUp_LoginPage.clickSignUpButton();
+
+  //Fill detailed signup formr
+  await signUpPage.checkDataInForm(name,email);
+  await signUpPage.fillSignUpForm(Title,name,password,BirthDay,BirthMonth,BirthYear,companyName,Address,Address2,Country,State,City,Zipcode,mobileNumber);
+  await signUpPage.clickCreateAccountButton();
+
+  //verift account was created
+  await accountCreatedPage.checkAccountCreationMessage();
+  await accountCreatedPage.clickContinueButton();
+  await homePage.checkLoggedInName(name);
+  authorized = true;
+
+  await homePage.gotoProductsPage();
+
+  await productsPage.checkIfAllProductsTextIsVissible();
+  await productsPage.checkIfProductsExist();
+  const ProductInfo = await productsPage.clickProductAddToCartButtonByIndex(productIndex);
+  await productsPage.clickViewCartButton();
+
+  await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
+  await cartPage.clickProcessButton(authorized);
+  await cartPage.verifyDeliveryAddress(Title,name,Address,Address2,Country,State,City,Zipcode,companyName,mobileNumber);
+  await cartPage.verifyBillingAddress(Title,name,Address,Address2,Country,State,City,Zipcode,companyName,mobileNumber);
+  await cartPage.inputDescriptionMessage(descriptionMessage);
+  await cartPage.clickPlaceOrderButton();
+
+  await paymentPage.verifyPageLoaded();
+  await paymentPage.fillPaymentForm(name,cardNumber,cardCVC,cardExpiryMonth,cardExpiryYear);
+  await paymentPage.clickPayButton();
+  await paymentPage.verifyOrderPlaced();
+  await paymentPage.clickContinueButton();
+
+  //delete account and verify it
+  await homePage.verifyHomePageItemsLoaded();
+  await homePage.clickDeleteAccount();
+  await accountDeletePage.checkAccountDeletedMessage();
+  await accountDeletePage.clickContinueButton();
+  await homePage.checkHomePageLoad();
+});
+
