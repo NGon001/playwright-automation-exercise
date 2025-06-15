@@ -27,6 +27,8 @@ export class CartPage{
     readonly placeOrderButtonLocator: Locator;
     readonly deliveryTextLocator: Locator;
     readonly productImageLocator: (product: Locator) => Locator;
+    readonly productDeleteButtonLocator: (product: Locator) => Locator;
+    readonly emptyCartTextLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -53,6 +55,8 @@ export class CartPage{
         this.placeOrderButtonLocator = this.page.getByRole("link",{name: "Place Order"});
         this.productImageLocator = (product: Locator) => product.locator("img");
         this.deliveryTextLocator = this.page.getByText("Your delivery address");
+        this.productDeleteButtonLocator = (product: Locator) => product.locator(".cart_quantity_delete");
+        this.emptyCartTextLocator = this.page.getByText("Cart is empty!");
     }
 
     async verifyImageWasLoaded(image: Locator){
@@ -75,8 +79,33 @@ export class CartPage{
         await expect(await this.subscribeMessage).toBeVisible();
     }
 
+    async isCartEmpty(){
+        return await this.emptyCartTextLocator.isVisible();
+    }
+
     async getProductsList(){
         return await this.productsListLocator;
+    }
+
+    async getProductByName(name: string): Promise<Locator | null> {
+        const product =  (await this.getProductsList()).filter({
+            has: this.page.locator('h4', { hasText: name })
+        });
+        
+        if (await product.count() === 0) {
+            return null;
+        }
+
+        return product;
+    }
+
+    async verifyProductImageWasLoaded(product: Locator){
+        await this.verifyImageWasLoaded(await this.productImageLocator(await product));
+    }
+
+    async verifyProductImageWasLoadedByName(name: string){
+        const product = await this.getProductByName(name);
+        if(product) await this.verifyProductImageWasLoaded(product);
     }
 
     async clickProcessButton(authorized: boolean) {
@@ -111,6 +140,31 @@ export class CartPage{
         await expect(productPrice).toBe(price);
         await expect(productQuantity).toBe(quantity);
         await expect(productPriceTotal).toBe((productPrice * quantity));
+    }
+
+    async clickDeleteButtonByProduct(product: Locator) {
+        if (await product.count() === 0) {
+            throw new Error('Product does not exist, cannot click delete.');
+        }
+        await this.productDeleteButtonLocator(product).click();
+        await expect(product).toHaveCount(0, { timeout: 50000 });
+    }
+
+    async deleteProductByName(name: string){
+        const product = await this.getProductByName(name);
+        await expect(product).not.toBe(null);
+        if (product) await this.clickDeleteButtonByProduct(product);
+    }
+
+    async checkProductExistByName(name: string){
+        if(await this.isCartEmpty()) return false;
+        const product = await this.getProductByName(name);
+        if(product === null) return false;
+        return true;
+    }
+
+    async verifyProductExistOrNot(exist: boolean, name: string){
+        await expect(await this.checkProductExistByName(name)).toBe(exist);
     }
 
     async verifyAddressFormInformation(addresForm: Locator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
