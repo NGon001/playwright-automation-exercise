@@ -223,8 +223,8 @@ test.describe("Checkout Flow", () => {
 
     await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
     await cartPage.clickProcessButton(authorized);
-    await cartPage.verifyDeliveryAddress(process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
-    await cartPage.verifyBillingAddress(process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
+    await cartPage.verifyAddress("delivery",process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
+    await cartPage.verifyAddress("billing",process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
     await cartPage.inputDescriptionMessage(descriptionMessage);
     await cartPage.clickPlaceOrderButton();
 
@@ -296,8 +296,8 @@ test.describe("Checkout Flow", () => {
 
     await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
     await cartPage.clickProcessButton(authorized);
-    await cartPage.verifyDeliveryAddress(process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
-    await cartPage.verifyBillingAddress(process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
+    await cartPage.verifyAddress("delivery",process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
+    await cartPage.verifyAddress("billing",process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
     await cartPage.inputDescriptionMessage(descriptionMessage);
     await cartPage.clickPlaceOrderButton();
 
@@ -416,6 +416,122 @@ test.describe("Cart Functionality", () =>{
     await cartPage.deleteProductByName(firstProductInfo.name);
     await cartPage.verifyProductExistOrNot(false,firstProductInfo.name);
   });
+
+  /*
+Test Case 20: Search Products and Verify Cart After Login
+1. Launch browser
+2. Navigate to url 'http://automationexercise.com'
+3. Click on 'Products' button
+4. Verify user is navigated to ALL PRODUCTS page successfully
+5. Enter product name in search input and click search button
+6. Verify 'SEARCHED PRODUCTS' is visible
+7. Verify all the products related to search are visible
+8. Add those products to cart
+9. Click 'Cart' button and verify that products are visible in cart
+10. Click 'Signup / Login' button and submit login details
+11. Again, go to Cart page
+12. Verify that those products are visible in cart after login as well
+*/
+
+/*//cant be parallel, because of cart check (login) //coment for now because i cant test it with others
+this test is only possible with regester new user
+//If you have multiple projects and the worker count is not 1, they will always run in parallel. Usually we recommend designing tests that they can run in parallel and are not depended on each other.
+test.describe.serial('Cart and Search Tests', () => {
+test('Test Case 20: Search Products and Verify Cart After Login', async ({ homePage,productsPage,productPage,cartPage,signUp_LoginPage}) => {
+  //data
+  const productsNames = ["dress"]; //keyWords
+
+  //data login
+  const email = process.env.VALID_EMAIL || '';
+  const password = process.env.VALID_PASSWORD || '';
+  const name = ["vlad", "Petrov"];
+
+
+  //goto
+  await homePage.goto();
+  await homePage.checkHomePageLoad();
+
+  //go through all productsNames
+  for(const productsName of productsNames){
+    let productsInfos = [];
+    //open ProductsPage
+    await homePage.gotoProductsPage();
+
+    //Verefying page loaded and search products by products name (keyWord)
+    await productsPage.checkIfAllProductsTextIsVissible();
+    await productsPage.searchProducts(productsName);
+    await productsPage.verefyThatProductsSearchComplited();
+
+    const productCount = await productsPage.getProductCount();
+    for(let i = 0; i < productCount; i++){
+      productsInfos.push(await productsPage.clickProductAddToCartButtonByIndex(i));
+      await productsPage.clickContinueShoppingButton();
+    }
+
+    //saved links for products when name is not include keyword
+    const productLinks = await productsPage.getLinksOfProductsThatDoNotMatchKeyword(productsName);
+
+    //go through all products links and check if category include keyWord
+    for(const productLink of productLinks){
+      await productsPage.gotoProduct(productLink);
+      await productPage.verifyMatchingCategory(productsName);
+    }
+
+    await productPage.gotoCart();
+    await cartPage.checkIfProcessButtonVisisble();
+    let countOfProductsInCart = await cartPage.getProductsCount();
+    await cartPage.checkValues(countOfProductsInCart,productCount);
+    for (let i = 0; i < countOfProductsInCart; i++){
+      await cartPage.verifyProductExistOrNot(true,(await productsInfos[i]).name);
+    }
+
+    await cartPage.gotoSignUpAndLoginPage();
+    await signUp_LoginPage.checkLoginText();
+
+    //fill login form
+    await signUp_LoginPage.fillLoginForm(email,password);
+    await signUp_LoginPage.clickLoginButton();
+
+    //verify login
+    await homePage.checkLoggedInName(name);
+
+    await homePage.gotoCart();
+    await cartPage.checkIfProcessButtonVisisble();
+    const countOfProductsInCart2 = await cartPage.getProductsCount();
+    await cartPage.checkValues(countOfProductsInCart,countOfProductsInCart2);
+    for (let i = 0; i < countOfProductsInCart2; i++){
+      await cartPage.verifyProductExistOrNot(true,(await productsInfos[i]).name);
+      await cartPage.checkIfProcessButtonVisisble();
+      await cartPage.verifyProductImageWasLoadedByName((await productsInfos[i]).name);
+      await cartPage.deleteProductByName((await productsInfos[i]).name);
+      await cartPage.verifyProductExistOrNot(false,(await productsInfos[i]).name);
+    }
+  }
+});
+});
+*/
+
+
+
+  /*
+  Test Case 22: Add to cart from Recommended items
+  1. Launch browser
+  2. Navigate to url 'http://automationexercise.com'
+  3. Scroll to bottom of page
+  4. Verify 'RECOMMENDED ITEMS' are visible
+  5. Click on 'Add To Cart' on Recommended product
+  6. Click on 'View Cart' button
+  7. Verify that product is displayed in cart page
+  */
+
+  test('Test Case 22: Add to cart from Recommended items', async ({ homePage, cartPage }) => {
+    await homePage.verifyRecomendedItemsTextVisible();
+    const productInfo = await homePage.clickAddToCartRecomendedItemsByIndex(0);
+    await homePage.clickViewCartButton();
+
+    await cartPage.checkProductExistByName(productInfo.name);
+  });
+  
 });
 
 test.describe("Product & Catalog", () =>{
@@ -663,122 +779,5 @@ test.describe("UI & Navigation", () => {
     await homePage.gotoTestCasesPage();
     await testCasesPage.verifyPageIsVisible();
   });
-  
+
 });
-
-
-
-
-
-
-/*
-Test Case 20: Search Products and Verify Cart After Login
-1. Launch browser
-2. Navigate to url 'http://automationexercise.com'
-3. Click on 'Products' button
-4. Verify user is navigated to ALL PRODUCTS page successfully
-5. Enter product name in search input and click search button
-6. Verify 'SEARCHED PRODUCTS' is visible
-7. Verify all the products related to search are visible
-8. Add those products to cart
-9. Click 'Cart' button and verify that products are visible in cart
-10. Click 'Signup / Login' button and submit login details
-11. Again, go to Cart page
-12. Verify that those products are visible in cart after login as well
-*/
-
-/*//cant be parallel, because of cart check (login) //coment for now because i cant test it with others
-this test is only possible with regester new user
-//If you have multiple projects and the worker count is not 1, they will always run in parallel. Usually we recommend designing tests that they can run in parallel and are not depended on each other.
-test.describe.serial('Cart and Search Tests', () => {
-test('Test Case 20: Search Products and Verify Cart After Login', async ({ homePage,productsPage,productPage,cartPage,signUp_LoginPage}) => {
-  //data
-  const productsNames = ["dress"]; //keyWords
-
-  //data login
-  const email = process.env.VALID_EMAIL || '';
-  const password = process.env.VALID_PASSWORD || '';
-  const name = ["vlad", "Petrov"];
-
-
-  //goto
-  await homePage.goto();
-  await homePage.checkHomePageLoad();
-
-  //go through all productsNames
-  for(const productsName of productsNames){
-    let productsInfos = [];
-    //open ProductsPage
-    await homePage.gotoProductsPage();
-
-    //Verefying page loaded and search products by products name (keyWord)
-    await productsPage.checkIfAllProductsTextIsVissible();
-    await productsPage.searchProducts(productsName);
-    await productsPage.verefyThatProductsSearchComplited();
-
-    const productCount = await productsPage.getProductCount();
-    for(let i = 0; i < productCount; i++){
-      productsInfos.push(await productsPage.clickProductAddToCartButtonByIndex(i));
-      await productsPage.clickContinueShoppingButton();
-    }
-
-    //saved links for products when name is not include keyword
-    const productLinks = await productsPage.getLinksOfProductsThatDoNotMatchKeyword(productsName);
-
-    //go through all products links and check if category include keyWord
-    for(const productLink of productLinks){
-      await productsPage.gotoProduct(productLink);
-      await productPage.verifyMatchingCategory(productsName);
-    }
-
-    await productPage.gotoCart();
-    await cartPage.checkIfProcessButtonVisisble();
-    let countOfProductsInCart = await cartPage.getProductsCount();
-    await cartPage.checkValues(countOfProductsInCart,productCount);
-    for (let i = 0; i < countOfProductsInCart; i++){
-      await cartPage.verifyProductExistOrNot(true,(await productsInfos[i]).name);
-    }
-
-    await cartPage.gotoSignUpAndLoginPage();
-    await signUp_LoginPage.checkLoginText();
-
-    //fill login form
-    await signUp_LoginPage.fillLoginForm(email,password);
-    await signUp_LoginPage.clickLoginButton();
-
-    //verify login
-    await homePage.checkLoggedInName(name);
-
-    await homePage.gotoCart();
-    await cartPage.checkIfProcessButtonVisisble();
-    const countOfProductsInCart2 = await cartPage.getProductsCount();
-    await cartPage.checkValues(countOfProductsInCart,countOfProductsInCart2);
-    for (let i = 0; i < countOfProductsInCart2; i++){
-      await cartPage.verifyProductExistOrNot(true,(await productsInfos[i]).name);
-      await cartPage.checkIfProcessButtonVisisble();
-      await cartPage.verifyProductImageWasLoadedByName((await productsInfos[i]).name);
-      await cartPage.deleteProductByName((await productsInfos[i]).name);
-      await cartPage.verifyProductExistOrNot(false,(await productsInfos[i]).name);
-    }
-  }
-});
-});
-*/
-
-
-
-/*
-Test Case 22: Add to cart from Recommended items
-1. Launch browser
-2. Navigate to url 'http://automationexercise.com'
-3. Scroll to bottom of page
-4. Verify 'RECOMMENDED ITEMS' are visible
-5. Click on 'Add To Cart' on Recommended product
-6. Click on 'View Cart' button
-7. Verify that product is displayed in cart page
-
-
-test('Test Case 22: Add to cart from Recommended items', async ({ homePage,productsPage,productPage}) => {
-
-  await homePage.verifyRecomendedItemsTextVisible;
-});*/

@@ -22,6 +22,7 @@ export class HomePage{
     readonly modalContentLocator: Locator;
     readonly categoriesLeftPanelLocator: Locator;
     readonly recomendedItemsTextLocator: Locator;
+    readonly recomendedItemsActiveLocator: Locator;
 
     readonly productViewProductButtonLocator: (product: Locator) => Locator;
     readonly productNameTextLocator: (product: Locator) => Locator;
@@ -35,6 +36,7 @@ export class HomePage{
     readonly panelDefaultClass: (link: Locator) => Locator;
     readonly productsTextSearchByCategoryLocator: (text: string) => Locator;
     readonly subCategoryCollabseOrInLocator: (panelCategory: Locator,option: string) => Locator;
+    readonly recomendedItemsAddToCartButtonLocator: (product: Locator) => Locator;
 
 
     constructor(page: Page) {
@@ -57,6 +59,8 @@ export class HomePage{
         this.allProductsItemsLocator = this.page.locator(".features_items .col-sm-4");
         this.modalContentLocator = this.page.locator(".modal-content");
         this.categoriesLeftPanelLocator = this.page.locator(".panel-group.category-products");
+        this.recomendedItemsActiveLocator = this.page.locator("#recommended-item-carousel .item.active .col-sm-4");
+        this.recomendedItemsAddToCartButtonLocator = (product: Locator) => product.locator(".btn.btn-default.add-to-cart");
         this.productViewProductButtonLocator = (product: Locator) => product.getByRole("link",{name: "View Product"});
         this.productNameTextLocator = (product: Locator) => product.locator("p").first();
         this.productPriceTextLocator = (product: Locator) => product.locator("h2").first();
@@ -253,6 +257,22 @@ export class HomePage{
         await overlayContentAddProductButton.hover();
         await overlayContentAddProductButton.click();
 
+        return {name: productName, price: productPrice};
+    }
+
+    async getActiveRecomendedItems(){
+        return await this.recomendedItemsActiveLocator;
+    }
+
+    async clickAddToCartRecomendedItemsByIndex(index: number): Promise<{name: string, price: number}> {
+        const products = await this.getActiveRecomendedItems();
+        const product = await products.nth(index);
+
+        //Get product data
+        const productName = await this.productNameTextLocator(product).textContent() ?? "";
+        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
+        
+        await this.recomendedItemsAddToCartButtonLocator(product).click();
         return {name: productName, price: productPrice};
     }
 

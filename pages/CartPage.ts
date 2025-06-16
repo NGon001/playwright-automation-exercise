@@ -192,7 +192,7 @@ export class CartPage{
         const Country = await this.billingFormCountry(addresForm).textContent();
         const PhoneNumber = await this.billingFormPhoneNumber(addresForm).textContent();
 
-        const expectedName = `${originalTitle} ${(originalFirstName + " " + originalLastName)}`;
+        const expectedName = `${originalTitle} ${originalFirstName} ${originalLastName}`;
         const expectedAddress = `${originalCompanyName} ${originalAddress} ${originalAddress2}`;
         const expectedCityStatePostcode = `${originalCity} ${originalState} ${originalZipcode}`;
 
@@ -203,14 +203,10 @@ export class CartPage{
         await expect(PhoneNumber).toBe(originalMobileNumber);
     }
 
-    async verifyDeliveryAddress(originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
-        await expect(await this.deliveryAdressLocator).toBeVisible();
-        await this.verifyAddressFormInformation(await this.deliveryAdressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
-    }
-
-    async verifyBillingAddress(originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
-        await expect(await this.billingAdressLocator).toBeVisible();
-        await this.verifyAddressFormInformation(await this.billingAdressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
+    async verifyAddress(addressName: string, originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+        const adressLocator = addressName === "billing" ? await this.billingAdressLocator : await this.deliveryAdressLocator;
+        await expect(adressLocator).toBeVisible();
+        await this.verifyAddressFormInformation(adressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
     }
 
     async inputDescriptionMessage(message: string){

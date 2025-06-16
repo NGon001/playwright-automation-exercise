@@ -5,7 +5,6 @@ export class SignUpPage{
     readonly nameFieldLocator: Locator;
     readonly emailFieldLocator: Locator;
     readonly createAccountButton:Locator;
-    readonly enterAccountInfTextLocator: Locator;
     readonly fillFormRadioTitleLocator: (Title: string) => Locator;
     readonly fillFormPasswordLocator: Locator;
     readonly fillFormDayOptionLocator: Locator;
@@ -29,7 +28,6 @@ export class SignUpPage{
         this.nameFieldLocator = this.page.locator("#name");
         this.emailFieldLocator = this.page.locator("#email");
         this.createAccountButton = this.page.getByRole('button', { name: 'Create Account' });
-        this.enterAccountInfTextLocator = this.page.getByText('Enter Account Information');
         this.fillFormRadioTitleLocator = (Title: string) => this.page.getByRole('radio', { name: Title });
         this.fillFormPasswordLocator = this.page.locator('#password');
         this.fillFormDayOptionLocator = this.page.locator('#days');

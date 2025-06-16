@@ -136,12 +136,6 @@ export class ProductsPage{
         const productName = await this.productNameTextLocator(product).textContent() ?? "";
         const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
         await expect(productPrice).not.toBe(0 || "");
-
-        //for all images in page
-        /*await this.page.waitForFunction(() => {
-            const images = Array.from(document.images);
-            return images.length === 0 || images.every(img => img.complete && img.naturalWidth > 0);
-        });*/
         
         // wait image to load, because it will depend on hover
         //----
