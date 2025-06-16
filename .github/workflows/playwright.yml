@@ -11,8 +11,30 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     env:
-      VALID_EMAIL: ${{ secrets.VALID_EMAIL }}
-      VALID_PASSWORD: ${{ secrets.VALID_PASSWORD }}
+      VALID_LOGIN_EMAIL: ${{ secrets.VALID_LOGIN_EMAIL }}
+      VALID_LOGIN_PASSWORD: ${{ secrets.VALID_LOGIN_PASSWORD }}
+      VALID_LOGIN_NAME_FIRST: ${{ secrets.VALID_LOGIN_NAME_FIRST }}
+      
+      REGISTER_TITLE: ${{ secrets.REGISTER_TITLE }}
+      REGISTER_NAME_FIRST: ${{ secrets.REGISTER_NAME_FIRST }}
+      REGISTER_NAME_LAST: ${{ secrets.REGISTER_NAME_LAST }}
+      REGISTER_PASSWORD: ${{ secrets.REGISTER_PASSWORD }}
+      REGISTER_BIRTH_DAY: ${{ secrets.REGISTER_BIRTH_DAY }}
+      REGISTER_BIRTH_MONTH: ${{ secrets.REGISTER_BIRTH_MONTH }}
+      REGISTER_BIRTH_YEAR: ${{ secrets.REGISTER_BIRTH_YEAR }}
+      REGISTER_ADDRESS: ${{ secrets.REGISTER_ADDRESS }}
+      REGISTER_ADDRESS2: ${{ secrets.REGISTER_ADDRESS2 }}
+      REGISTER_COUNTRY: ${{ secrets.REGISTER_COUNTRY }}
+      REGISTER_STATE: ${{ secrets.REGISTER_STATE }}
+      REGISTER_CITY: ${{ secrets.REGISTER_CITY }}
+      REGISTER_ZIPCODE: ${{ secrets.REGISTER_ZIPCODE }}
+      REGISTER_COMPANY_NAME: ${{ secrets.REGISTER_COMPANY_NAME }}
+      REGISTER_MOBILE_NUMBER: ${{ secrets.REGISTER_MOBILE_NUMBER }}
+
+      CARD_NUMBER: ${{ secrets.CARD_NUMBER }}
+      CARD_CVC: ${{ secrets.CARD_CVC }}
+      CARD_EXPIRY_MONTH: ${{ secrets.CARD_EXPIRY_MONTH }}
+      CARD_EXPIRY_YEAR: ${{ secrets.CARD_EXPIRY_YEAR }}
 
     steps:
     - name: Checkout repository
