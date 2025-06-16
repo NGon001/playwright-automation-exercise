@@ -5,7 +5,6 @@ export class SignUpPage{
     readonly nameFieldLocator: Locator;
     readonly emailFieldLocator: Locator;
     readonly createAccountButton:Locator;
-    readonly enterAccountInfTextLocator: Locator;
     readonly fillFormRadioTitleLocator: (Title: string) => Locator;
     readonly fillFormPasswordLocator: Locator;
     readonly fillFormDayOptionLocator: Locator;
@@ -29,7 +28,6 @@ export class SignUpPage{
         this.nameFieldLocator = this.page.locator("#name");
         this.emailFieldLocator = this.page.locator("#email");
         this.createAccountButton = this.page.getByRole('button', { name: 'Create Account' });
-        this.enterAccountInfTextLocator = this.page.getByText('Enter Account Information');
         this.fillFormRadioTitleLocator = (Title: string) => this.page.getByRole('radio', { name: Title });
         this.fillFormPasswordLocator = this.page.locator('#password');
         this.fillFormDayOptionLocator = this.page.locator('#days');
@@ -49,13 +47,14 @@ export class SignUpPage{
         this.fillFormMobileNumberInputLocator = this.page.locator('#mobile_number');
     }
 
-    async checkDataInForm(fullName, email){
+    async checkDataInForm(firstName, email){
         await expect(await this.page.getByText('Enter Account Information')).toBeVisible();
-        await expect(await this.nameFieldLocator.getAttribute('value')).toBe(fullName[0]);
+        await expect(await this.nameFieldLocator.getAttribute('value')).toBe(firstName);
         await expect(await this.emailFieldLocator.getAttribute('value')).toBe(email);   
     }
 
-    async fillSignUpForm(Title,fullName,password,BirthDay,BirthMonth,BirthYear,companyName,Address,Address2,Country,State,City,Zipcode,mobileNumber){
+    async fillSignUpForm(Title,firstName,lastName,password,BirthDay,BirthMonth,BirthYear,companyName,Address,Address2,Country,State,City,Zipcode,mobileNumber){
+        const fullName = [firstName,lastName];
         await this.fillFormRadioTitleLocator(Title).check();
         await this.fillFormPasswordLocator.fill(password);
         await this.fillFormDayOptionLocator.selectOption({ label: BirthDay });

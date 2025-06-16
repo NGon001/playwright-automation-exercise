@@ -27,6 +27,9 @@ export class CartPage{
     readonly placeOrderButtonLocator: Locator;
     readonly deliveryTextLocator: Locator;
     readonly productImageLocator: (product: Locator) => Locator;
+    readonly productDeleteButtonLocator: (product: Locator) => Locator;
+    readonly emptyCartTextLocator: Locator;
+    readonly signUpAndLoginPageLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -53,6 +56,9 @@ export class CartPage{
         this.placeOrderButtonLocator = this.page.getByRole("link",{name: "Place Order"});
         this.productImageLocator = (product: Locator) => product.locator("img");
         this.deliveryTextLocator = this.page.getByText("Your delivery address");
+        this.productDeleteButtonLocator = (product: Locator) => product.locator(".cart_quantity_delete");
+        this.emptyCartTextLocator = this.page.getByText("Cart is empty!");
+        this.signUpAndLoginPageLocator = this.page.getByRole('link', { name: 'Signup / Login' });
     }
 
     async verifyImageWasLoaded(image: Locator){
@@ -67,16 +73,49 @@ export class CartPage{
     }
 
     async inputValueToSubscriptionEmailField(email: string){
-        await this.subscriptionEmailInputLocator.fill(email);
-        await this.subscribeButtonLocator.click();
+        await expect(async () => {
+            await this.subscriptionEmailInputLocator.fill(email);
+            await this.subscribeButtonLocator.click();
+            await this.checkSuccesSubscriptionMessage();
+        }).toPass();
     }
 
     async checkSuccesSubscriptionMessage(){
         await expect(await this.subscribeMessage).toBeVisible();
     }
 
+    async isCartEmpty(){
+        return await this.emptyCartTextLocator.isVisible();
+    }
+
     async getProductsList(){
         return await this.productsListLocator;
+    }
+
+    async getProductByName(name: string): Promise<Locator | null> {
+        const product =  (await this.getProductsList()).filter({
+            has: this.page.locator('h4', { hasText: name })
+        });
+        
+        if (await product.count() === 0) {
+            return null;
+        }
+
+        return product;
+    }
+
+    async verifyProductImageWasLoaded(product: Locator){
+        await this.verifyImageWasLoaded(await this.productImageLocator(await product));
+    }
+
+    async checkIfProcessButtonVisisble(){
+        await expect(await this.processToCheckoutButtonLocator).toBeVisible();
+    }
+
+    async verifyProductImageWasLoadedByName(name: string){
+        const product = await this.getProductByName(name);
+        await expect(product).not.toBe(null);
+        if(product) await this.verifyProductImageWasLoaded(product);
     }
 
     async clickProcessButton(authorized: boolean) {
@@ -113,7 +152,34 @@ export class CartPage{
         await expect(productPriceTotal).toBe((productPrice * quantity));
     }
 
-    async verifyAddressFormInformation(addresForm: Locator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+    async clickDeleteButtonByProduct(product: Locator) {
+        if (await product.count() === 0) {
+            throw new Error('Product does not exist, cannot click delete.');
+        }
+        await expect(async () => {
+            await this.productDeleteButtonLocator(product).click();
+            await expect(product).toHaveCount(0, { timeout: 10000 });
+        }).toPass();
+    }
+
+    async deleteProductByName(name: string){
+        const product = await this.getProductByName(name);
+        await expect(product).not.toBe(null);
+        if (product) await this.clickDeleteButtonByProduct(product);
+    }
+
+    async checkProductExistByName(name: string){
+        if(await this.isCartEmpty()) return false;
+        const product = await this.getProductByName(name);
+        if(product === null) return false;
+        return true;
+    }
+
+    async verifyProductExistOrNot(exist: boolean, name: string){
+        await expect(await this.checkProductExistByName(name)).toBe(exist);
+    }
+
+    async verifyAddressFormInformation(addresForm: Locator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
         const Name = await this.billingFormName(addresForm).textContent();
         const AddressesLocators = await this.billingFormAddress(addresForm).all();
         let combinedAddress = '';
@@ -126,7 +192,7 @@ export class CartPage{
         const Country = await this.billingFormCountry(addresForm).textContent();
         const PhoneNumber = await this.billingFormPhoneNumber(addresForm).textContent();
 
-        const expectedName = `${originalTitle} ${originalName.join(' ')}`;
+        const expectedName = `${originalTitle} ${originalFirstName} ${originalLastName}`;
         const expectedAddress = `${originalCompanyName} ${originalAddress} ${originalAddress2}`;
         const expectedCityStatePostcode = `${originalCity} ${originalState} ${originalZipcode}`;
 
@@ -137,14 +203,10 @@ export class CartPage{
         await expect(PhoneNumber).toBe(originalMobileNumber);
     }
 
-    async verifyDeliveryAddress(originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
-        await expect(await this.deliveryAdressLocator).toBeVisible();
-        await this.verifyAddressFormInformation(await this.deliveryAdressLocator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
-    }
-
-    async verifyBillingAddress(originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
-        await expect(await this.billingAdressLocator).toBeVisible();
-        await this.verifyAddressFormInformation(await this.billingAdressLocator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
+    async verifyAddress(addressName: string, originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+        const adressLocator = addressName === "billing" ? await this.billingAdressLocator : await this.deliveryAdressLocator;
+        await expect(adressLocator).toBeVisible();
+        await this.verifyAddressFormInformation(adressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
     }
 
     async inputDescriptionMessage(message: string){
@@ -153,5 +215,17 @@ export class CartPage{
 
     async clickPlaceOrderButton(){
         await this.placeOrderButtonLocator.click();
+    }
+
+    async getProductsCount(){
+        return await (await this.getProductsList()).count();
+    }
+
+    async gotoSignUpAndLoginPage(){
+        await this.signUpAndLoginPageLocator.click();
+    }
+
+    async checkValues(value1, value2){
+        await expect(value1).toBe(value2);
     }
 }

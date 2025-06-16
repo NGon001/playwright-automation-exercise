@@ -19,6 +19,12 @@ export class ProductsPage{
     readonly productPriceTextLocator: (product: Locator) => Locator;
     readonly productImageLocator: (product: Locator) => Locator;
     readonly modalContentLocator: Locator;
+    readonly categoriesLeftPanelLocator: Locator;
+    readonly categoriesLocator: (categoriesLeftPanelLocator: Locator) => Locator;
+    readonly categoryWithNameLocator: (category: Locator, categoryName: string) => Locator;
+    readonly panelDefaultClass: (link: Locator) => Locator;
+    readonly productsTextSearchByCategoryLocator: (text: string) => Locator;
+    readonly subCategoryCollabseOrInLocator: (panelCategory: Locator,option: string) => Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -38,6 +44,12 @@ export class ProductsPage{
         this.productImageLocator = (product: Locator) => product.locator("img");
         this.productAddToCartTextLocator = this.page.getByText("Your product has been added");
         this.modalContentLocator = this.page.locator(".modal-content");
+        this.categoriesLeftPanelLocator = this.page.locator(".panel-group.category-products");
+        this.categoriesLocator = (categoriesLeftPanelLocator: Locator) => categoriesLeftPanelLocator.locator(".panel.panel-default");
+        this.categoryWithNameLocator = (category: Locator, categoryName: string) => category.getByRole('link', { name: categoryName });
+        this.panelDefaultClass = (link: Locator) => link.locator('xpath=ancestor::div[contains(@class,"panel") and contains(@class,"panel-default")]');
+        this.productsTextSearchByCategoryLocator = (text: string) => this.page.getByText(text);
+        this.subCategoryCollabseOrInLocator = (panelCategory: Locator,option: string) => panelCategory.locator((".panel-collapse" + option));
     }
 
     async gotoProduct(link: string){
@@ -65,9 +77,13 @@ export class ProductsPage{
         await this.productViewProductButtonLocator(product).click();
     }
 
-    async clickProductViewProductButtonByIndex(index: number){
+    async clickViewProductButtonByIndex(index: number): Promise<{name: string, price: number}>{
         const products = await this.getAllProducts();
-        await this.clickViewProductButton(products.nth(index));
+        const product = await products.nth(index);
+        const productName = await this.productNameTextLocator(product).textContent() ?? "";
+        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
+        await this.clickViewProductButton(product);
+        return {name: productName, price: productPrice};
     }
 
     async verefyThatProductsSearchComplited(){
@@ -120,12 +136,6 @@ export class ProductsPage{
         const productName = await this.productNameTextLocator(product).textContent() ?? "";
         const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
         await expect(productPrice).not.toBe(0 || "");
-
-        //for all images in page
-        /*await this.page.waitForFunction(() => {
-            const images = Array.from(document.images);
-            return images.length === 0 || images.every(img => img.complete && img.naturalWidth > 0);
-        });*/
         
         // wait image to load, because it will depend on hover
         //----
@@ -167,5 +177,73 @@ export class ProductsPage{
         await expect(await this.modalContentLocator).toBeVisible();
         await expect(await this.cartModelViewCartButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
         await this.cartModelViewCartButton(await this.modalContentLocator).click();
+    }
+
+    async verifySearchByGroupTextIsVissible(categoryName: string, subCategoryName: string){
+        await expect(await this.productsTextSearchByCategoryLocator((categoryName + " - " + subCategoryName + " Products"))).toBeVisible();
+    }
+
+    async verifyCategoryLeftPanelVisisble(){
+        await expect(await this.categoriesLeftPanelLocator).toBeVisible();
+    }
+
+    async getAllCategories(){
+        await this.verifyCategoryLeftPanelVisisble();
+        return await this.categoriesLocator(await this.categoriesLeftPanelLocator);
+    }
+
+    // exact option is not working here, beasuse of spaces
+    private async clickCategoryByName(name: string): Promise<Locator> {
+        await this.categoriesLeftPanelLocator.scrollIntoViewIfNeeded();
+        await this.verifyCategoryLeftPanelVisisble();
+        const categories = await this.getAllCategories();
+        const categoryLinks: Locator[] = [];
+        for(const category of await categories.all()){
+            const link = await this.categoryWithNameLocator(category,name);
+            if(await link.count() > 0)
+                categoryLinks.push(link);
+        }
+        if(categoryLinks.length === 0)
+            throw new Error(`Category with name "${name}" not found`);
+
+        if(categoryLinks.length > 1){
+            for(const potentialCategoryLink of await categoryLinks){
+                const text = (await potentialCategoryLink.textContent() ?? '').trim();
+                if (text === name.trim()) {
+                    const panelCategory = await this.panelDefaultClass(potentialCategoryLink);
+                    await expect(async () => {
+                        await potentialCategoryLink.click();
+                        await this.page.waitForTimeout(500); // i know it is not a best practice, but for now ;-;
+                        const subCategoryIn = await this.subCategoryCollabseOrInLocator(panelCategory,".in");
+                        await expect(await subCategoryIn.count()).not.toBe(0);
+                    }).toPass();         
+                    return panelCategory;
+                }
+            }
+            throw new Error(`Link with name "${name}" not found`);
+        }
+        else{
+            if(categoryLinks.length === 0) throw new Error(`Link with name "${name}" not found`);
+            const link = categoryLinks[0];
+            const panelCategory = await this.panelDefaultClass(link);   
+            await expect(async () => {
+                await link.click();
+                await this.page.waitForTimeout(500); // i know it is not a best practice, but for now ;-;
+                const subCategoryIn = await this.subCategoryCollabseOrInLocator(panelCategory,".in");       
+                await expect(await subCategoryIn.count()).not.toBe(0);
+            }).toPass();  
+            return await this.panelDefaultClass(link);
+        }
+    }
+
+    async clickSubCategoryOfCategory(categoryName: string, subCategoryName: string){
+        const categoty = await this.clickCategoryByName(categoryName);
+        const subCategory = await categoty.getByRole("link", {name: subCategoryName});
+        await subCategory.click();  
+        await this.verifySearchByGroupTextIsVissible(categoryName, subCategoryName); 
+    }
+
+    async getProductCount(){
+        return await (await this.getAllProducts()).count();
     }
 }
