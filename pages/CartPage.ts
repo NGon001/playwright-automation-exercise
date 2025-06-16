@@ -179,7 +179,7 @@ export class CartPage{
         await expect(await this.checkProductExistByName(name)).toBe(exist);
     }
 
-    async verifyAddressFormInformation(addresForm: Locator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+    async verifyAddressFormInformation(addresForm: Locator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
         const Name = await this.billingFormName(addresForm).textContent();
         const AddressesLocators = await this.billingFormAddress(addresForm).all();
         let combinedAddress = '';
@@ -192,7 +192,7 @@ export class CartPage{
         const Country = await this.billingFormCountry(addresForm).textContent();
         const PhoneNumber = await this.billingFormPhoneNumber(addresForm).textContent();
 
-        const expectedName = `${originalTitle} ${originalName.join(' ')}`;
+        const expectedName = `${originalTitle} ${(originalFirstName + " " + originalLastName)}`;
         const expectedAddress = `${originalCompanyName} ${originalAddress} ${originalAddress2}`;
         const expectedCityStatePostcode = `${originalCity} ${originalState} ${originalZipcode}`;
 
@@ -203,14 +203,14 @@ export class CartPage{
         await expect(PhoneNumber).toBe(originalMobileNumber);
     }
 
-    async verifyDeliveryAddress(originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+    async verifyDeliveryAddress(originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
         await expect(await this.deliveryAdressLocator).toBeVisible();
-        await this.verifyAddressFormInformation(await this.deliveryAdressLocator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
+        await this.verifyAddressFormInformation(await this.deliveryAdressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
     }
 
-    async verifyBillingAddress(originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+    async verifyBillingAddress(originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
         await expect(await this.billingAdressLocator).toBeVisible();
-        await this.verifyAddressFormInformation(await this.billingAdressLocator,originalTitle, originalName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
+        await this.verifyAddressFormInformation(await this.billingAdressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
     }
 
     async inputDescriptionMessage(message: string){

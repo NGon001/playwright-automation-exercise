@@ -100,8 +100,8 @@ export class HomePage{
         return {name: productName, price: productPrice};
     }
 
-    async checkLoggedInName(name){
-        const expectedMessage = `Logged in as ${name[0]}`;
+    async checkLoggedInName(firstName){
+        const expectedMessage = `Logged in as ${firstName}`;
         const loggedInMessage = await this.textLoggedInUserLocator.textContent();
         await expect(await this.textLoggedInUserLocator).toBeVisible();
         await expect(await loggedInMessage?.trim()).toBe(expectedMessage);

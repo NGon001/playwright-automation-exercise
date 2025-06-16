@@ -49,13 +49,14 @@ export class SignUpPage{
         this.fillFormMobileNumberInputLocator = this.page.locator('#mobile_number');
     }
 
-    async checkDataInForm(fullName, email){
+    async checkDataInForm(firstName, email){
         await expect(await this.page.getByText('Enter Account Information')).toBeVisible();
-        await expect(await this.nameFieldLocator.getAttribute('value')).toBe(fullName[0]);
+        await expect(await this.nameFieldLocator.getAttribute('value')).toBe(firstName);
         await expect(await this.emailFieldLocator.getAttribute('value')).toBe(email);   
     }
 
-    async fillSignUpForm(Title,fullName,password,BirthDay,BirthMonth,BirthYear,companyName,Address,Address2,Country,State,City,Zipcode,mobileNumber){
+    async fillSignUpForm(Title,firstName,lastName,password,BirthDay,BirthMonth,BirthYear,companyName,Address,Address2,Country,State,City,Zipcode,mobileNumber){
+        const fullName = [firstName,lastName];
         await this.fillFormRadioTitleLocator(Title).check();
         await this.fillFormPasswordLocator.fill(password);
         await this.fillFormDayOptionLocator.selectOption({ label: BirthDay });

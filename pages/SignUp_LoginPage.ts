@@ -35,8 +35,8 @@ export class SignUp_LoginPage{
         await expect(await this.signUpAndLoginPageLocator).toBeVisible();
     }
 
-    async fillStartSignUpForm(fullName, email){
-        await this.FormNameInputLocator(await this.signUpFormLocator).fill(fullName[0]);
+    async fillStartSignUpForm(firstName: string, email: string){
+        await this.FormNameInputLocator(await this.signUpFormLocator).fill(firstName);
         await this.FormEmailInputLocator(await this.signUpFormLocator).fill(email);
     }
 

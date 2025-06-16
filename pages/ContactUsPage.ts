@@ -29,8 +29,8 @@ export class ContactUsPage{
         await expect(await this.getInTouchTextLocator).toBeVisible();
     }
 
-    async fillContactUsForm(name, email, subject, message, filePath) {
-        await this.nameFieldLocator.fill(name.join(' '));
+    async fillContactUsForm(firstName,lastName, email, subject, message, filePath) {
+        await this.nameFieldLocator.fill(`${firstName}  ${lastName}`);
         await this.emailFieldLocator.fill(email);
         await this.subjectFieldLocator.fill(subject);
         await this.messageFieldLocator.fill(message);

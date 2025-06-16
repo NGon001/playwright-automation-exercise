@@ -31,9 +31,9 @@ export class PaymentPage{
         await expect(await this.paymentTextLocator).toBeVisible();
     }
 
-    async fillPaymentForm(name,cardNumber,CVC,expiryMonth,expiryYear){
+    async fillPaymentForm(firstName,lastName,cardNumber,CVC,expiryMonth,expiryYear){
         await this.verifyPageLoaded();
-        await this.nameOnCardInputLocator.fill(name.join(" "));
+        await this.nameOnCardInputLocator.fill((firstName + ' ' + lastName));
         await this.cardNumberInputLocator.fill(cardNumber);
         await this.cardCVCInputLocator.fill(CVC);
         await this.expiryMonthInputLocator.fill(expiryMonth);

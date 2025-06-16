@@ -64,9 +64,9 @@ export class ProductPage{
         await expect(await this.writeReviewTextLocator).toBeVisible();
     }
 
-    async fillReviewForm(fullName: string[], email: string, message: string){
+    async fillReviewForm(firstName: string, lastName: string, email: string, message: string){
         await this.verifyWriteReviewTextVissible();
-        await this.reviewNameInputLocator.fill(fullName.join(" "));
+        await this.reviewNameInputLocator.fill((`${firstName} ${lastName}`));
         await this.reviewEmailInputLocator.fill(email);
         await this.reviewTextAreaInputLocator.fill(message);
     }
