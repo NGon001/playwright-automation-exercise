@@ -16,6 +16,13 @@ export class ProductPage{
     readonly modalContentLocator: Locator;
     readonly cartModelContinueShoppingButton: (modalContent: Locator) => Locator;
     readonly productImageLocator: Locator;
+    readonly cartButtonLocator: Locator;
+    readonly writeReviewTextLocator: Locator;
+    readonly reviewNameInputLocator: Locator;
+    readonly reviewEmailInputLocator: Locator;
+    readonly reviewTextAreaInputLocator: Locator;
+    readonly reviewSubmitButtonLocator: Locator;
+    readonly reviewSuccessMessageTextLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -31,7 +38,14 @@ export class ProductPage{
         this.cartModelViewCartButton = (modalContent: Locator) => modalContent.getByRole("link",{name: "View Cart"});
         this.modalContentLocator = this.page.locator(".modal-content");
         this.cartModelContinueShoppingButton = (modalContent: Locator) => modalContent.getByRole("button",{name: "Continue Shopping"});
+        this.writeReviewTextLocator = this.page.getByRole("link",{name: "Write Your Review"});
         this.productImageLocator = this.page.locator(".col-sm-5 img");
+        this.cartButtonLocator = this.page.locator('.col-sm-8 a[href="/view_cart"]');
+        this.reviewNameInputLocator = this.page.getByPlaceholder("Your Name");
+        this.reviewEmailInputLocator = this.page.getByPlaceholder("Email Address",{exact:true});
+        this.reviewTextAreaInputLocator = this.page.getByPlaceholder("Add Review Here!");
+        this.reviewSubmitButtonLocator = this.page.getByRole("button",{name: "Submit"});
+        this.reviewSuccessMessageTextLocator = this.page.getByText("Thank you for your review.");
     }
 
     async goBack(){
@@ -45,6 +59,22 @@ export class ProductPage{
         )).toBeTruthy();
     }
 
+    async verifyWriteReviewTextVissible(){
+        await this.verifyImageWasLoaded(await this.productImageLocator);
+        await expect(await this.writeReviewTextLocator).toBeVisible();
+    }
+
+    async fillReviewForm(fullName: string[], email: string, message: string){
+        await this.verifyWriteReviewTextVissible();
+        await this.reviewNameInputLocator.fill(fullName.join(" "));
+        await this.reviewEmailInputLocator.fill(email);
+        await this.reviewTextAreaInputLocator.fill(message);
+    }
+
+    async clickReviewSubmitButton(){
+        await this.reviewSubmitButtonLocator.click();
+        await expect(await this.reviewSuccessMessageTextLocator).toBeVisible();
+    }
 
     async verifyThatProductInformationIsVisible(){
         const productName = await this.prductInformationNameLocator(await this.productInformationSectionLocator).textContent() || "";
@@ -87,5 +117,9 @@ export class ProductPage{
         await expect(await this.modalContentLocator).toBeVisible();
         await expect(await this.cartModelViewCartButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
         await this.cartModelViewCartButton(await this.modalContentLocator).click();
+    }
+
+    async gotoCart(){
+        await this.cartButtonLocator.click();
     }
 }

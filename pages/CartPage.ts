@@ -29,6 +29,7 @@ export class CartPage{
     readonly productImageLocator: (product: Locator) => Locator;
     readonly productDeleteButtonLocator: (product: Locator) => Locator;
     readonly emptyCartTextLocator: Locator;
+    readonly signUpAndLoginPageLocator: Locator;
 
     constructor(page: Page){
         this.page = page;
@@ -57,6 +58,7 @@ export class CartPage{
         this.deliveryTextLocator = this.page.getByText("Your delivery address");
         this.productDeleteButtonLocator = (product: Locator) => product.locator(".cart_quantity_delete");
         this.emptyCartTextLocator = this.page.getByText("Cart is empty!");
+        this.signUpAndLoginPageLocator = this.page.getByRole('link', { name: 'Signup / Login' });
     }
 
     async verifyImageWasLoaded(image: Locator){
@@ -71,8 +73,11 @@ export class CartPage{
     }
 
     async inputValueToSubscriptionEmailField(email: string){
-        await this.subscriptionEmailInputLocator.fill(email);
-        await this.subscribeButtonLocator.click();
+        await expect(async () => {
+            await this.subscriptionEmailInputLocator.fill(email);
+            await this.subscribeButtonLocator.click();
+            await this.checkSuccesSubscriptionMessage();
+        }).toPass();
     }
 
     async checkSuccesSubscriptionMessage(){
@@ -103,8 +108,13 @@ export class CartPage{
         await this.verifyImageWasLoaded(await this.productImageLocator(await product));
     }
 
+    async checkIfProcessButtonVisisble(){
+        await expect(await this.processToCheckoutButtonLocator).toBeVisible();
+    }
+
     async verifyProductImageWasLoadedByName(name: string){
         const product = await this.getProductByName(name);
+        await expect(product).not.toBe(null);
         if(product) await this.verifyProductImageWasLoaded(product);
     }
 
@@ -146,8 +156,10 @@ export class CartPage{
         if (await product.count() === 0) {
             throw new Error('Product does not exist, cannot click delete.');
         }
-        await this.productDeleteButtonLocator(product).click();
-        await expect(product).toHaveCount(0, { timeout: 50000 });
+        await expect(async () => {
+            await this.productDeleteButtonLocator(product).click();
+            await expect(product).toHaveCount(0, { timeout: 10000 });
+        }).toPass();
     }
 
     async deleteProductByName(name: string){
@@ -207,5 +219,17 @@ export class CartPage{
 
     async clickPlaceOrderButton(){
         await this.placeOrderButtonLocator.click();
+    }
+
+    async getProductsCount(){
+        return await (await this.getProductsList()).count();
+    }
+
+    async gotoSignUpAndLoginPage(){
+        await this.signUpAndLoginPageLocator.click();
+    }
+
+    async checkValues(value1, value2){
+        await expect(value1).toBe(value2);
     }
 }
