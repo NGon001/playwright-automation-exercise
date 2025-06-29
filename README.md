@@ -4,16 +4,20 @@ This is a **personal project** created to **practice automation testing** contai
 
 ## 🧰 Tech Stack
 
-- [Playwright](https://playwright.dev/) (JavaScript / TypeScript)
+- [Playwright 1.53.0 ](https://playwright.dev/) (JavaScript / TypeScript)
 - [dotenv](https://www.npmjs.com/package/dotenv) for managing environment variables (  ```VALID_EMAIL, VALID_PASSWORD```)
+- [TestRail](https://support.testrail.com/hc/en-us) for test case management (```Specification-first workflow```)
 - GitHub Actions for CI/CD
 
 ---
 ## Run tests using the following command:
 ```npx playwright test --repeat-each=5 ```
 ---
-
+## Example of TestRail tracking
+![Screenshot_26](https://github.com/user-attachments/assets/44ab1b94-18f5-46ea-982a-15a835c4f051)
+![Screenshot_27](https://github.com/user-attachments/assets/58a5217e-f446-406c-9e6f-b51ae7bb04cd)
 ---
+
 
 ## 🚀 Features Covered
 
@@ -289,3 +293,6 @@ Slightly modified Test Case 9 to strengthen the verification of the product sear
 7. Verify that product is displayed in cart page
 
 ---
+
+
+
