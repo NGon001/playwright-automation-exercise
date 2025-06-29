@@ -11,7 +11,7 @@ This is a **personal project** created to **practice automation testing** contai
 
 ---
 ## Run tests using the following command:
-```npx playwright test --repeat-each=5 ```
+```npm run test```
 ---
 ## Example of TestRail tracking
 ![Screenshot_26](https://github.com/user-attachments/assets/44ab1b94-18f5-46ea-982a-15a835c4f051)
