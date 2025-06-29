@@ -1,7 +1,10 @@
 import { test } from '../Helper/base.ts';
 import { generateRandomEmail } from '../Helper/tools.ts';
 import dotenv from 'dotenv';
+import { randomUUID } from 'crypto';
+import fs from 'fs/promises'; // Add this import at the top
 dotenv.config();
+
 
 test.beforeEach(async ({ context }) => {
     await context.route("**/*", route => {
@@ -9,6 +12,18 @@ test.beforeEach(async ({ context }) => {
       route.abort() : route.continue();
       return;
     })
+});
+
+test.afterEach(async ({ page }, testInfo) => {
+    let screenshotPath = `test-resultsSave/screenshots/screenshot-${randomUUID()}.png`;
+    const videoPath = `test-resultsSave/videos/video-${randomUUID()}.webm`;
+    await page.screenshot({ path: screenshotPath, fullPage: true });
+    await page.close();
+    testInfo.annotations.push({ type: 'testrail_attachment', description: screenshotPath });
+    if (page.video()) {
+        await page.video().saveAs(videoPath);
+        testInfo.annotations.push({ type: 'testrail_attachment', description: videoPath });
+    }
 });
 
 test.describe("Authorization tests", () => {
@@ -41,23 +56,27 @@ test.describe("Authorization tests", () => {
   17. Click 'Delete Account' button
   18. Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button */
 
-  test('Test Case 1: Register User', async ({ homePage, signUp_LoginPage,signUpPage,accountCreatedPage,accountDeletePage }) => {
+  test('C2259 Register User', async ({ homePage, signUp_LoginPage,signUpPage,accountCreatedPage,accountDeletePage },testInfo) => {
     const email = await generateRandomEmail();
-    //Fill signup form
+    //Step 1: Fill signup form
+    testInfo.annotations.push({type: "testrail_result_comment", description: "Step 1: Fill signup form" });
     await signUp_LoginPage.fillStartSignUpForm(process.env.REGISTER_NAME_FIRST,email);
     await signUp_LoginPage.clickSignUpButton();
 
-    //Fill detailed signup formr
+    //Step 2: Fill detailed signup form
+    testInfo.annotations.push({type: "testrail_result_comment", description: "Step 2: Fill detailed signup form" });
     await signUpPage.checkDataInForm(process.env.REGISTER_NAME_FIRST,email);
     await signUpPage.fillSignUpForm(process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_PASSWORD,process.env.REGISTER_BIRTH_DAY,process.env.REGISTER_BIRTH_MONTH,process.env.REGISTER_BIRTH_YEAR,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_MOBILE_NUMBER);
     await signUpPage.clickCreateAccountButton();
 
-    //verift account was created
+    //Step 3: verift account was created
+    testInfo.annotations.push({type: "testrail_result_comment", description: "Step 3: verift account was created" });
     await accountCreatedPage.checkAccountCreationMessage();
     await accountCreatedPage.clickContinueButton();
     await homePage.checkLoggedInName(process.env.REGISTER_NAME_FIRST);
 
-    //delete account and verify it
+    //Step 4: delete account and Verify it
+    testInfo.annotations.push({type: "testrail_result_comment", description: "Step 4: delete account and Verify it" });
     await homePage.clickDeleteAccount();
     await accountDeletePage.checkAccountDeletedMessage();
     await accountDeletePage.clickContinueButton();
@@ -75,7 +94,7 @@ test.describe("Authorization tests", () => {
   8. Verify that 'Logged in as username' is visible
   */
 
-  test('Test Case 2: Login User with correct email and password', async ({ homePage, signUp_LoginPage }) => {
+  test('C2281 Login User with correct email and password', async ({ homePage, signUp_LoginPage }) => {
     //fill login form
     await signUp_LoginPage.fillLoginForm(process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD);
     await signUp_LoginPage.clickLoginButton();
@@ -95,7 +114,7 @@ test.describe("Authorization tests", () => {
   8. Verify error 'Your email or password is incorrect!' is visible
    */
 
-  test('Test Case 3: Login User with incorrect email and password', async ({signUp_LoginPage }) => {
+  test('C2282 Login User with incorrect email and password', async ({signUp_LoginPage }) => {
     //data
     const incorrectEmail = 'max12341@gmail.com';
 
@@ -119,7 +138,7 @@ test.describe("Authorization tests", () => {
   10. Verify that user is navigated to login page
    */
 
-  test('Test Case 4: Logout User', async ({ homePage, signUp_LoginPage }) => {
+  test('C2283 Logout User', async ({ homePage, signUp_LoginPage }) => {
     //fill login form
     await signUp_LoginPage.fillLoginForm(process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD);
     await signUp_LoginPage.clickLoginButton();
@@ -144,7 +163,7 @@ test.describe("Authorization tests", () => {
   8. Verify error 'Email Address already exist!' is visible
    */
 
-  test('Test Case 5: Register User with existing email', async ({ signUp_LoginPage }) => {
+  test('C2284 Register User with existing email', async ({ signUp_LoginPage }) => {
     //Fill signup form
     await signUp_LoginPage.fillStartSignUpForm(process.env.REGISTER_NAME_FIRST,process.env.VALID_LOGIN_EMAIL);
     await signUp_LoginPage.clickSignUpButton();
@@ -189,7 +208,7 @@ test.describe("Checkout Flow", () => {
   19. Click 'Delete Account' button
   20. Verify 'ACCOUNT DELETED!' and click 'Continue' button
   */
-  test('Test Case 14: Place Order: Register while Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  test('C2293 Place Order: Register while Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
     const email = await generateRandomEmail();
     let authorized = false;
 
@@ -264,7 +283,7 @@ test.describe("Checkout Flow", () => {
   18. Verify 'ACCOUNT DELETED!' and click 'Continue' button
   */
 
-  test('Test Case 15: Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  test('C2294 Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
     const email = await generateRandomEmail();
     let authorized = false;
 
@@ -337,7 +356,7 @@ test.describe("Cart Functionality", () =>{
   10. Verify their prices, quantity and total price
   */
 
-  test('Test Case 12: Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
+  test('C2285 12: Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
     //data
     const productQuantity = 1;
 
@@ -368,7 +387,7 @@ test.describe("Cart Functionality", () =>{
   9. Verify that product is displayed in cart page with exact quantity
   */
 
-  test('Test Case 13: Verify Product quantity in Cart', async ({ homePage,productPage,cartPage }) => {
+  test('C2286 Verify Product quantity in Cart', async ({ homePage,productPage,cartPage }) => {
     //data 
     const Quantity = 4;
     const productIndex = 0;
@@ -397,7 +416,7 @@ test.describe("Cart Functionality", () =>{
   test case was changed to verify that cart delete product button will work with multiple products
   */
 
-  test('Test Case 17: Remove Products From Cart', async ({ homePage,cartPage}) => {
+  test('C2287 Remove Products From Cart', async ({ homePage,cartPage}) => {
     const firstProductInfo = await homePage.clickProductAddToCartButtonByIndex(0);
     await homePage.clickContinueShoppingButton();
     const secondProductInfo = await homePage.clickProductAddToCartButtonByIndex(1);
@@ -524,7 +543,7 @@ test('Test Case 20: Search Products and Verify Cart After Login', async ({ homeP
   7. Verify that product is displayed in cart page
   */
 
-  test('Test Case 22: Add to cart from Recommended items', async ({ homePage, cartPage }) => {
+  test('C2288 Add to cart from Recommended items', async ({ homePage, cartPage }) => {
     await homePage.verifyRecomendedItemsTextVisible();
     const productInfo = await homePage.clickAddToCartRecomendedItemsByIndex(0);
     await homePage.clickViewCartButton();
@@ -553,7 +572,7 @@ test.describe("Product & Catalog", () =>{
   9. Verify that detail detail is visible: product name, category, price, availability, condition, brand
    */
 
-  test('Test Case 8: Verify All Products and product detail page', async ({ homePage, productsPage, productPage }) => {
+  test('C2303 Verify All Products and product detail page', async ({ homePage, productsPage, productPage }) => {
     await homePage.gotoProductsPage();
     await productsPage.checkIfAllProductsTextIsVissible();
     await productsPage.checkIfProductsExist();
@@ -581,7 +600,7 @@ test.describe("Product & Catalog", () =>{
   // If neither the name nor category matches, the test fails.
   */
 
-  test('Test Case 9: Search Products', async ({ homePage, productsPage, productPage}) => {
+  test('C2299 Search Products', async ({ homePage, productsPage, productPage}) => {
     //data
     const productsNames = ["dress","top","tshirt"]; //keyWords
 
@@ -618,7 +637,7 @@ test.describe("Product & Catalog", () =>{
   8. Verify that user is navigated to that category page
   */
 
-  test('Test Case 18: View Category Products', async ({ homePage}) => {
+  test('C2300 View Category Products', async ({ homePage}) => {
     //data
     const WomantCategory = { category: "Women", subCategory: "Dress" };
     const KidstCategory = { category: "Kids", subCategory: "Tops & Shirts" };
@@ -641,7 +660,7 @@ test.describe("Product & Catalog", () =>{
   8. Verify that user is navigated to that brand page and can see products
   */
 
-  test('Test Case 19: View & Cart Brand Products', async ({ homePage,productsPage}) => {
+  test('C2301 View & Cart Brand Products', async ({ homePage,productsPage}) => {
     //data
     const WomantCategory = { category: "Women", subCategory: "Dress" };
     const KidstCategory = { category: "Kids", subCategory: "Tops & Shirts" };
@@ -667,7 +686,7 @@ test.describe("Product & Catalog", () =>{
   9. Verify success message 'Thank you for your review.'
   */
 
-  test('Test Case 21: Add review on product', async ({ homePage,productsPage,productPage}) => {
+  test('C2302 Add review on product', async ({ homePage,productsPage,productPage}) => {
     const message = "Test review message.";
 
     await homePage.gotoProductsPage();
@@ -701,7 +720,7 @@ test.describe("Contact & Subscriptions", () => {
   11. Click 'Home' button and verify that landed to home page successfully
    */
 
-  test('Test Case 6: Contact Us Form', async ({ homePage, contactUsPage }) => {
+  test('C2298 Contact Us Form', async ({ homePage, contactUsPage }) => {
     //data
     const subject = 'Test Subject';
     const message = 'This is a test message.';
@@ -734,7 +753,7 @@ test.describe("Contact & Subscriptions", () => {
   7. Verify success message 'You have been successfully subscribed!' is visible
   */
 
-  test('Test Case 10: Verify Subscription in home page', async ({ homePage }) => {
+  test('C2290 Verify Subscription in home page', async ({ homePage }) => {
     await homePage.inputValueToSubscriptionEmailField(process.env.VALID_LOGIN_EMAIL);
     await homePage.checkSuccessSubscriptionMessage();
   });
@@ -751,7 +770,7 @@ test.describe("Contact & Subscriptions", () => {
   8. Verify success message 'You have been successfully subscribed!' is visible
   */
 
-  test('Test Case 11: Verify Subscription in Cart page', async ({ homePage,cartPage }) => {
+  test('C2291 Verify Subscription in Cart page', async ({ homePage,cartPage }) => {
     //goto
     await homePage.gotoCart();
     await cartPage.verifySubscriptionText();
@@ -775,7 +794,7 @@ test.describe("UI & Navigation", () => {
   5. Verify user is navigated to test cases page successfully
   */
 
-  test('Test Case 7: Verify Test Cases Page', async ({ homePage,testCasesPage }) => {
+  test('C2292 Verify Test Cases Page', async ({ homePage,testCasesPage }) => {
     await homePage.gotoTestCasesPage();
     await testCasesPage.verifyPageIsVisible();
   });

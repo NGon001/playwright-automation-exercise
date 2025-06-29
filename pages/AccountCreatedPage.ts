@@ -8,8 +8,8 @@ export class AccountCreatedPage{
 
     constructor(page: Page){
         this.page = page;
-        this.accountCreatedTextLocator = this.page.getByText('Account Created!');
-        this.continueButtonLocator = this.page.getByRole('link', { name: 'Continue' });
+        this.accountCreatedTextLocator = this.page.getByText('Account Created!').describe("Green Account Created! Text on Page");
+        this.continueButtonLocator = this.page.getByRole('link', { name: 'Continue' }).describe("Continue Button");
     }
 
     async checkAccountCreationMessage(){

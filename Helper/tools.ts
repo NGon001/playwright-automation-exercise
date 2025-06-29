@@ -1,4 +1,4 @@
-import { Locator,expect } from "@playwright/test";
+import { expect } from "@playwright/test";
 
 export async function generateRandomEmail() {
   const randomNumber = Math.floor(Math.random() * 1e16).toString().padStart(16, '0');

@@ -23,7 +23,11 @@ export default defineConfig({
   /* Opt out of parallel tests on CI. */
   workers: process.env.CI ? 1 : undefined,
   /* Reporter to use. See https://playwright.dev/docs/test-reporters */
-  reporter: 'html',
+  reporter: [
+    ['list'],
+    ['html', { outputFolder: 'test-results', open: 'never' }],
+    ['junit', {outputFile: './test-results/junit-report.xml', embedAnnotationsAsProperties: true}]
+  ],
   timeout: 100000,
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
@@ -31,11 +35,12 @@ export default defineConfig({
      baseURL: 'http://automationexercise.com',
      headless: true,
 
-    /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
-    trace: 'on',
-    video: 'on',
-    screenshot: 'on',
+    screenshot: "on",
+    video: "on",
+    trace: 'on',      // <-- keep traces only for failures
   },
+  outputDir: 'test-results/', // <-- preserves attachments
+
 
   /* Configure projects for major browsers */
   projects: [
