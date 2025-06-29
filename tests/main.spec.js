@@ -1,8 +1,7 @@
 import { test } from '../Helper/base.ts';
 import { generateRandomEmail } from '../Helper/tools.ts';
-import dotenv from 'dotenv';
 import { randomUUID } from 'crypto';
-import fs from 'fs/promises'; // Add this import at the top
+import dotenv from 'dotenv';
 dotenv.config();
 
 
@@ -59,24 +58,20 @@ test.describe("Authorization tests", () => {
   test('C2259 Register User', async ({ homePage, signUp_LoginPage,signUpPage,accountCreatedPage,accountDeletePage },testInfo) => {
     const email = await generateRandomEmail();
     //Step 1: Fill signup form
-    testInfo.annotations.push({type: "testrail_result_comment", description: "Step 1: Fill signup form" });
     await signUp_LoginPage.fillStartSignUpForm(process.env.REGISTER_NAME_FIRST,email);
     await signUp_LoginPage.clickSignUpButton();
 
     //Step 2: Fill detailed signup form
-    testInfo.annotations.push({type: "testrail_result_comment", description: "Step 2: Fill detailed signup form" });
     await signUpPage.checkDataInForm(process.env.REGISTER_NAME_FIRST,email);
     await signUpPage.fillSignUpForm(process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_PASSWORD,process.env.REGISTER_BIRTH_DAY,process.env.REGISTER_BIRTH_MONTH,process.env.REGISTER_BIRTH_YEAR,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_MOBILE_NUMBER);
     await signUpPage.clickCreateAccountButton();
 
     //Step 3: verift account was created
-    testInfo.annotations.push({type: "testrail_result_comment", description: "Step 3: verift account was created" });
     await accountCreatedPage.checkAccountCreationMessage();
     await accountCreatedPage.clickContinueButton();
     await homePage.checkLoggedInName(process.env.REGISTER_NAME_FIRST);
 
     //Step 4: delete account and Verify it
-    testInfo.annotations.push({type: "testrail_result_comment", description: "Step 4: delete account and Verify it" });
     await homePage.clickDeleteAccount();
     await accountDeletePage.checkAccountDeletedMessage();
     await accountDeletePage.clickContinueButton();
