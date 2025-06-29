@@ -15,7 +15,9 @@ This is a **personal project** created to **practice automation testing** contai
 ---
 ## Example of TestRail tracking
 ![Screenshot_26](https://github.com/user-attachments/assets/44ab1b94-18f5-46ea-982a-15a835c4f051)
+![Screenshot_27](https://github.com/user-attachments/assets/58a5217e-f446-406c-9e6f-b51ae7bb04cd)
 ---
+
 
 ## 🚀 Features Covered
 
