@@ -8,16 +8,25 @@
     "trcli": "dotenv -e .env -- node ./Helper/trcli-runner.js",
     "test": "npm-run-all --continue-on-error -s testonly trcli"
   },
-  "keywords": [],
-  "author": "",
+  "keywords": [
+    "playwright",
+    "End-to-end",
+    "E2E",
+    "dotenv",
+    "NGON",
+    "automationexercise.com",
+    "automationexercise"
+  ],
+  "author": "NGON",
   "license": "ISC",
-  "description": "",
+  "description": "Project to train and showcase my knowlage",
   "devDependencies": {
     "@playwright/test": "^1.53.0",
     "@types/node": "^22.15.29",
     "dotenv-cli": "^8.0.0",
     "globals": "^16.2.0",
-    "npm-run-all": "^4.1.5"
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.8.3"
   },
   "dependencies": {
     "crypto": "^1.0.1",
