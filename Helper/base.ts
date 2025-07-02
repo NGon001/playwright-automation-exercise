@@ -10,6 +10,9 @@ import { ProductsPage } from '../pages/ProductsPage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
 import { PaymentPage } from '../pages/PaymentPage';
+import { randomUUID } from 'crypto';
+import dotenv from 'dotenv';
+dotenv.config();
 
 type MyFixtures = {
     homePage: HomePage;
@@ -23,6 +26,7 @@ type MyFixtures = {
     productPage: ProductPage;
     cartPage: CartPage;
     paymentPage: PaymentPage;
+    saveData: void;
 }
 
 export const test = baseTest.extend<MyFixtures>({
@@ -59,6 +63,30 @@ export const test = baseTest.extend<MyFixtures>({
     paymentPage: async({page}, use) =>{
         await use(new PaymentPage(page));
     },
+
+    // Thanks to Checkly for that https://www.youtube.com/watch?v=hegZS46J0rA
+    // -----
+    saveData: [async ({ context, page }, use, testInfo) => {
+        await context.route("**/*", route => {
+          route.request().url().startsWith("https://googleads.") ?
+          route.abort() : route.continue();
+          return;
+        })
+
+        await use();
+
+        let screenshotPath = `test-resultsSave/screenshots/screenshot-${randomUUID()}.png`;
+        const videoPath = `test-resultsSave/videos/video-${randomUUID()}.webm`;
+        await page.screenshot({ path: screenshotPath, fullPage: true });
+        await page.close();
+        testInfo.annotations.push({ type: 'testrail_attachment', description: screenshotPath });
+        if (page.video()) {
+            await page.video()?.saveAs(videoPath);
+            testInfo.annotations.push({ type: 'testrail_attachment', description: videoPath });
+        }
+
+    }, { auto: true }],
+    // -----
 });
 
 export {expect} from '@playwright/test';

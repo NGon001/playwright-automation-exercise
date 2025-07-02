@@ -12,9 +12,6 @@ if (!host || !user || !key) {
   process.exit(1);
 }
 
-const now = new Date();
-const timestamp = now.toISOString().replace(/T/, '_').replace(/:/g, '-').replace(/\..+/, '');
-
-const cmd = `trcli -y -h "${host}" --project "Automationexercise" -u "${user}" -k "${key}" parse_junit --case-matcher "name" --title "Local run and import ${timestamp}" --run-description "Manual local test run" -f ./test-results/junit-report.xml --close-run`;
+const cmd = `trcli -y -h "${host}" --project "Automationexercise" -u "${user}" -k "${key}" parse_junit --case-matcher "name" --title "Local run and import ${new Date().toISOString()}" --run-description "Manual local test run" -f ./test-results/junit-report.xml --close-run`;
 
 execSync(cmd, { stdio: 'inherit' });
