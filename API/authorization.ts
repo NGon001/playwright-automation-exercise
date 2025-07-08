@@ -20,7 +20,6 @@ export class AuthorizationAPI{
 
     async verifyResponseCode(response, expectedCode){
         const responseBody = await response.json();
-        console.log(responseBody);
         await expect(responseBody.responseCode).toBe(expectedCode);
         await expect((await response).ok()).toBeTruthy();
     }
