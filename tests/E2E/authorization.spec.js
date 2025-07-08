@@ -1,7 +1,7 @@
-import { test } from '../Helper/base.ts';
-import { generateRandomEmail } from '../Helper/tools.js';
+import { test } from '../../Helper/base.ts';
+import { generateRandomEmail } from '../../Helper/tools.js';
 
-test.describe("Authorization tests", () => {
+test.describe("E2E Authorization tests", () => {
   test.beforeEach(async ({ homePage, signUp_LoginPage }) => {
     //goto
     await homePage.goto();
@@ -39,7 +39,23 @@ test.describe("Authorization tests", () => {
 
     //Step 2: Fill detailed signup form
     await signUpPage.checkDataInForm(process.env.REGISTER_NAME_FIRST,email);
-    await signUpPage.fillSignUpForm(process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_PASSWORD,process.env.REGISTER_BIRTH_DAY,process.env.REGISTER_BIRTH_MONTH,process.env.REGISTER_BIRTH_YEAR,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_MOBILE_NUMBER);
+    await signUpPage.fillSignUpForm(
+      process.env.REGISTER_TITLE,
+      process.env.REGISTER_NAME_FIRST,
+      process.env.REGISTER_NAME_LAST,
+      process.env.REGISTER_PASSWORD,
+      process.env.REGISTER_BIRTH_DAY,
+      process.env.REGISTER_BIRTH_MONTH,
+      process.env.REGISTER_BIRTH_YEAR,
+      process.env.REGISTER_COMPANY_NAME,
+      process.env.REGISTER_ADDRESS,
+      process.env.REGISTER_ADDRESS2,
+      process.env.REGISTER_COUNTRY,
+      process.env.REGISTER_STATE,
+      process.env.REGISTER_CITY,
+      process.env.REGISTER_ZIPCODE,
+      process.env.REGISTER_MOBILE_NUMBER
+    );
     await signUpPage.clickCreateAccountButton();
 
     //Step 3: verift account was created

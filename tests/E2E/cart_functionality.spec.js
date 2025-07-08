@@ -1,7 +1,7 @@
-import { test } from '../Helper/base.ts';
+import { test } from '../../Helper/base.ts';
 
 
-test.describe("Cart Functionality", () =>{
+test.describe("E2E Cart Functionality", () =>{
   test.beforeEach(async ({ homePage }) =>{
     //goto
     await homePage.goto();
@@ -87,7 +87,6 @@ test.describe("Cart Functionality", () =>{
     await homePage.clickContinueShoppingButton();
     const secondProductInfo = await homePage.clickProductAddToCartButtonByIndex(1);
     await homePage.clickViewCartButton();
-    await homePage.gotoCart();
 
     //delete secondProduct
     await cartPage.checkIfProcessButtonVisisble();
