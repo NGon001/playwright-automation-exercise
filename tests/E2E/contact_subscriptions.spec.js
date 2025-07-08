@@ -1,7 +1,7 @@
-import { test } from '../Helper/base.ts';
+import { test } from '../../Helper/base.ts';
 
 
-test.describe("Contact & Subscriptions", () => {
+test.describe("E2E Contact & Subscriptions", () => {
   test.beforeEach(async ({ homePage }) =>{
     await homePage.goto();
     await homePage.checkHomePageLoad();

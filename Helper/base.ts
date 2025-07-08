@@ -1,4 +1,5 @@
 import {test as baseTest} from '@playwright/test';
+import {test as apiBaseTest} from '@playwright/test';
 import { HomePage } from '../pages/HomePage';
 import { SignUp_LoginPage } from '../pages/SignUp_LoginPage';
 import { SignUpPage } from '../pages/SignUpPage';
@@ -10,6 +11,7 @@ import { ProductsPage } from '../pages/ProductsPage';
 import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
 import { PaymentPage } from '../pages/PaymentPage';
+import { AuthorizationAPI } from '../API/authorization';
 import { randomUUID } from 'crypto';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -27,7 +29,15 @@ type MyFixtures = {
     cartPage: CartPage;
     paymentPage: PaymentPage;
     saveData: void;
+    authorizationAPI: AuthorizationAPI;
 }
+
+// To not open browser
+export const apiTest = apiBaseTest.extend<MyFixtures>({
+    authorizationAPI: async({request},use) => {
+        await use(new AuthorizationAPI(request));
+    },
+});
 
 export const test = baseTest.extend<MyFixtures>({
     homePage: async ({page}, use) => {

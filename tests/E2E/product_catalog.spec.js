@@ -1,6 +1,6 @@
-import { test } from '../Helper/base.ts';
+import { test } from '../../Helper/base.ts';
 
-test.describe("Product & Catalog", () =>{
+test.describe("E2E Product & Catalog", () =>{
   test.beforeEach(async ({ homePage }) =>{
     //goto
     await homePage.goto();

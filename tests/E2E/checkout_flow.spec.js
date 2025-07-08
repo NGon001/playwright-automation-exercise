@@ -1,7 +1,7 @@
-import { test } from '../Helper/base.ts';
-import { generateRandomEmail } from '../Helper/tools.js';
+import { test } from '../../Helper/base.ts';
+import { generateRandomEmail } from '../../Helper/tools.js';
 
-test.describe("Checkout Flow", () => {
+test.describe("E2E Checkout Flow", () => {
   //product data
   const productIndex = 0;
   const Quantity = 1;
