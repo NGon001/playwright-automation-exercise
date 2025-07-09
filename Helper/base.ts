@@ -100,3 +100,6 @@ export const test = baseTest.extend<MyFixtures>({
 });
 
 export {expect} from '@playwright/test';
+
+export const Status = { success: 200, resourceCreated: 201, badReq: 400, notFound: 404, methodNotAllowed: 405, serverError: 500};
+export const Methods = { GET: 'GET', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE'};
