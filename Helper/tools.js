@@ -44,7 +44,7 @@ export async function makeRequest(request,url,method, form) {
 
 export async function verifyResponseCode(response, expectedCode){
   const responseBody = await response.json();
-  console.log(responseBody);
+  //console.log(responseBody);
   await expect(responseBody.responseCode).toBe(expectedCode,`Expected: ${expectedCode}\nReceived: ${responseBody.responseCode}\nFull response: ${JSON.stringify(responseBody, null, 2)}`);
   await expect((await response).ok()).toBeTruthy();
 }
