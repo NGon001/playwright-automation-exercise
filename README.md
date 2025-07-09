@@ -1,17 +1,72 @@
-# Playwright E2E Tests for AutomationExercise
+# Playwright E2E and API Tests for AutomationExercise
 
-This is a **personal project** created to **practice automation testing** contains end-to-end (E2E) automated tests for [http://automationexercise.com](http://automationexercise.com) using [Playwright](https://playwright.dev/).
+This is a **personal project** created to **practice automation testing** contains end-to-end (E2E) and API automated tests for [http://automationexercise.com](http://automationexercise.com) using [Playwright](https://playwright.dev/).
 
 ## 🧰 Tech Stack
 
 - [Playwright 1.53.0 ](https://playwright.dev/) (JavaScript / TypeScript)
 - [dotenv](https://www.npmjs.com/package/dotenv) for managing environment variables (  ```VALID_EMAIL, VALID_PASSWORD```)
-- [TestRail](https://support.testrail.com/hc/en-us) for test case management (```Specification-first workflow```)
+- [TestRail CLI]( https://support.testrail.com/hc/en-us/articles/7146548750868-Overview-and-installation ) for test case management (```Specification-first workflow```)
+- [Zod](https://zod.dev/) for Schema validation.
+- [npm-run-all](https://www.npmjs.com/package/npm-run-all) to run everythin inside of ```scripts``` if even error appear
 - GitHub Actions for CI/CD
 
 ---
-## Run tests using the following command:
-```npm run test```
+## 🛠 Setup & Configuration
+
+To run the API and E2E tests locally, follow these steps:
+### 1. Install Dependencies
+
+``` "@playwright/test": "^1.53.0",
+    "@types/node": "^22.15.29",
+    "dotenv-cli": "^8.0.0",
+    "globals": "^16.2.0",
+    "npm-run-all": "^4.1.5",
+    "typescript": "^5.8.3"
+    "crypto": "^1.0.1",
+    "dotenv": "^16.5.0",
+    "zod": "^3.25.76"
+```
+
+### 2. Create a .env File
+```
+VALID_LOGIN_EMAIL=
+VALID_LOGIN_PASSWORD=
+VALID_LOGIN_NAME_FIRST=
+
+REGISTER_TITLE=
+REGISTER_NAME_FIRST=
+REGISTER_NAME_LAST=
+REGISTER_PASSWORD=
+REGISTER_BIRTH_DAY=
+REGISTER_BIRTH_MONTH=
+REGISTER_BIRTH_YEAR=
+REGISTER_ADDRESS=
+REGISTER_ADDRESS2=
+REGISTER_COUNTRY=
+REGISTER_STATE=
+REGISTER_CITY=
+REGISTER_ZIPCODE=
+REGISTER_COMPANY_NAME=
+REGISTER_MOBILE_NUMBER=
+
+CARD_NUMBER=
+CARD_CVC=
+CARD_EXPIRY_MONTH=
+CARD_EXPIRY_YEAR=
+
+TRCLI_HOST=
+TRCLI_USER=
+TRCLI_KEY=
+```
+
+### 3. Run tests using the following command:
+```npm run test``` - 
+It will run 
+1. clean resultSave folder process, 
+2. playwright tests execution ```npx playwright test```, 
+3. and then upload into TestRail (if you dont want to upload result into testrail simply delete third opption inside of ```package.json```).
+
 ---
 ## Example of TestRail tracking
 ![Screenshot_26](https://github.com/user-attachments/assets/44ab1b94-18f5-46ea-982a-15a835c4f051)
@@ -20,7 +75,7 @@ This is a **personal project** created to **practice automation testing** contai
 
 
 ## 🚀 Features Covered
-
+### E2E
 | Test Case | Summary |
 |-----------|-------------|
 | ✅ TC1 | Register a new user |
@@ -44,6 +99,31 @@ This is a **personal project** created to **practice automation testing** contai
 | ✅ TC20 | Search Products and Verify Cart After Login |
 | ✅ TC22 | Add to cart from Recommended items |
 
+### API
+| Test Case | Summary |
+|-----------|-------------|
+| ✅ API_TC1 | POST (/api/verifyLogin) User exists with valid credentials |
+| ✅ API_TC2 | POST (/api/verifyLogin) User does not exist (valid format but not registered) |
+| ✅ API_TC3 | POST (/api/verifyLogin) Invalid email format |
+| ✅ API_TC4 | POST (/api/verifyLogin) Empty email field |
+| ✅ API_TC5 | POST (/api/verifyLogin) Empty password field |
+| ✅ API_TC6 | POST (/api/verifyLogin) Both email and password missing |
+| ✅ API_TC7 | POST (/api/verifyLogin) Case sensitivity check email |
+| ✅ API_TC8 | POST (/api/verifyLogin) Case sensitivity check password |
+| ✅ API_TC9 | POST (/api/verifyLogin) SQL Injection in email |
+| ✅ API_TC10 | POST (/api/verifyLogin) SQL Injection in password |
+| ✅ API_TC11 | POST (/api/verifyLogin) Very long input fields |
+| ✅ API_TC12 | POST (/api/verifyLogin) No email key |
+| ✅ API_TC13 | POST (/api/verifyLogin) No password key |
+| ✅ API_TC14 | GET, PUT, DELETE (/api/verifyLogin) Incorrect req method |
+| ✅ API_TC15 | POST (/api/createAccount) Successful registration with valid data |
+| ✅ API_TC16 | POST (/api/createAccount) Bad req registration with only email and password |
+| ✅ API_TC17 | POST (/api/createAccount) Success registration with only email and password |
+| ✅ API_TC18 | POST (/api/createAccount) Duplicate email registration |
+| ✅ API_TC19 | GET (/api/getUserDetailByEmail) Valid request with existing user email |
+| ✅ API_TC20 | GET (/api/getUserDetailByEmail) Valid request with not existing user email |
+| ✅ API_TC21 | GET (/api/getUserDetailByEmail) Case-insensitive email match |
+| ✅ API_TC22 | GET (/api/getUserDetailByEmail) Missing email parameter |
 
 ## Test Case 1: Register User
 1. Launch browser
@@ -293,6 +373,3 @@ Slightly modified Test Case 9 to strengthen the verification of the product sear
 7. Verify that product is displayed in cart page
 
 ---
-
-
-
