@@ -102,10 +102,10 @@ It will run
 ### API
 | Test Case | Summary |
 |-----------|-------------|
-| ✅ API_TC1 | POST (/api/verifyLogin) User exists with valid credentials |
+| ✅ API_TC1 | POST (/api/verifyLogin) Empty email field |
 | ✅ API_TC2 | POST (/api/verifyLogin) User does not exist (valid format but not registered) |
-| ✅ API_TC3 | POST (/api/verifyLogin) Invalid email format |
-| ✅ API_TC4 | POST (/api/verifyLogin) Empty email field |
+| ✅ API_TC3 | POST (/api/verifyLogin) User exists with valid credentials |
+| ✅ API_TC4 | POST (/api/verifyLogin) Invalid email format |
 | ✅ API_TC5 | POST (/api/verifyLogin) Empty password field |
 | ✅ API_TC6 | POST (/api/verifyLogin) Both email and password missing |
 | ✅ API_TC7 | POST (/api/verifyLogin) Case sensitivity check email |
@@ -120,10 +120,18 @@ It will run
 | ✅ API_TC16 | POST (/api/createAccount) Bad req registration with only email and password |
 | ✅ API_TC17 | POST (/api/createAccount) Success registration with only email and password |
 | ✅ API_TC18 | POST (/api/createAccount) Duplicate email registration |
-| ✅ API_TC19 | GET (/api/getUserDetailByEmail) Valid request with existing user email |
-| ✅ API_TC20 | GET (/api/getUserDetailByEmail) Valid request with not existing user email |
-| ✅ API_TC21 | GET (/api/getUserDetailByEmail) Case-insensitive email match |
-| ✅ API_TC22 | GET (/api/getUserDetailByEmail) Missing email parameter |
+| ✅ API_TC19 | GET, PUT, DELETE (/api/createAccount) Incorrect req method |
+| ✅ API_TC20 | GET (/api/getUserDetailByEmail) Valid request with existing user email |
+| ✅ API_TC21 | GET (/api/getUserDetailByEmail) Valid request with not existing user email |
+| ✅ API_TC22 | GET (/api/getUserDetailByEmail) Case-insensitive email match |
+| ✅ API_TC23 | GET (/api/getUserDetailByEmail) Missing email parameter |
+| ✅ API_TC24 | POST, PUT, DELETE (/api/getUserDetailByEmail) Incorrect req method |
+| ✅ API_TC25 | GET (/api/brandsList) returns valid brand list |
+| ✅ API_TC26 | POST, PUT, DELETE (/api/brandsList) Incorrect req method |
+| ✅ API_TC27 | POST (/api/searchProduct) returns products for valid keywords |
+| ✅ API_TC28 | GET, PUT, DELETE (/api/searchProduct) Incorrect req method |
+| ✅ API_TC29 | POST (/api/searchProduct) returns empty result for non-existent product |
+| ✅ API_TC30 | POST (/api/searchProduct) returns 400 Bad Request when keyword is missing |
 
 ## Test Case 1: Register User
 1. Launch browser
@@ -373,3 +381,7 @@ Slightly modified Test Case 9 to strengthen the verification of the product sear
 7. Verify that product is displayed in cart page
 
 ---
+
+## Author
+
+- [@NGon001](https://github.com/NGon001)

@@ -64,7 +64,22 @@ export class AuthorizationAPI{
         await verifyResponseSchema(response,schema);
     }
 
-    async createAccount(method, ExpectedCode, ExpectedMessage, name: string | undefined, email: string | undefined, password: string | undefined, title: string | undefined, birth_date: string | undefined, birth_month: string | undefined, birth_year: string | undefined, firstname: string | undefined, lastname: string | undefined, company: string | undefined, address1: string | undefined, address2: string | undefined, country: string | undefined, zipcode: string | undefined, state: string | undefined, city: string | undefined, mobile_number: string | undefined){
+    async verifyCreateACcountAPISchema(response, expectedCode: number, expectedMessage: string){
+        let schema;
+        if(expectedCode !== 405){
+            schema = z.object({
+              responseCode: z.literal(expectedCode),
+              message: z.literal(expectedMessage),
+            });
+        }else{
+            schema = z.object({
+              detail: z.literal(expectedMessage),
+            });
+        }
+        await verifyResponseSchema(response,schema);
+    }
+
+    async createAccount(method, ExpectedCode, ExpectedMessage:string , name: string | undefined, email: string | undefined, password: string | undefined, title: string | undefined, birth_date: string | undefined, birth_month: string | undefined, birth_year: string | undefined, firstname: string | undefined, lastname: string | undefined, company: string | undefined, address1: string | undefined, address2: string | undefined, country: string | undefined, zipcode: string | undefined, state: string | undefined, city: string | undefined, mobile_number: string | undefined){
         const response = await this.POST_createAccount(
             method,
             name,
@@ -85,8 +100,8 @@ export class AuthorizationAPI{
             city,
             mobile_number
         );
-        await verifyResponseCode(response,ExpectedCode);
-        await this.verifyLoginAPISchema(response,ExpectedCode,ExpectedMessage);
+        await expect((await response).ok()).toBe((ExpectedMessage.includes("not allowed.") ? false : true));
+        await this.verifyCreateACcountAPISchema(response,ExpectedCode,ExpectedMessage);
     }
 
     async deleteAccount(method, email, password, ExpectedCode, ExpectedMessage){
@@ -130,6 +145,12 @@ export class AuthorizationAPI{
         }
         
         await verifyResponseSchema(response,schema);
+    }
+
+    async verifyLogin(method, expectedCode, expectedMessage, email, password){
+        const response = await this.POST_verifyLogin(method,email,password);
+        await verifyResponseCode(response,expectedCode);
+        await this.verifyLoginAPISchema(response,expectedCode,expectedMessage);
     }
 
     async getUserDetailByEmail(method, email, ExpectedCode, ExpectedMessage: string | undefined){

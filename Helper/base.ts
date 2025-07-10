@@ -12,6 +12,7 @@ import { ProductPage } from '../pages/ProductPage';
 import { CartPage } from '../pages/CartPage';
 import { PaymentPage } from '../pages/PaymentPage';
 import { AuthorizationAPI } from '../API/authorization';
+import { ProductsAPI } from '../API/products';
 import { randomUUID } from 'crypto';
 import dotenv from 'dotenv';
 dotenv.config();
@@ -30,12 +31,16 @@ type MyFixtures = {
     paymentPage: PaymentPage;
     saveData: void;
     authorizationAPI: AuthorizationAPI;
+    productsAPI: ProductsAPI;
 }
 
 // To not open browser
 export const apiTest = apiBaseTest.extend<MyFixtures>({
     authorizationAPI: async({request},use) => {
         await use(new AuthorizationAPI(request));
+    },
+    productsAPI: async({request},use) => {
+        await use(new ProductsAPI(request));
     },
 });
 
