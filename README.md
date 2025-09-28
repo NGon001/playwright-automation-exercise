@@ -70,7 +70,7 @@ It will run
 ---
 ## Example of TestRail tracking
 ![Screenshot_26](https://github.com/user-attachments/assets/44ab1b94-18f5-46ea-982a-15a835c4f051)
-![Screenshot_27](https://github.com/user-attachments/assets/58a5217e-f446-406c-9e6f-b51ae7bb04cd)
+<img width="3018" height="1722" alt="image" src="https://github.com/user-attachments/assets/081180ff-f472-4154-8a70-529051692a09" />
 ---
 
 
