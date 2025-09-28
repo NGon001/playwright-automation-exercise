@@ -2,85 +2,85 @@ import { apiTest as test, Methods, Status  } from '../../Helper/base.ts';
 import { generateRandomEmail } from '../../Helper/tools.js';
 
 test.describe("API Authorization tests", () => {
-    test('C3836 POST (/api/verifyLogin) User exists with valid credentials', async({ authorizationAPI }) => {
+    test('C8 POST (/api/verifyLogin) User exists with valid credentials', async({ authorizationAPI }) => {
         const expectedCode = Status.success;
         const expectedMessage = "User exists!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage, process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD);
     });
 
-    test('C3837 POST (/api/verifyLogin) User does not exist (valid format but not registered)', async ({ authorizationAPI }) => {
+    test('C4 POST (/api/verifyLogin) User does not exist (valid format but not registered)', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,(await generateRandomEmail()),process.env.REGISTER_PASSWORD);
     });
 
-    test('C3838 POST (/api/verifyLogin) Invalid email format', async ({ authorizationAPI }) => {
+    test('C1 POST (/api/verifyLogin) Invalid email format', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,"invalid-email",process.env.VALID_LOGIN_PASSWORD);
     });
 
-    test('C3839 POST (/api/verifyLogin) Empty email field', async ({ authorizationAPI }) => {
+    test('C3 POST (/api/verifyLogin) Empty email field', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,"",process.env.VALID_LOGIN_PASSWORD);
     });
 
-    test('C3840 POST (/api/verifyLogin) Empty password field', async ({ authorizationAPI }) => {
+    test('C5 POST (/api/verifyLogin) Empty password field', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,process.env.VALID_LOGIN_EMAIL,"");
     });  
 
-    test('C3841 POST (/api/verifyLogin) Both email and password missing', async ({ authorizationAPI }) => {
+    test('C2 POST (/api/verifyLogin) Both email and password missing', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,"","");
     });
 
-    test('C3842 POST (/api/verifyLogin) Case sensitivity check email', async ({ authorizationAPI }) => {
+    test('C7 POST (/api/verifyLogin) Case sensitivity check email', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,process.env.VALID_LOGIN_EMAIL.toUpperCase(),process.env.VALID_LOGIN_PASSWORD);
     });
 
-    test('C3843 POST (/api/verifyLogin) Case sensitivity check password', async ({ authorizationAPI }) => {
+    test('C10 POST (/api/verifyLogin) Case sensitivity check password', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD.toUpperCase());
     });
 
-    test('C3844 POST (/api/verifyLogin) SQL Injection in email', async ({ authorizationAPI }) => {
+    test('C9 POST (/api/verifyLogin) SQL Injection in email', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,process.env.VALID_LOGIN_EMAIL + "' OR '1'='1",process.env.VALID_LOGIN_PASSWORD);
     });
 
-    test('C3845 POST (/api/verifyLogin) SQL Injection in password', async ({ authorizationAPI }) => {
+    test('C6 POST (/api/verifyLogin) SQL Injection in password', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD + "' OR '1'='1");
     });
 
-    test('C3846 POST (/api/verifyLogin) Very long input fields', async ({ authorizationAPI }) => {
+    test('C11 POST (/api/verifyLogin) Very long input fields', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "User not found!";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,process.env.VALID_LOGIN_EMAIL.repeat(400),process.env.VALID_LOGIN_PASSWORD.repeat(400));
     });
 
-    test('C3847 POST (/api/verifyLogin) No email key', async ({ authorizationAPI }) => {
+    test('C12 POST (/api/verifyLogin) No email key', async ({ authorizationAPI }) => {
         const expectedCode = Status.badReq;
         const expectedMessage = "Bad request, email or password parameter is missing in POST request.";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,undefined,process.env.VALID_LOGIN_PASSWORD);
     });
 
-    test('C3848 POST (/api/verifyLogin) No password key', async ({ authorizationAPI }) => {
+    test('C13 POST (/api/verifyLogin) No password key', async ({ authorizationAPI }) => {
         const expectedCode = Status.badReq;
         const expectedMessage = "Bad request, email or password parameter is missing in POST request.";
         await authorizationAPI.verifyLogin(Methods.POST,expectedCode,expectedMessage,process.env.VALID_LOGIN_EMAIL,undefined);
     });
 
-    test('C3849 GET, PUT, DELETE (/api/verifyLogin) Incorrect req method', async ({ authorizationAPI }) => {
+    test('C18 GET, PUT, DELETE (/api/verifyLogin) Incorrect req method', async ({ authorizationAPI }) => {
         const expectedCode = Status.methodNotAllowed;
         const expectedMessage = "This request method is not supported.";
 
@@ -89,7 +89,7 @@ test.describe("API Authorization tests", () => {
             await authorizationAPI.verifyLogin(method,expectedCode,expectedMessage,process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD);
         }
     });
-    test('C3850 POST (/api/createAccount) Successful registration with valid data', async ({ authorizationAPI }) => {
+    test('C15 POST (/api/createAccount) Successful registration with valid data', async ({ authorizationAPI }) => {
         const expectedCode = Status.resourceCreated;
         const expectedMessage = "User created!";
         const email = await generateRandomEmail();
@@ -122,7 +122,7 @@ test.describe("API Authorization tests", () => {
         await authorizationAPI.deleteAccount(Methods.DELETE,email,process.env.REGISTER_PASSWORD,deleteExpectedCode,deleteExpectedMessage);
     });
 
-    test('C3851 POST (/api/createAccount) Bad req registration with only email and password', async ({ authorizationAPI }) => {
+    test('C16 POST (/api/createAccount) Bad req registration with only email and password', async ({ authorizationAPI }) => {
         const expectedCode = Status.badReq;
         const expectedMessage = "Bad request, name parameter is missing in POST request.";
         const email = await generateRandomEmail();
@@ -136,7 +136,7 @@ test.describe("API Authorization tests", () => {
         );
     });
 
-    test('C3852 POST (/api/createAccount) Success registration with only email and password', async ({ authorizationAPI }) => {
+    test('C17 POST (/api/createAccount) Success registration with only email and password', async ({ authorizationAPI }) => {
         const expectedCode = Status.resourceCreated;
         const expectedMessage = "User created!";
         const email = await generateRandomEmail();
@@ -169,7 +169,7 @@ test.describe("API Authorization tests", () => {
         await authorizationAPI.deleteAccount(Methods.DELETE,email,process.env.REGISTER_PASSWORD,deleteExpectedCode,deleteExpectedMessage);
     });
 
-    test('C3853 POST (/api/createAccount) Duplicate email registration', async ({ authorizationAPI }) => {
+    test('C19 POST (/api/createAccount) Duplicate email registration', async ({ authorizationAPI }) => {
         const expectedCode = Status.badReq;
         const expectedMessage = "Email already exists!";
         await authorizationAPI.createAccount(
@@ -196,7 +196,7 @@ test.describe("API Authorization tests", () => {
         );
     });
 
-    test('C3854 GET, PUT, DELETE (/api/createAccount) Incorrect req method', async ({ authorizationAPI }) => {
+    test('C14 GET, PUT, DELETE (/api/createAccount) Incorrect req method', async ({ authorizationAPI }) => {
         const expectedCode = Status.methodNotAllowed;
 
         for (const method of Object.values(Methods)) {
@@ -228,30 +228,30 @@ test.describe("API Authorization tests", () => {
         }
     });
 
-    test('C3855 GET (/api/getUserDetailByEmail) Valid request with existing user email', async ({ authorizationAPI }) => {
+    test('C20 GET (/api/getUserDetailByEmail) Valid request with existing user email', async ({ authorizationAPI }) => {
         const expectedCode = Status.success;
         await authorizationAPI.getUserDetailByEmail(Methods.GET,process.env.VALID_LOGIN_EMAIL,expectedCode);
     });
 
-    test('C3856 GET (/api/getUserDetailByEmail) Valid request with not existing user email', async ({ authorizationAPI }) => {
+    test('C21 GET (/api/getUserDetailByEmail) Valid request with not existing user email', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "Account not found with this email, try another email!";
         await authorizationAPI.getUserDetailByEmail(Methods.GET,(process.env.VALID_LOGIN_EMAIL + "1"),expectedCode,expectedMessage);
     });
 
-    test('C3857 GET (/api/getUserDetailByEmail) Case-insensitive email match', async ({ authorizationAPI }) => {
+    test('C23 GET (/api/getUserDetailByEmail) Case-insensitive email match', async ({ authorizationAPI }) => {
         const expectedCode = Status.notFound;
         const expectedMessage = "Account not found with this email, try another email!";
         await authorizationAPI.getUserDetailByEmail(Methods.GET,process.env.VALID_LOGIN_EMAIL.toUpperCase(),expectedCode,expectedMessage);
     });
 
-    test('C3858 GET (/api/getUserDetailByEmail) Missing email parameter', async ({ authorizationAPI }) => {
+    test('C22 GET (/api/getUserDetailByEmail) Missing email parameter', async ({ authorizationAPI }) => {
         const expectedCode = Status.badReq;
         const expectedMessage = "Bad request, email parameter is missing in GET request.";
         await authorizationAPI.getUserDetailByEmail(Methods.GET,undefined,expectedCode,expectedMessage);
     });
 
-    test('C3859 POST, PUT, DELETE (/api/getUserDetailByEmail) Incorrect req method', async ({ authorizationAPI }) => {
+    test('C24 POST, PUT, DELETE (/api/getUserDetailByEmail) Incorrect req method', async ({ authorizationAPI }) => {
         const expectedCode = Status.methodNotAllowed;
         const expectedMessage = "This request method is not supported.";
         for (const method of Object.values(Methods)) {

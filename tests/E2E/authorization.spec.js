@@ -31,7 +31,7 @@ test.describe("E2E Authorization tests", () => {
   17. Click 'Delete Account' button
   18. Verify that 'ACCOUNT DELETED!' is visible and click 'Continue' button */
 
-  test('C2259 Register User', async ({ homePage, signUp_LoginPage,signUpPage,accountCreatedPage,accountDeletePage },testInfo) => {
+  test('C32 Register User', async ({ homePage, signUp_LoginPage,signUpPage,accountCreatedPage,accountDeletePage },testInfo) => {
     const email = await generateRandomEmail();
     //Step 1: Fill signup form
     await signUp_LoginPage.fillStartSignUpForm(process.env.REGISTER_NAME_FIRST,email);
@@ -81,7 +81,7 @@ test.describe("E2E Authorization tests", () => {
   8. Verify that 'Logged in as username' is visible
   */
 
-  test('C2281 Login User with correct email and password', async ({ homePage, signUp_LoginPage }) => {
+  test('C36 Login User with correct email and password', async ({ homePage, signUp_LoginPage }) => {
     //fill login form
     await signUp_LoginPage.fillLoginForm(process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD);
     await signUp_LoginPage.clickLoginButton();
@@ -101,7 +101,7 @@ test.describe("E2E Authorization tests", () => {
   8. Verify error 'Your email or password is incorrect!' is visible
    */
 
-  test('C2282 Login User with incorrect email and password', async ({signUp_LoginPage }) => {
+  test('C35 Login User with incorrect email and password', async ({signUp_LoginPage }) => {
     //data
     const incorrectEmail = 'max12341@gmail.com';
 
@@ -125,7 +125,7 @@ test.describe("E2E Authorization tests", () => {
   10. Verify that user is navigated to login page
    */
 
-  test('C2283 Logout User', async ({ homePage, signUp_LoginPage }) => {
+  test('C31 Logout User', async ({ homePage, signUp_LoginPage }) => {
     //fill login form
     await signUp_LoginPage.fillLoginForm(process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD);
     await signUp_LoginPage.clickLoginButton();
@@ -150,7 +150,7 @@ test.describe("E2E Authorization tests", () => {
   8. Verify error 'Email Address already exist!' is visible
    */
 
-  test('C2284 Register User with existing email', async ({ signUp_LoginPage }) => {
+  test('C33 Register User with existing email', async ({ signUp_LoginPage }) => {
     //Fill signup form
     await signUp_LoginPage.fillStartSignUpForm(process.env.REGISTER_NAME_FIRST,process.env.VALID_LOGIN_EMAIL);
     await signUp_LoginPage.clickSignUpButton();

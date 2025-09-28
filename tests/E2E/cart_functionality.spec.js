@@ -22,7 +22,7 @@ test.describe("E2E Cart Functionality", () =>{
   10. Verify their prices, quantity and total price
   */
 
-  test('C2285 12: Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
+  test('C34 Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
     //data
     const productQuantity = 1;
 
@@ -53,7 +53,7 @@ test.describe("E2E Cart Functionality", () =>{
   9. Verify that product is displayed in cart page with exact quantity
   */
 
-  test('C2286 Verify Product quantity in Cart', async ({ homePage,productPage,cartPage }) => {
+  test('C37 Verify Product quantity in Cart', async ({ homePage,productPage,cartPage }) => {
     //data 
     const Quantity = 4;
     const productIndex = 0;
@@ -82,7 +82,7 @@ test.describe("E2E Cart Functionality", () =>{
   test case was changed to verify that cart delete product button will work with multiple products
   */
 
-  test('C2287 Remove Products From Cart', async ({ homePage,cartPage}) => {
+  test('C38 Remove Products From Cart', async ({ homePage,cartPage}) => {
     const firstProductInfo = await homePage.clickProductAddToCartButtonByIndex(0);
     await homePage.clickContinueShoppingButton();
     const secondProductInfo = await homePage.clickProductAddToCartButtonByIndex(1);
@@ -208,7 +208,7 @@ test('Test Case 20: Search Products and Verify Cart After Login', async ({ homeP
   7. Verify that product is displayed in cart page
   */
 
-  test('C2288 Add to cart from Recommended items', async ({ homePage, cartPage }) => {
+  test('C39 Add to cart from Recommended items', async ({ homePage, cartPage }) => {
     await homePage.verifyRecomendedItemsTextVisible();
     const productInfo = await homePage.clickAddToCartRecomendedItemsByIndex(0);
     await homePage.clickViewCartButton();

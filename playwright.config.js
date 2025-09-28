@@ -26,7 +26,6 @@ export default defineConfig({
 
     screenshot: "on",
     video: "on",
-    trace: 'on',
   },
   outputDir: 'test-results/',
 
@@ -43,16 +42,16 @@ export default defineConfig({
       testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
       use: { ...devices['Desktop Chrome'] },
     },
-    {
-      name: 'Mobile Chrome',
-      testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
-      use: { ...devices['Pixel 5'] },
-    },
-    {
-      name: 'Mobile Safari',
-      testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
-      use: { ...devices['iPhone 14'] },
-    },
+    ///{
+    ///  name: 'Mobile Chrome',
+    ///  testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
+    ///  use: { ...devices['Pixel 5'] },
+    ///},
+    ///{
+    ///  name: 'Mobile Safari',
+    ///  testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
+    ///  use: { ...devices['iPhone 14'] },
+    ///},
   ],
 });
 

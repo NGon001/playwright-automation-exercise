@@ -15,7 +15,7 @@ test.describe("E2E UI & Navigation", () => {
   5. Verify user is navigated to test cases page successfully
   */
 
-  test('C2292 Verify Test Cases Page', async ({ homePage,testCasesPage }) => {
+  test('C48 Verify Test Cases Page', async ({ homePage,testCasesPage }) => {
     await homePage.gotoTestCasesPage();
     await testCasesPage.verifyPageIsVisible();
   });

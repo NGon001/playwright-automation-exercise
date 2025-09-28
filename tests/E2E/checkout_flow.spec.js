@@ -36,7 +36,7 @@ test.describe("E2E Checkout Flow", () => {
   19. Click 'Delete Account' button
   20. Verify 'ACCOUNT DELETED!' and click 'Continue' button
   */
-  test('C2293 Place Order: Register while Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  test('C40 Place Order: Register while Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
     const email = await generateRandomEmail();
     let authorized = false;
 
@@ -111,7 +111,7 @@ test.describe("E2E Checkout Flow", () => {
   18. Verify 'ACCOUNT DELETED!' and click 'Continue' button
   */
 
-  test('C2294 Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  test('C41 Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
     const email = await generateRandomEmail();
     let authorized = false;
 
