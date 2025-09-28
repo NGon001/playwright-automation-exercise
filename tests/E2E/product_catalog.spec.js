@@ -19,7 +19,7 @@ test.describe("E2E Product & Catalog", () =>{
   9. Verify that detail detail is visible: product name, category, price, availability, condition, brand
    */
 
-  test('C2303 Verify All Products and product detail page', async ({ homePage, productsPage, productPage }) => {
+  test('C45 Verify All Products and product detail page', async ({ homePage, productsPage, productPage }) => {
     await homePage.gotoProductsPage();
     await productsPage.checkIfAllProductsTextIsVissible();
     await productsPage.checkIfProductsExist();
@@ -47,7 +47,7 @@ test.describe("E2E Product & Catalog", () =>{
   // If neither the name nor category matches, the test fails.
   */
 
-  test('C2299 Search Products', async ({ homePage, productsPage, productPage}) => {
+  test('C46 Search Products', async ({ homePage, productsPage, productPage}) => {
     //data
     const productsNames = ["dress","top","tshirt"]; //keyWords
 
@@ -84,7 +84,7 @@ test.describe("E2E Product & Catalog", () =>{
   8. Verify that user is navigated to that category page
   */
 
-  test('C2300 View Category Products', async ({ homePage}) => {
+  test('C47 View Category Products', async ({ homePage}) => {
     //data
     const WomantCategory = { category: "Women", subCategory: "Dress" };
     const KidstCategory = { category: "Kids", subCategory: "Tops & Shirts" };
@@ -107,7 +107,7 @@ test.describe("E2E Product & Catalog", () =>{
   8. Verify that user is navigated to that brand page and can see products
   */
 
-  test('C2301 View & Cart Brand Products', async ({ homePage,productsPage}) => {
+  test('C49 View & Cart Brand Products', async ({ homePage,productsPage}) => {
     //data
     const WomantCategory = { category: "Women", subCategory: "Dress" };
     const KidstCategory = { category: "Kids", subCategory: "Tops & Shirts" };
@@ -133,7 +133,7 @@ test.describe("E2E Product & Catalog", () =>{
   9. Verify success message 'Thank you for your review.'
   */
 
-  test('C2302 Add review on product', async ({ homePage,productsPage,productPage}) => {
+  test('C50 Add review on product', async ({ homePage,productsPage,productPage}) => {
     const message = "Test review message.";
 
     await homePage.gotoProductsPage();

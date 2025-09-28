@@ -88,7 +88,15 @@ export const test = baseTest.extend<MyFixtures>({
           return;
         })
 
+        // Start tracing (with screenshots, snapshots, and sources)
+        await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
+
         await use();
+
+        // Stop tracing and save it
+        const tracePath = `test-resultsSave/traces/trace-${randomUUID()}.zip`;
+        await context.tracing.stop({ path: tracePath });
+        testInfo.annotations.push({ type: 'testrail_attachment', description: tracePath });
 
         let screenshotPath = `test-resultsSave/screenshots/screenshot-${randomUUID()}.png`;
         const videoPath = `test-resultsSave/videos/video-${randomUUID()}.webm`;

@@ -137,7 +137,7 @@ export class ProductsPage{
         const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
         await expect(productPrice).not.toBe(0 || "");
         
-        // wait image to load, because it will depend on hover
+        // wait image to load, because it will depend on hover (not loaded image, will not have size and hover will not work)
         //----
         await this.page.waitForFunction(
             (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,

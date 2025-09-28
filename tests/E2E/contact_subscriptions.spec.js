@@ -21,7 +21,7 @@ test.describe("E2E Contact & Subscriptions", () => {
   11. Click 'Home' button and verify that landed to home page successfully
    */
 
-  test('C2298 Contact Us Form', async ({ homePage, contactUsPage }) => {
+  test('C43 Contact Us Form', async ({ homePage, contactUsPage }) => {
     //data
     const subject = 'Test Subject';
     const message = 'This is a test message.';
@@ -54,7 +54,7 @@ test.describe("E2E Contact & Subscriptions", () => {
   7. Verify success message 'You have been successfully subscribed!' is visible
   */
 
-  test('C2290 Verify Subscription in home page', async ({ homePage }) => {
+  test('C44 Verify Subscription in home page', async ({ homePage }) => {
     await homePage.inputValueToSubscriptionEmailField(process.env.VALID_LOGIN_EMAIL);
     await homePage.checkSuccessSubscriptionMessage();
   });
@@ -71,7 +71,7 @@ test.describe("E2E Contact & Subscriptions", () => {
   8. Verify success message 'You have been successfully subscribed!' is visible
   */
 
-  test('C2291 Verify Subscription in Cart page', async ({ homePage,cartPage }) => {
+  test('C42 Verify Subscription in Cart page', async ({ homePage,cartPage }) => {
     //goto
     await homePage.gotoCart();
     await cartPage.verifySubscriptionText();

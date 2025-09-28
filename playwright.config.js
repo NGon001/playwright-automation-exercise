@@ -26,7 +26,6 @@ export default defineConfig({
 
     screenshot: "on",
     video: "on",
-    trace: 'on',
   },
   outputDir: 'test-results/',
 
@@ -34,11 +33,25 @@ export default defineConfig({
   /* Configure projects for major browsers */
   projects: [
     {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'],
-        //viewport: { width: 1920, height: 1080 },
-       },
+      name: 'api-tests',
+      testMatch: /.*\.api\.spec\.js$/,      // only API tests
+      use: {},                              // no browser/device
     },
+    {
+      name: 'chromium',
+      testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
+      use: { ...devices['Desktop Chrome'] },
+    },
+    ///{
+    ///  name: 'Mobile Chrome',
+    ///  testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
+    ///  use: { ...devices['Pixel 5'] },
+    ///},
+    ///{
+    ///  name: 'Mobile Safari',
+    ///  testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
+    ///  use: { ...devices['iPhone 14'] },
+    ///},
   ],
 });
 
