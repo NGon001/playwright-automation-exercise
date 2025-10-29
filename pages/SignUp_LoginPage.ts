@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
+import { BasePage } from "../Helper/BasePage";
 
-export class SignUp_LoginPage{
-    readonly page: Page;
+export class SignUp_LoginPage extends BasePage{
     readonly signUpFormLocator: Locator;
     readonly loginFormLocator: Locator;
     readonly loginButtonLocator: Locator;
@@ -16,7 +16,7 @@ export class SignUp_LoginPage{
     readonly FormPasswordnputLocator: (signUpForm: Locator) => Locator;
 
     constructor(page: Page){
-        this.page = page;
+        super(page);
         this.signUpFormLocator = this.page.locator('form[action="/signup"]');
         this.loginFormLocator = this.page.locator('form[action="/login"]');
         this.loginButtonLocator = this.loginFormLocator.getByRole('button', { name: 'Login' });
@@ -40,7 +40,7 @@ export class SignUp_LoginPage{
         await this.FormEmailInputLocator(await this.signUpFormLocator).fill(email);
     }
 
-    async fillLoginForm(email,password){
+    async fillLoginForm(email: string,password: string){
         await this.FormEmailInputLocator(await this.loginFormLocator).fill(email);
         await this.FormPasswordnputLocator(await this.loginFormLocator).fill(password);
     }

@@ -1,8 +1,9 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { textPriceToFloat } from "../Helper/tools";
+import { BasePage } from "../Helper/BasePage";
+import { ProductInfo } from "../Helper/base";
 
-export class ProductsPage{
-    readonly page: Page;
+export class ProductsPage extends BasePage{
     readonly allProductsTextLocator: Locator;
     readonly allProductsItemsLocator: Locator;
     readonly searchInputLocator: Locator;
@@ -27,7 +28,7 @@ export class ProductsPage{
     readonly subCategoryCollabseOrInLocator: (panelCategory: Locator,option: string) => Locator;
 
     constructor(page: Page){
-        this.page = page;
+        super(page);
         this.allProductsTextLocator = this.page.getByText("All Products", {exact: true});
         this.allProductsItemsLocator = this.page.locator(".features_items .col-sm-4");
         this.searchInputLocator = this.page.getByPlaceholder("Search Product");
@@ -77,13 +78,13 @@ export class ProductsPage{
         await this.productViewProductButtonLocator(product).click();
     }
 
-    async clickViewProductButtonByIndex(index: number): Promise<{name: string, price: number}>{
+    async clickViewProductButtonByIndex(index: number): Promise<ProductInfo>{
         const products = await this.getAllProducts();
         const product = await products.nth(index);
         const productName = await this.productNameTextLocator(product).textContent() ?? "";
         const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
         await this.clickViewProductButton(product);
-        return {name: productName, price: productPrice};
+        return new ProductInfo(productName, productPrice, 1);
     }
 
     async verefyThatProductsSearchComplited(){
@@ -104,7 +105,7 @@ export class ProductsPage{
         return productName.toLowerCase().includes(keyWord.toLowerCase());
     }
 
-    async verifyPassedProducts(productCount,expectProductCount){
+    async verifyPassedProducts(productCount: string, expectProductCount: string){
         await expect(productCount).toBe(expectProductCount);
     }
 
@@ -127,7 +128,7 @@ export class ProductsPage{
         return productsLinksToCheck;
     }
 
-    async clickProductAddToCartButtonByIndex(index: number): Promise<{ name: string; price: number }>{
+    async clickProductAddToCartButtonByIndex(index: number): Promise<ProductInfo>{
         const products = await this.getAllProducts();
         const product = await products.nth(index);
         const productImage = await this.productImageLocator(product);
@@ -164,7 +165,7 @@ export class ProductsPage{
         await overlayContentAddProductButton.hover();
         await overlayContentAddProductButton.click();
 
-        return {name: productName, price: productPrice};
+        return new ProductInfo(productName, productPrice,1);
     }
 
     async clickContinueShoppingButton(){

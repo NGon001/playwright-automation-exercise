@@ -28,7 +28,7 @@ test.describe("E2E Contact & Subscriptions", () => {
     const filePath = './README.md';
 
     //goto
-    await homePage.gotoContactUsPage();
+    await homePage.clickContactUs();
     await contactUsPage.checkGetInTouchText();
 
     //fill contact us form

@@ -4,7 +4,6 @@ import { generateRandomEmail } from '../../Helper/tools.js';
 test.describe("E2E Checkout Flow", () => {
   //product data
   const productIndex = 0;
-  const Quantity = 1;
   const descriptionMessage = "This is test description message.";
 
   test.beforeEach(async ({ homePage }) => {
@@ -46,7 +45,7 @@ test.describe("E2E Checkout Flow", () => {
     const ProductInfo = await productsPage.clickProductAddToCartButtonByIndex(productIndex);
     await productsPage.clickViewCartButton();
 
-    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
+    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
     await cartPage.clickProcessButton(authorized);
     await cartPage.clickRegisterAndLoginButton();
 
@@ -68,7 +67,7 @@ test.describe("E2E Checkout Flow", () => {
     await homePage.checkLoggedInName(process.env.REGISTER_NAME_FIRST);
     await homePage.gotoCart();
 
-    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
+    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
     await cartPage.clickProcessButton(authorized);
     await cartPage.verifyAddress("delivery",process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
     await cartPage.verifyAddress("billing",process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
@@ -116,7 +115,7 @@ test.describe("E2E Checkout Flow", () => {
     let authorized = false;
 
     //goto
-    await homePage.gotoSignUpAndLoginPage();
+    await homePage.clickSignUpAndLoginLink();
     await signUp_LoginPage.checkSignUpText();
 
     //Fill signup form
@@ -141,7 +140,7 @@ test.describe("E2E Checkout Flow", () => {
     const ProductInfo = await productsPage.clickProductAddToCartButtonByIndex(productIndex);
     await productsPage.clickViewCartButton();
 
-    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.name,ProductInfo.price,Quantity);
+    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
     await cartPage.clickProcessButton(authorized);
     await cartPage.verifyAddress("delivery",process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);
     await cartPage.verifyAddress("billing",process.env.REGISTER_TITLE,process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.REGISTER_ADDRESS,process.env.REGISTER_ADDRESS2,process.env.REGISTER_COUNTRY,process.env.REGISTER_STATE,process.env.REGISTER_CITY,process.env.REGISTER_ZIPCODE,process.env.REGISTER_COMPANY_NAME,process.env.REGISTER_MOBILE_NUMBER);

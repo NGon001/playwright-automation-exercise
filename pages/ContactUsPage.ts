@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
+import { BasePage } from "../Helper/BasePage";
 
-export class ContactUsPage{
-    readonly page: Page;
+export class ContactUsPage extends BasePage{
     readonly getInTouchTextLocator: Locator;
     readonly nameFieldLocator: Locator;
     readonly emailFieldLocator: Locator;
@@ -13,7 +13,7 @@ export class ContactUsPage{
     readonly returnHomeButtonLocator: Locator;
 
     constructor(page: Page){
-        this.page = page;
+        super(page);
         this.getInTouchTextLocator = this.page.getByText('Get In Touch');
         this.nameFieldLocator = this.page.getByPlaceholder('Name',{ exact: true });
         this.emailFieldLocator = this.page.getByPlaceholder('Email',{ exact: true });
@@ -29,7 +29,7 @@ export class ContactUsPage{
         await expect(await this.getInTouchTextLocator).toBeVisible();
     }
 
-    async fillContactUsForm(firstName,lastName, email, subject, message, filePath) {
+    async fillContactUsForm(firstName: string,lastName: string, email: string, subject: string, message: string, filePath: string) {
         await this.nameFieldLocator.fill(`${firstName}  ${lastName}`);
         await this.emailFieldLocator.fill(email);
         await this.subjectFieldLocator.fill(subject);

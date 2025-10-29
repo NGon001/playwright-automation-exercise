@@ -116,3 +116,26 @@ export {expect} from '@playwright/test';
 
 export const Status = { success: 200, resourceCreated: 201, badReq: 400, notFound: 404, methodNotAllowed: 405, serverError: 500};
 export const Methods = { GET: 'GET', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE'};
+
+export class ProductInfo{
+    Name: string;
+    Price: number;
+    Quantity: number;
+
+    constructor(name: string, price: number, quantity: number){
+        this.Name = name;
+        this.Price = price;
+        this.Quantity = quantity;
+    }
+}
+
+export const userFoundMessage = "User exists!";
+export const userNotFoundMessage = "User not found!";
+export const userCreatedMessage = "User created!";
+export const userDeletedMessage = "Account deleted!";
+export const accountNotFoundMessage = "Account not found with this email, try another email!";
+export const badRequestMessage = (method: string) => `Bad request, email or password parameter is missing in ${method} request.`;
+export const badRequestParameterMessage = (method: string, parameter: string) => `Bad request, ${parameter} parameter is missing in ${method} request.`;
+export const notSupportedReqMethodMessage = "This request method is not supported.";
+export const emailAlreadyExistsMessage = "Email already exists!";
+export const methodNotAllowedMessage = (method: string) => `Method \"${method}\" not allowed.`;

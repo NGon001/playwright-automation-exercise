@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
+import { BasePage } from "../Helper/BasePage";
 
-export class PaymentPage{
-    readonly page: Page;
+export class PaymentPage extends BasePage{
     readonly paymentTextLocator: Locator;
     readonly nameOnCardInputLocator: Locator;
     readonly cardNumberInputLocator: Locator;
@@ -14,7 +14,7 @@ export class PaymentPage{
     readonly paymentMessageLocator: Locator;
 
     constructor(page: Page){
-        this.page = page;
+        super(page);
         this.paymentTextLocator = this.page.getByText("Name on Card");
         this.nameOnCardInputLocator = this.page.locator('input[data-qa="name-on-card"]');
         this.cardNumberInputLocator = this.page.locator('input[data-qa="card-number"]');
@@ -31,7 +31,7 @@ export class PaymentPage{
         await expect(await this.paymentTextLocator).toBeVisible();
     }
 
-    async fillPaymentForm(firstName,lastName,cardNumber,CVC,expiryMonth,expiryYear){
+    async fillPaymentForm(firstName: string,lastName: string,cardNumber: string,CVC: string,expiryMonth: string,expiryYear: string){
         await this.verifyPageLoaded();
         await this.nameOnCardInputLocator.fill((firstName + ' ' + lastName));
         await this.cardNumberInputLocator.fill(cardNumber);
