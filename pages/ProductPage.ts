@@ -1,8 +1,8 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { expectTextNotBeNull } from "../Helper/tools";
+import { BasePage } from "../Helper/BasePage";
 
-export class ProductPage{
-    readonly page: Page;
+export class ProductPage extends BasePage{
     readonly productInformationSectionLocator: Locator;
     readonly prductInformationSectionCategoryLocator: (productInformationSection: Locator) => Locator;
     readonly prductInformationSectionPriceLocator: (productInformationSection: Locator) => Locator;
@@ -25,7 +25,7 @@ export class ProductPage{
     readonly reviewSuccessMessageTextLocator: Locator;
 
     constructor(page: Page){
-        this.page = page;
+        super(page);
         this.productInformationSectionLocator = this.page.locator(".product-information");
         this.prductInformationSectionCategoryLocator = (productInformationSection: Locator) => productInformationSection.getByText("Category:");
         this.prductInformationSectionPriceLocator = (productInformationSection: Locator) => productInformationSection.locator("span span");
@@ -46,10 +46,6 @@ export class ProductPage{
         this.reviewTextAreaInputLocator = this.page.getByPlaceholder("Add Review Here!");
         this.reviewSubmitButtonLocator = this.page.getByRole("button",{name: "Submit"});
         this.reviewSuccessMessageTextLocator = this.page.getByText("Thank you for your review.");
-    }
-
-    async goBack(){
-        this.page.goBack();
     }
 
     async verifyImageWasLoaded(image: Locator){

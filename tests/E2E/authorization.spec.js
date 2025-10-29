@@ -6,7 +6,7 @@ test.describe("E2E Authorization tests", () => {
     //goto
     await homePage.goto();
     await homePage.checkHomePageLoad();
-    await homePage.gotoSignUpAndLoginPage();
+    await homePage.clickSignUpAndLoginLink();
     await signUp_LoginPage.checkSignUpText();
     await signUp_LoginPage.checkLoginText();
   });

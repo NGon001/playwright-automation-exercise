@@ -1,9 +1,8 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { textPriceToFloat } from "../Helper/tools";
+import { BasePage } from "../Helper/BasePage";
 
-export class CartPage{
-
-    readonly page: Page;
+export class CartPage extends BasePage{
     readonly subscriptionTextLocator: Locator;
     readonly subscriptionEmailInputLocator: Locator;
     readonly subscribeButtonLocator: Locator;
@@ -32,7 +31,7 @@ export class CartPage{
     readonly signUpAndLoginPageLocator: Locator;
 
     constructor(page: Page){
-        this.page = page;
+        super(page);
         this.subscriptionTextLocator = this.page.getByText("Subscription");
         this.subscriptionEmailInputLocator = this.page.getByPlaceholder("Your email address");
         this.subscribeButtonLocator = this.page.locator("#subscribe");
@@ -88,12 +87,8 @@ export class CartPage{
         return await this.emptyCartTextLocator.isVisible();
     }
 
-    async getProductsList(){
-        return await this.productsListLocator;
-    }
-
     async getProductByName(name: string): Promise<Locator | null> {
-        const product =  (await this.getProductsList()).filter({
+        const product =  (await await this.productsListLocator).filter({
             has: this.page.locator('h4', { hasText: name })
         });
         
@@ -119,7 +114,7 @@ export class CartPage{
     }
 
     async clickProcessButton(authorized: boolean) {
-        const products = await this.getProductsList();
+        const products = await await this.productsListLocator;
         await this.verifyImageWasLoaded(await this.productImageLocator(await products.nth(0)));
     
         await expect(async () => {
@@ -139,7 +134,7 @@ export class CartPage{
     }
 
     async checkProductInfoByIndex(index: number, name: string, price: number, quantity: number){
-        const products = await this.getProductsList();
+        const products = await this.productsListLocator;
         const product = await products.nth(index);
         const productName = await this.productNameTextLocator(product).textContent();
         const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
@@ -179,7 +174,9 @@ export class CartPage{
         await expect(await this.checkProductExistByName(name)).toBe(exist);
     }
 
-    async verifyAddressFormInformation(addresForm: Locator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+    async verifyAddressFormInformation(addresForm: Locator,originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string
+        ,originalAddress2: string,originalCountry: string,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string
+    ){
         const Name = await this.billingFormName(addresForm).textContent();
         const AddressesLocators = await this.billingFormAddress(addresForm).all();
         let combinedAddress = '';
@@ -203,7 +200,8 @@ export class CartPage{
         await expect(PhoneNumber).toBe(originalMobileNumber);
     }
 
-    async verifyAddress(addressName: string, originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber){
+    async verifyAddress(addressName: string, originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string,originalAddress2: string,originalCountry: string
+        ,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string){
         const adressLocator = addressName === "billing" ? await this.billingAdressLocator : await this.deliveryAdressLocator;
         await expect(adressLocator).toBeVisible();
         await this.verifyAddressFormInformation(adressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
@@ -218,14 +216,10 @@ export class CartPage{
     }
 
     async getProductsCount(){
-        return await (await this.getProductsList()).count();
+        return await (await await this.productsListLocator).count();
     }
 
     async gotoSignUpAndLoginPage(){
         await this.signUpAndLoginPageLocator.click();
-    }
-
-    async checkValues(value1, value2){
-        await expect(value1).toBe(value2);
     }
 }

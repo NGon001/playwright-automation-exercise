@@ -1,11 +1,11 @@
 import { Locator, Page, expect } from "@playwright/test";
+import { BasePage } from "../Helper/BasePage";
 
-export class TestCasesPage{
-    readonly page: Page;
+export class TestCasesPage extends BasePage{
     readonly testCasePageTextCheckLocator: Locator;
 
     constructor(page: Page){
-        this.page = page;
+        super(page);
         this.testCasePageTextCheckLocator = this.page.getByText("Below is the list of test Cases");
     }
 

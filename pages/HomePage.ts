@@ -1,9 +1,9 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { textPriceToFloat } from "../Helper/tools";
+import { BasePage } from "../Helper/BasePage";
+import { ProductInfo } from "../Helper/base";
 
-export class HomePage{
-    readonly page: Page;
-
+export class HomePage extends BasePage {
     readonly signUpAndLoginPageLocator: Locator;
     readonly deleteButtonLocator: Locator;
     readonly logoutButtonLocator: Locator;
@@ -40,7 +40,7 @@ export class HomePage{
 
 
     constructor(page: Page) {
-        this.page = page;
+        super(page);
         this.signUpAndLoginPageLocator = this.page.getByRole('link', { name: 'Signup / Login' });
         this.deleteButtonLocator = this.page.getByRole("link",{name: " Delete Account"});
         this.logoutButtonLocator = this.page.getByRole('link', { name: 'Logout' });
@@ -75,36 +75,28 @@ export class HomePage{
         this.subCategoryCollabseOrInLocator = (panelCategory: Locator,option: string) => panelCategory.locator((".panel-collapse" + option));
     }
 
-    async goto(){
-        await this.page.goto("/");
-    }
-
-    async gotoSignUpAndLoginPage(){
+    async clickSignUpAndLoginLink(){
         await this.signUpAndLoginPageLocator.click();
     }
 
-    async gotoContactUsPage(){
+    async clickContactUs(){
         await this.contactUsButtonLocator.click();
-    }
-
-    async getAllProducts() {
-        return this.allProductsItemsLocator;
     }
   
     async clickViewProductButton(product: Locator){
         await this.productViewProductButtonLocator(product).click();
     }
 
-    async clickViewProductButtonByIndex(index: number): Promise<{name: string, price: number}>{
-        const products = await this.getAllProducts();
+    async clickViewProductButtonByIndex(index: number): Promise<ProductInfo>{
+        const products = await this.allProductsItemsLocator;
         const product = await products.nth(index);
         const productName = await this.productNameTextLocator(product).textContent() ?? "";
         const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
         await this.clickViewProductButton(product);
-        return {name: productName, price: productPrice};
+        return new ProductInfo(productName, productPrice,1);
     }
 
-    async checkLoggedInName(firstName){
+    async checkLoggedInName(firstName: string | undefined){
         const expectedMessage = `Logged in as ${firstName}`;
         const loggedInMessage = await this.textLoggedInUserLocator.textContent();
         await expect(await this.textLoggedInUserLocator).toBeVisible();
@@ -149,7 +141,7 @@ export class HomePage{
                     const panelCategory = await this.panelDefaultClass(potentialCategoryLink);
                     await expect(async () => {
                         await potentialCategoryLink.click();
-                        await this.page.waitForTimeout(500); // i know it is not a best practice, but for now ;-;
+                        await this.page.waitForTimeout(500); //wait for animation
                         const subCategoryIn = await this.subCategoryCollabseOrInLocator(panelCategory,".in");
                         await expect(await subCategoryIn.count()).not.toBe(0);
                     }).toPass();         
@@ -164,7 +156,7 @@ export class HomePage{
             const panelCategory = await this.panelDefaultClass(link);   
             await expect(async () => {
                 await link.click();
-                await this.page.waitForTimeout(500); // i know it is not a best practice, but for now ;-;
+                await this.page.waitForTimeout(500); //wait for animation
                 const subCategoryIn = await this.subCategoryCollabseOrInLocator(panelCategory,".in");       
                 await expect(await subCategoryIn.count()).not.toBe(0);
             }).toPass();  
@@ -214,8 +206,8 @@ export class HomePage{
         await this.subscribeButtonLocator.click();
     }
 
-    async clickProductAddToCartButtonByIndex(index: number): Promise<{ name: string; price: number }>{
-        const products = await this.getAllProducts();
+    async clickProductAddToCartButtonByIndex(index: number): Promise<ProductInfo>{
+        const products = await this.allProductsItemsLocator;
         const product = await products.nth(index);
         const productImage = await this.productImageLocator(product);
 
@@ -257,14 +249,14 @@ export class HomePage{
         await overlayContentAddProductButton.hover();
         await overlayContentAddProductButton.click();
 
-        return {name: productName, price: productPrice};
+        return new ProductInfo(productName, productPrice,1);
     }
 
     async getActiveRecomendedItems(){
         return await this.recomendedItemsActiveLocator;
     }
 
-    async clickAddToCartRecomendedItemsByIndex(index: number): Promise<{name: string, price: number}> {
+    async clickAddToCartRecomendedItemsByIndex(index: number): Promise<ProductInfo>{
         const products = await this.getActiveRecomendedItems();
         const product = await products.nth(index);
 
@@ -273,7 +265,7 @@ export class HomePage{
         const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
         
         await this.recomendedItemsAddToCartButtonLocator(product).click();
-        return {name: productName, price: productPrice};
+        return new ProductInfo(productName, productPrice,1);
     }
 
     async checkSuccessSubscriptionMessage(){
