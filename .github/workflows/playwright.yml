@@ -74,28 +74,28 @@ jobs:
     - name: Run Playwright tests
       run: npm run testonly
     
-    - name: Upload Playwright Traces
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright-traces
-        path: test-results/**/*.zip  # trace.zip files are usually stored in the output folder
-
-    - name: Upload Screenshots
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright-screenshots
-        path: test-results/**/*.png
-
-    - name: Upload Videos
-      if: failure()
-      uses: actions/upload-artifact@v4
-      with:
-        name: playwright-videos
-        path: test-results/**/*.webm
-        
-    - name: Upload results to TestRail
-      if: always()
-      run: |
-        npm run trcli
+    #- name: Upload Playwright Traces
+    #  if: failure()
+    #  uses: actions/upload-artifact@v4
+    #  with:
+    #    name: playwright-traces
+    #    path: test-results/**/*.zip  # trace.zip files are usually stored in the output folder
+#
+    #- name: Upload Screenshots
+    #  if: failure()
+    #  uses: actions/upload-artifact@v4
+    #  with:
+    #    name: playwright-screenshots
+    #    path: test-results/**/*.png
+#
+    #- name: Upload Videos
+    #  if: failure()
+    #  uses: actions/upload-artifact@v4
+    #  with:
+    #    name: playwright-videos
+    #    path: test-results/**/*.webm
+    #    
+    #- name: Upload results to TestRail
+    #  if: always()
+    #  run: |
+    #    npm run trcli
