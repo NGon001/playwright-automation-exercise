@@ -1,22 +1,40 @@
 import { Locator, Page, expect } from "@playwright/test";
+import { BasePage } from "../Helper/BasePage";
 
 
-export class AccountCreatedPage{
-    readonly page: Page;
-    readonly accountCreatedTextLocator: Locator;
-    readonly continueButtonLocator: Locator;
+export class AccountCreatedPage extends BasePage{
+
+    readonly locators: {
+        accountCreatedTextLocator: Locator;
+        continueButtonLocator: Locator;
+    };
+
+    readonly assertions: {
+        expectAccountCreatedTextVisible: () => Promise<void>;
+    }
+
+    readonly actions: {
+        clickContinueButton: () => Promise<void>;
+    }
 
     constructor(page: Page){
-        this.page = page;
-        this.accountCreatedTextLocator = this.page.getByText('Account Created!').describe("Green Account Created! Text on Page");
-        this.continueButtonLocator = this.page.getByRole('link', { name: 'Continue' }).describe("Continue Button");
-    }
+        super(page);
 
-    async checkAccountCreationMessage(){
-        await expect(await this.accountCreatedTextLocator).toBeVisible();
-    }
+        this.locators = {
+            accountCreatedTextLocator: this.page.getByText('Account Created!').describe("Green Account Created! Text on Page"),
+            continueButtonLocator: this.page.getByRole('link', { name: 'Continue' }).describe("Continue Button"),
+        };
 
-    async clickContinueButton(){
-        await this.continueButtonLocator.click();
+        this.assertions = {
+            expectAccountCreatedTextVisible: async () => {
+                await expect(await this.locators.accountCreatedTextLocator).toBeVisible();
+            },
+        };
+
+        this.actions = {
+            clickContinueButton: async () => {
+                await this.locators.continueButtonLocator.click();
+            }
+        };
     }
 }

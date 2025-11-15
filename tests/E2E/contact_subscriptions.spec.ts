@@ -1,5 +1,5 @@
 import { test } from '../../Helper/base.ts';
-
+import { getEnv } from '../../Helper/tools.ts';
 
 test.describe("E2E Contact & Subscriptions", () => {
   test.beforeEach(async ({ homePage }) =>{
@@ -28,17 +28,24 @@ test.describe("E2E Contact & Subscriptions", () => {
     const filePath = './README.md';
 
     //goto
-    await homePage.gotoContactUsPage();
-    await contactUsPage.checkGetInTouchText();
+    await homePage.clickContactUs();
+    await contactUsPage.assertions.expectGetInTouchTextVisible();
 
     //fill contact us form
-    await contactUsPage.fillContactUsForm(process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.VALID_LOGIN_EMAIL,subject,message,filePath);
+    await contactUsPage.actions.fillContactUsForm(
+      await getEnv("REGISTER_NAME_FIRST"),
+      await getEnv("REGISTER_NAME_LAST"),
+      await getEnv("VALID_LOGIN_EMAIL"),
+      subject,
+      message,
+      filePath
+    );
     await contactUsPage.page.waitForTimeout(2000);
-    await contactUsPage.clickSubmitButton();
+    await contactUsPage.actions.clickSubmitButton();
 
     //verify success message
-    await contactUsPage.checkSuccessMessage();
-    await contactUsPage.clickReturnHomeButton();
+    await contactUsPage.assertions.expectSuccessMessageVisible();
+    await contactUsPage.actions.clickReturnHomeButton();
 
     await homePage.checkHomePageLoad();
   });
@@ -55,7 +62,7 @@ test.describe("E2E Contact & Subscriptions", () => {
   */
 
   test('C44 Verify Subscription in home page', async ({ homePage }) => {
-    await homePage.inputValueToSubscriptionEmailField(process.env.VALID_LOGIN_EMAIL);
+    await homePage.inputValueToSubscriptionEmailField(await getEnv("VALID_LOGIN_EMAIL"));
     await homePage.checkSuccessSubscriptionMessage();
   });
 
@@ -76,6 +83,6 @@ test.describe("E2E Contact & Subscriptions", () => {
     await homePage.gotoCart();
     await cartPage.verifySubscriptionText();
 
-    await cartPage.inputValueToSubscriptionEmailField(process.env.VALID_LOGIN_EMAIL);
+    await cartPage.inputValueToSubscriptionEmailField(await getEnv("VALID_LOGIN_EMAIL"));
   });
 });

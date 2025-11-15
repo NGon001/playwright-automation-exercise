@@ -23,21 +23,18 @@ test.describe("E2E Cart Functionality", () =>{
   */
 
   test('C34 Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
-    //data
-    const productQuantity = 1;
-
     //goto
     await homePage.gotoProductsPage();
 
-    await productsPage.checkIfAllProductsTextIsVissible();
-    await productsPage.checkIfProductsExist();
-    const firstProductInfo = await productsPage.clickProductAddToCartButtonByIndex(0);
-    await productsPage.clickContinueShoppingButton();
-    const secondProductInfo = await productsPage.clickProductAddToCartButtonByIndex(1);
-    await productsPage.clickViewCartButton();
+    await productsPage.assertions.expectProductsTextIsVissible();
+    await productsPage.assertions.expectProductsExist();
+    const firstProductInfo = await productsPage.actions.clickProductAddToCartButtonByIndex(0);
+    await productsPage.actions.clickContinueShoppingButton();
+    const secondProductInfo = await productsPage.actions.clickProductAddToCartButtonByIndex(1);
+    await productsPage.actions.clickViewCartButton();
 
-    await cartPage.checkProductInfoByIndex(0,firstProductInfo.name,firstProductInfo.price,productQuantity);
-    await cartPage.checkProductInfoByIndex(1,secondProductInfo.name,secondProductInfo.price,productQuantity);
+    await cartPage.checkProductInfoByIndex(0,firstProductInfo.Name,firstProductInfo.Price,firstProductInfo.Quantity);
+    await cartPage.checkProductInfoByIndex(1,secondProductInfo.Name,secondProductInfo.Price,secondProductInfo.Quantity);
   });
 
   /*
@@ -61,11 +58,12 @@ test.describe("E2E Cart Functionality", () =>{
 
     const productInfo = await homePage.clickViewProductButtonByIndex(productIndex);
 
-    await productPage.setQuantity(Quantity);
-    await productPage.clickAddToCartButton();
-    await productPage.clickViewCartButton();
+    await productPage.actions.setQuantity(Quantity);
+    productInfo.Quantity = Quantity;
+    await productPage.actions.clickAddToCartButton();
+    await productPage.actions.clickViewCartButton();
 
-    await cartPage.checkProductInfoByIndex(productIndex,productInfo.name,productInfo.price,Quantity);
+    await cartPage.checkProductInfoByIndex(productIndex,productInfo.Name,productInfo.Price,productInfo.Quantity);
   });
 
   /*
@@ -90,15 +88,15 @@ test.describe("E2E Cart Functionality", () =>{
 
     //delete secondProduct
     await cartPage.checkIfProcessButtonVisisble();
-    await cartPage.verifyProductImageWasLoadedByName(secondProductInfo.name);
-    await cartPage.deleteProductByName(secondProductInfo.name);
-    await cartPage.verifyProductExistOrNot(false,secondProductInfo.name);
+    await cartPage.verifyProductImageWasLoadedByName(secondProductInfo.Name);
+    await cartPage.deleteProductByName(secondProductInfo.Name);
+    await cartPage.verifyProductExistOrNot(false,secondProductInfo.Name);
 
     //delete firstProduct
     await cartPage.checkIfProcessButtonVisisble();
-    await cartPage.verifyProductImageWasLoadedByName(firstProductInfo.name);
-    await cartPage.deleteProductByName(firstProductInfo.name);
-    await cartPage.verifyProductExistOrNot(false,firstProductInfo.name);
+    await cartPage.verifyProductImageWasLoadedByName(firstProductInfo.Name);
+    await cartPage.deleteProductByName(firstProductInfo.Name);
+    await cartPage.verifyProductExistOrNot(false,firstProductInfo.Name);
   });
 
   /*
@@ -126,8 +124,8 @@ test('Test Case 20: Search Products and Verify Cart After Login', async ({ homeP
   const productsNames = ["dress"]; //keyWords
 
   //data login
-  const email = process.env.VALID_EMAIL || '';
-  const password = process.env.VALID_PASSWORD || '';
+  const email = await getEnv("VALID_EMAIL") || '';
+  const password = await getEnv("VALID_PASSWORD") || '';
   const name = ["vlad", "Petrov"];
 
 
@@ -195,8 +193,6 @@ test('Test Case 20: Search Products and Verify Cart After Login', async ({ homeP
 });
 */
 
-
-
   /*
   Test Case 22: Add to cart from Recommended items
   1. Launch browser
@@ -213,7 +209,7 @@ test('Test Case 20: Search Products and Verify Cart After Login', async ({ homeP
     const productInfo = await homePage.clickAddToCartRecomendedItemsByIndex(0);
     await homePage.clickViewCartButton();
 
-    await cartPage.checkProductExistByName(productInfo.name);
+    await cartPage.checkProductExistByName(productInfo.Name);
   });
   
 });

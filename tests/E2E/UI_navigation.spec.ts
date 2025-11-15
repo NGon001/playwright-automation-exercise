@@ -17,7 +17,7 @@ test.describe("E2E UI & Navigation", () => {
 
   test('C48 Verify Test Cases Page', async ({ homePage,testCasesPage }) => {
     await homePage.gotoTestCasesPage();
-    await testCasesPage.verifyPageIsVisible();
+    await testCasesPage.assertions.expectTestCasePageTextVisible();
   });
 
 });

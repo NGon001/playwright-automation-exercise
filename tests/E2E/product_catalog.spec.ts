@@ -1,4 +1,5 @@
 import { test } from '../../Helper/base.ts';
+import { getEnv } from '../../Helper/tools.ts';
 
 test.describe("E2E Product & Catalog", () =>{
   test.beforeEach(async ({ homePage }) =>{
@@ -21,11 +22,11 @@ test.describe("E2E Product & Catalog", () =>{
 
   test('C45 Verify All Products and product detail page', async ({ homePage, productsPage, productPage }) => {
     await homePage.gotoProductsPage();
-    await productsPage.checkIfAllProductsTextIsVissible();
-    await productsPage.checkIfProductsExist();
-    await productsPage.clickViewProductButtonByIndex(0);
+    await productsPage.assertions.expectProductsTextIsVissible();
+    await productsPage.assertions.expectProductsExist();
+    await productsPage.actions.clickViewProductButtonByIndex(0);
 
-    await productPage.verifyThatProductInformationIsVisible();
+    await productPage.assertions.expectThatProductInformationIsVisible();
   });
 
   /*
@@ -57,17 +58,17 @@ test.describe("E2E Product & Catalog", () =>{
       await homePage.gotoProductsPage();
 
       //Verefying page loaded and search products by products name (keyWord)
-      await productsPage.checkIfAllProductsTextIsVissible();
-      await productsPage.searchProducts(productsName);
-      await productsPage.verefyThatProductsSearchComplited();
+      await productsPage.assertions.expectProductsTextIsVissible();
+      await productsPage.actions.searchProducts(productsName);
+      await productsPage.assertions.expectSearchedProductsComplited();
 
       //saved links for products when name is not include keyword
-      const productLinks = await productsPage.getLinksOfProductsThatDoNotMatchKeyword(productsName);
+      const productLinks = await productsPage.actions.getLinksOfProductsThatDoNotMatchKeyword(productsName);
 
       //go through all products links and check if category include keyWord
       for(const productLink of productLinks){
-        await productsPage.gotoProduct(productLink);
-        await productPage.verifyMatchingCategory(productsName);
+        await productsPage.actions.gotoProduct(productLink);
+        await productPage.assertions.expectMatchingCategory(productsName);
       }
     }
   });
@@ -115,9 +116,9 @@ test.describe("E2E Product & Catalog", () =>{
 
 
     await homePage.gotoProductsPage();
-    await productsPage.clickSubCategoryOfCategory(WomantCategory.category,WomantCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
-    await productsPage.clickSubCategoryOfCategory(KidstCategory.category, KidstCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
-    await productsPage.clickSubCategoryOfCategory(MentCategory.category, MentCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
+    await productsPage.actions.clickSubCategoryOfCategory(WomantCategory.category,WomantCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
+    await productsPage.actions.clickSubCategoryOfCategory(KidstCategory.category, KidstCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
+    await productsPage.actions.clickSubCategoryOfCategory(MentCategory.category, MentCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
   });
 
   /*
@@ -137,12 +138,12 @@ test.describe("E2E Product & Catalog", () =>{
     const message = "Test review message.";
 
     await homePage.gotoProductsPage();
-    await productsPage.checkIfAllProductsTextIsVissible();
-    await productsPage.checkIfProductsExist();
-    await productsPage.clickViewProductButtonByIndex(0);
+    await productsPage.assertions.expectProductsTextIsVissible();
+    await productsPage.assertions.expectProductsExist();
+    await productsPage.actions.clickViewProductButtonByIndex(0);
 
-    await productPage.verifyWriteReviewTextVissible();
-    await productPage.fillReviewForm(process.env.REGISTER_NAME_FIRST,process.env.REGISTER_NAME_LAST,process.env.VALID_LOGIN_EMAIL,message);
-    await productPage.clickReviewSubmitButton();
+    await productPage.assertions.expectWriteReviewTextVissible();
+    await productPage.actions.fillReviewForm(await getEnv("REGISTER_NAME_FIRST"),await getEnv("REGISTER_NAME_LAST"),await getEnv("VALID_LOGIN_EMAIL"),message);
+    await productPage.actions.clickReviewSubmitButton();
   });
 });
