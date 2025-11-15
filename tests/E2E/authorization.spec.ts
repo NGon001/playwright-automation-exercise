@@ -5,8 +5,8 @@ test.describe("E2E Authorization tests", () => {
   test.beforeEach(async ({ homePage, signUp_LoginPage }) => {
     //goto
     await homePage.goto();
-    await homePage.checkHomePageLoad();
-    await homePage.clickSignUpAndLoginLink();
+    await homePage.assertions.expectPageLoaded();
+    await homePage.actions.clickSignUpAndLoginLink();
     await signUp_LoginPage.assertions.expectSignUpTextVisible();
     await signUp_LoginPage.assertions.expectLoginTextVisible();
   });
@@ -61,13 +61,13 @@ test.describe("E2E Authorization tests", () => {
     //Step 3: verift account was created
     await accountCreatedPage.assertions.expectAccountCreatedTextVisible();
     await accountCreatedPage.actions.clickContinueButton();
-    await homePage.checkLoggedInName(await getEnv("REGISTER_NAME_FIRST"));
+    await homePage.assertions.expectLoggedInNameIsVisible(await getEnv("REGISTER_NAME_FIRST"));
 
     //Step 4: delete account and Verify it
-    await homePage.clickDeleteAccount();
+    await homePage.actions.clickDeleteAccount();
     await accountDeletePage.assertions.expectAccountDeletedTextVisible();
     await accountDeletePage.actions.clickContinueButton();
-    await homePage.checkHomePageLoad();
+    await homePage.assertions.expectPageLoaded();
   });
 
   /*
@@ -87,7 +87,7 @@ test.describe("E2E Authorization tests", () => {
     await signUp_LoginPage.actions.clickLoginButton();
 
     //verify login
-    await homePage.checkLoggedInName(await getEnv("VALID_LOGIN_NAME_FIRST"));
+    await homePage.assertions.expectLoggedInNameIsVisible(await getEnv("VALID_LOGIN_NAME_FIRST"));
   });
 
   /*
@@ -131,10 +131,10 @@ test.describe("E2E Authorization tests", () => {
     await signUp_LoginPage.actions.clickLoginButton();
 
     //verify login
-    await homePage.checkLoggedInName(await getEnv("VALID_LOGIN_NAME_FIRST"));
+    await homePage.assertions.expectLoggedInNameIsVisible(await getEnv("VALID_LOGIN_NAME_FIRST"));
 
     //logout
-    await homePage.logout();
+    await homePage.actions.logout();
     await signUp_LoginPage.assertions.expectLoginTextVisible();
     await signUp_LoginPage.assertions.expectSignUpTextVisible();
   });

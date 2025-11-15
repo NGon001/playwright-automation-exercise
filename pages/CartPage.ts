@@ -3,223 +3,257 @@ import { textPriceToFloat } from "../Helper/tools";
 import { BasePage } from "../Helper/BasePage";
 
 export class CartPage extends BasePage{
-    readonly subscriptionTextLocator: Locator;
-    readonly subscriptionEmailInputLocator: Locator;
-    readonly subscribeButtonLocator: Locator;
-    readonly subscribeMessage: Locator;
-    readonly productsListLocator: Locator;
-    readonly productQuantityTextLocator: (product: Locator) => Locator;
-    readonly productNameTextLocator: (product: Locator) => Locator;
-    readonly productPriceTextLocator: (product: Locator) => Locator;
-    readonly productPriceTotalTextLocator: (product: Locator) => Locator;
-    readonly processToCheckoutButtonLocator: Locator;
-    readonly modalContentLocator: Locator;
-    readonly modalContentRegisterAndLoginButtonLocator: (modalContent: Locator) => Locator;
-    readonly billingFormName: (form: Locator) => Locator;
-    readonly billingFormAddress: (form: Locator) => Locator;
-    readonly billingFormCityStatePostCode: (form: Locator) => Locator;
-    readonly billingFormCountry: (form: Locator) => Locator;
-    readonly billingFormPhoneNumber: (form: Locator) => Locator;
-    readonly deliveryAdressLocator: Locator;
-    readonly billingAdressLocator: Locator;
-    readonly descriptionInputLocator: Locator;
-    readonly placeOrderButtonLocator: Locator;
-    readonly deliveryTextLocator: Locator;
-    readonly productImageLocator: (product: Locator) => Locator;
-    readonly productDeleteButtonLocator: (product: Locator) => Locator;
-    readonly emptyCartTextLocator: Locator;
-    readonly signUpAndLoginPageLocator: Locator;
+    readonly locators: {
+        subscriptionTextLocator: Locator;
+        subscriptionEmailInputLocator: Locator;
+        subscribeButtonLocator: Locator;
+        subscribeMessage: Locator;
+        productsListLocator: Locator;
+        productQuantityTextLocator: (product: Locator) => Locator;
+        productNameTextLocator: (product: Locator) => Locator;
+        productPriceTextLocator: (product: Locator) => Locator;
+        productPriceTotalTextLocator: (product: Locator) => Locator;
+        processToCheckoutButtonLocator: Locator;
+        modalContentLocator: Locator;
+        modalContentRegisterAndLoginButtonLocator: (modalContent: Locator) => Locator;
+        billingFormName: (form: Locator) => Locator;
+        billingFormAddress: (form: Locator) => Locator;
+        billingFormCityStatePostCode: (form: Locator) => Locator;
+        billingFormCountry: (form: Locator) => Locator;
+        billingFormPhoneNumber: (form: Locator) => Locator;
+        deliveryAdressLocator: Locator;
+        billingAdressLocator: Locator;
+        descriptionInputLocator: Locator;
+        placeOrderButtonLocator: Locator;
+        deliveryTextLocator: Locator;
+        productImageLocator: (product: Locator) => Locator;
+        productDeleteButtonLocator: (product: Locator) => Locator;
+        emptyCartTextLocator: Locator;
+    };
+
+    readonly assertions: {
+        expectImageWasLoaded(image: Locator): Promise<void>;
+        expectSubscriptionText(): Promise<void>;
+        expectSuccessSubscriptionMessage(): Promise<void>;
+        expectProductImageWasLoaded(product: Locator): Promise<void>;
+        expectProductImageWasLoadedByName(name: string): Promise<void>;
+        expectProductInfoByIndex(index: number, name: string, price: number, quantity: number): Promise<void>;
+        expectProductExistOrNot(exist: boolean, name: string): Promise<void>;
+        expectAddress(addressName: string, originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string,originalAddress2: string,originalCountry: string
+            ,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string): Promise<void>;
+
+        expectProductExistByName(name: string): Promise<boolean>;
+        expectProcessButtonVisisble(): Promise<void>;
+        expectAddressFormInformation(addresForm: Locator,originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string
+            ,originalAddress2: string,originalCountry: string,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string): Promise<void>;
+    };
+
+    readonly actions: {
+        inputValueToSubscriptionEmailField(email: string): Promise<void>;
+        isCartEmpty(): Promise<boolean>;
+        getProductByName(name: string): Promise<Locator | null>;
+        clickProcessButton(authorized: boolean): Promise<void>;
+        clickRegisterAndLoginButton(): Promise<void>;
+        clickDeleteButtonByProduct(product: Locator): Promise<void>;
+        deleteProductByName(name: string): Promise<void>;
+        inputDescriptionMessage(message: string): Promise<void>;
+        clickPlaceOrderButton(): Promise<void>;
+        getProductsCount(): Promise<number>;
+    };
 
     constructor(page: Page){
         super(page);
-        this.subscriptionTextLocator = this.page.getByText("Subscription");
-        this.subscriptionEmailInputLocator = this.page.getByPlaceholder("Your email address");
-        this.subscribeButtonLocator = this.page.locator("#subscribe");
-        this.subscribeMessage = this.page.getByText("You have been successfully subscribed!");
-        this.productsListLocator = this.page.locator("#cart_info_table tbody tr");
-        this.productQuantityTextLocator = (product: Locator) => product.locator(".cart_quantity button");
-        this.productNameTextLocator = (product: Locator) => product.locator("h4");
-        this.productPriceTextLocator = (product: Locator) => product.locator(".cart_price p");
-        this.productPriceTotalTextLocator = (product: Locator) => product.locator(".cart_total_price");
-        this.processToCheckoutButtonLocator = this.page.locator(".btn.btn-default.check_out");
-        this.modalContentLocator = this.page.locator(".modal-content");
-        this.modalContentRegisterAndLoginButtonLocator = (modalContent: Locator) => modalContent.getByRole("link",{name: "Register / Login"});
-        this.billingFormName = (form: Locator) => form.locator(".address_firstname.address_lastname");
-        this.billingFormAddress = (form: Locator) => form.locator(".address_address1.address_address2");
-        this.billingFormCityStatePostCode = (form: Locator) => form.locator(".address_city.address_state_name.address_postcode");
-        this.billingFormCountry = (form: Locator) => form.locator(".address_country_name");
-        this.billingFormPhoneNumber = (form: Locator) => form.locator(".address_phone");
-        this.deliveryAdressLocator = this.page.locator(".address.item.box");
-        this.billingAdressLocator = this.page.locator(".address.alternate_item.box");
-        this.descriptionInputLocator = this.page.locator(".form-control");
-        this.placeOrderButtonLocator = this.page.getByRole("link",{name: "Place Order"});
-        this.productImageLocator = (product: Locator) => product.locator("img");
-        this.deliveryTextLocator = this.page.getByText("Your delivery address");
-        this.productDeleteButtonLocator = (product: Locator) => product.locator(".cart_quantity_delete");
-        this.emptyCartTextLocator = this.page.getByText("Cart is empty!");
-        this.signUpAndLoginPageLocator = this.page.getByRole('link', { name: 'Signup / Login' });
-    }
 
-    async verifyImageWasLoaded(image: Locator){
-        await expect(await this.page.waitForFunction(
-            (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,
-            await image.elementHandle()
-        )).toBeTruthy();
-    }
+        this.locators = {
+            subscriptionTextLocator : this.page.getByText("Subscription"),
+            subscriptionEmailInputLocator : this.page.getByPlaceholder("Your email address"),
+            subscribeButtonLocator : this.page.locator("#subscribe"),
+            subscribeMessage : this.page.getByText("You have been successfully subscribed!"),
+            productsListLocator : this.page.locator("#cart_info_table tbody tr"),
+            productQuantityTextLocator : (product: Locator) => product.locator(".cart_quantity button"),
+            productNameTextLocator : (product: Locator) => product.locator("h4"),
+            productPriceTextLocator : (product: Locator) => product.locator(".cart_price p"),
+            productPriceTotalTextLocator : (product: Locator) => product.locator(".cart_total_price"),
+            processToCheckoutButtonLocator : this.page.locator(".btn.btn-default.check_out"),
+            modalContentLocator : this.page.locator(".modal-content"),
+            modalContentRegisterAndLoginButtonLocator : (modalContent: Locator) => modalContent.getByRole("link",{name: "Register / Login"}),
+            billingFormName : (form: Locator) => form.locator(".address_firstname.address_lastname"),
+            billingFormAddress : (form: Locator) => form.locator(".address_address1.address_address2"),
+            billingFormCityStatePostCode : (form: Locator) => form.locator(".address_city.address_state_name.address_postcode"),
+            billingFormCountry : (form: Locator) => form.locator(".address_country_name"),
+            billingFormPhoneNumber : (form: Locator) => form.locator(".address_phone"),
+            deliveryAdressLocator : this.page.locator(".address.item.box"),
+            billingAdressLocator : this.page.locator(".address.alternate_item.box"),
+            descriptionInputLocator : this.page.locator(".form-control"),
+            placeOrderButtonLocator : this.page.getByRole("link",{name: "Place Order"}),
+            productImageLocator : (product: Locator) => product.locator("img"),
+            deliveryTextLocator : this.page.getByText("Your delivery address"),
+            productDeleteButtonLocator : (product: Locator) => product.locator(".cart_quantity_delete"),
+            emptyCartTextLocator : this.page.getByText("Cart is empty!"),
+        };
 
-    async verifySubscriptionText(){
-        await expect(await this.subscriptionTextLocator).toBeVisible();
-    }
+        this.assertions = {
+            expectImageWasLoaded: async (image: Locator) => {
+                await expect(await this.page.waitForFunction(
+                    (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,
+                    await image.elementHandle()
+                )).toBeTruthy();
+            },
 
-    async inputValueToSubscriptionEmailField(email: string){
-        await expect(async () => {
-            await this.subscriptionEmailInputLocator.fill(email);
-            await this.subscribeButtonLocator.click();
-            await this.checkSuccesSubscriptionMessage();
-        }).toPass();
-    }
+            expectSuccessSubscriptionMessage: async () => {
+                await expect(await this.locators.subscribeMessage).toBeVisible();
+            },
 
-    async checkSuccesSubscriptionMessage(){
-        await expect(await this.subscribeMessage).toBeVisible();
-    }
+            expectSubscriptionText: async () => {
+                await expect(await this.locators.subscriptionTextLocator).toBeVisible();
+            },
 
-    async isCartEmpty(){
-        return await this.emptyCartTextLocator.isVisible();
-    }
+            expectProductImageWasLoaded: async (product: Locator) => {
+                await this.assertions.expectImageWasLoaded(await this.locators.productImageLocator(await product));
+            },
 
-    async getProductByName(name: string): Promise<Locator | null> {
-        const product =  (await await this.productsListLocator).filter({
-            has: this.page.locator('h4', { hasText: name })
-        });
-        
-        if (await product.count() === 0) {
-            return null;
-        }
+            expectProductImageWasLoadedByName: async (name: string) => {
+                const product = await this.actions.getProductByName(name);
+                await expect(product).not.toBe(null);
+                if(product) await this.assertions.expectProductImageWasLoaded(product);
+            },
 
-        return product;
-    }
+            expectProductInfoByIndex: async (index: number, name: string, price: number, quantity: number) => {
+                const products = await this.locators.productsListLocator;
+                const product = await products.nth(index);
+                const productName = await this.locators.productNameTextLocator(product).textContent();
+                const productPrice = await textPriceToFloat(await this.locators.productPriceTextLocator(product).textContent() ?? "");
+                const productQuantity = parseInt(await this.locators.productQuantityTextLocator(product).textContent() ?? "");
+                const productPriceTotal = await textPriceToFloat(await this.locators.productPriceTotalTextLocator(product).textContent() ?? "");
 
-    async verifyProductImageWasLoaded(product: Locator){
-        await this.verifyImageWasLoaded(await this.productImageLocator(await product));
-    }
+                await expect(productName).toBe(name);
+                await expect(productPrice).toBe(price);
+                await expect(productQuantity).toBe(quantity);
+                await expect(productPriceTotal).toBe((productPrice * quantity));
+            },
 
-    async checkIfProcessButtonVisisble(){
-        await expect(await this.processToCheckoutButtonLocator).toBeVisible();
-    }
+            expectProductExistOrNot: async (exist: boolean, name: string) => {
+                await expect(await this.assertions.expectProductExistByName(name)).toBe(exist);
+            },
 
-    async verifyProductImageWasLoadedByName(name: string){
-        const product = await this.getProductByName(name);
-        await expect(product).not.toBe(null);
-        if(product) await this.verifyProductImageWasLoaded(product);
-    }
+            expectAddress: async (addressName: string, originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string,originalAddress2: string,originalCountry: string
+                ,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string) => 
+            {
+                const adressLocator = addressName === "billing" ? await this.locators.billingAdressLocator : await this.locators.deliveryAdressLocator;
+                await expect(adressLocator).toBeVisible();
+                await this.assertions.expectAddressFormInformation(adressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
+            },
 
-    async clickProcessButton(authorized: boolean) {
-        const products = await await this.productsListLocator;
-        await this.verifyImageWasLoaded(await this.productImageLocator(await products.nth(0)));
-    
-        await expect(async () => {
-            await this.processToCheckoutButtonLocator.click();
-            if (authorized) {
-                await expect(await this.deliveryTextLocator).toBeVisible();
-            } else {
-                await expect(await this.modalContentLocator).toBeVisible();
+            expectProductExistByName: async (name: string) => {
+                if(await this.actions.isCartEmpty()) return false;
+                const product = await this.actions.getProductByName(name);
+                if(product === null) return false;
+                return true;
+            },
+
+            expectProcessButtonVisisble: async () => {
+                await expect(await this.locators.processToCheckoutButtonLocator).toBeVisible();
+            },
+
+            expectAddressFormInformation: async (addresForm: Locator,originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string
+                ,originalAddress2: string,originalCountry: string,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string) => 
+            {
+                const Name = await this.locators.billingFormName(addresForm).textContent();
+                const AddressesLocators = await this.locators.billingFormAddress(addresForm).all();
+                let combinedAddress = '';
+                for (const Address of AddressesLocators) {
+                  const text = await Address.textContent();
+                  combinedAddress += (text?.trim() ?? '') + ' ';
+                }
+                combinedAddress = combinedAddress.trim();
+                const CityStatePostCode = (await this.locators.billingFormCityStatePostCode(addresForm).textContent())?.replace(/\s+/g, ' ').trim();;
+                const Country = await this.locators.billingFormCountry(addresForm).textContent();
+                const PhoneNumber = await this.locators.billingFormPhoneNumber(addresForm).textContent();
+            
+                const expectedName = `${originalTitle} ${originalFirstName} ${originalLastName}`;
+                const expectedAddress = `${originalCompanyName} ${originalAddress} ${originalAddress2}`;
+                const expectedCityStatePostcode = `${originalCity} ${originalState} ${originalZipcode}`;
+            
+                await expect(Name).toBe(expectedName);
+                await expect(combinedAddress).toBe(expectedAddress);
+                await expect(CityStatePostCode).toBe(expectedCityStatePostcode);
+                await expect(Country).toBe(originalCountry);
+                await expect(PhoneNumber).toBe(originalMobileNumber);
             }
-        }).toPass();
-    }
+        };
 
-    async clickRegisterAndLoginButton(){
-        await expect(await this.modalContentLocator).toBeVisible();
-        await expect(await this.modalContentRegisterAndLoginButtonLocator(await this.modalContentLocator)).toBeVisible({timeout: 20000});
-        await this.modalContentRegisterAndLoginButtonLocator(await this.modalContentLocator).click();
-    }
+        this.actions = {
+            inputValueToSubscriptionEmailField: async (email: string) => {
+                await expect(async () => {
+                    await this.locators.subscriptionEmailInputLocator.fill(email);
+                    await this.locators.subscribeButtonLocator.click();
+                    await this.assertions.expectSuccessSubscriptionMessage();
+                }).toPass();
+            },
 
-    async checkProductInfoByIndex(index: number, name: string, price: number, quantity: number){
-        const products = await this.productsListLocator;
-        const product = await products.nth(index);
-        const productName = await this.productNameTextLocator(product).textContent();
-        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
-        const productQuantity = parseInt(await this.productQuantityTextLocator(product).textContent() ?? "");
-        const productPriceTotal = await textPriceToFloat(await this.productPriceTotalTextLocator(product).textContent() ?? "");
-        
-        await expect(productName).toBe(name);
-        await expect(productPrice).toBe(price);
-        await expect(productQuantity).toBe(quantity);
-        await expect(productPriceTotal).toBe((productPrice * quantity));
-    }
+            isCartEmpty: async () => {
+                return await this.locators.emptyCartTextLocator.isVisible();
+            },
 
-    async clickDeleteButtonByProduct(product: Locator) {
-        if (await product.count() === 0) {
-            throw new Error('Product does not exist, cannot click delete.');
-        }
-        await expect(async () => {
-            await this.productDeleteButtonLocator(product).click();
-            await expect(product).toHaveCount(0, { timeout: 10000 });
-        }).toPass();
-    }
+            getProductByName: async (name: string): Promise<Locator | null> => {
+                const product =  (await await this.locators.productsListLocator).filter({
+                    has: this.page.locator('h4', { hasText: name })
+                });
 
-    async deleteProductByName(name: string){
-        const product = await this.getProductByName(name);
-        await expect(product).not.toBe(null);
-        if (product) await this.clickDeleteButtonByProduct(product);
-    }
+                if (await product.count() === 0) {
+                    return null;
+                }
+            
+                return product;
+            },
 
-    async checkProductExistByName(name: string){
-        if(await this.isCartEmpty()) return false;
-        const product = await this.getProductByName(name);
-        if(product === null) return false;
-        return true;
-    }
+            clickProcessButton: async (authorized: boolean) => {
+                const products = await await this.locators.productsListLocator;
+                await this.assertions.expectImageWasLoaded(await this.locators.productImageLocator(await products.nth(0)));
 
-    async verifyProductExistOrNot(exist: boolean, name: string){
-        await expect(await this.checkProductExistByName(name)).toBe(exist);
-    }
+                await expect(async () => {
+                    await this.locators.processToCheckoutButtonLocator.click();
+                    if (authorized) {
+                        await expect(await this.locators.deliveryTextLocator).toBeVisible();
+                    } else {
+                        await expect(await this.locators.modalContentLocator).toBeVisible();
+                    }
+                }).toPass();
+            },
 
-    async verifyAddressFormInformation(addresForm: Locator,originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string
-        ,originalAddress2: string,originalCountry: string,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string
-    ){
-        const Name = await this.billingFormName(addresForm).textContent();
-        const AddressesLocators = await this.billingFormAddress(addresForm).all();
-        let combinedAddress = '';
-        for (const Address of AddressesLocators) {
-          const text = await Address.textContent();
-          combinedAddress += (text?.trim() ?? '') + ' ';
-        }
-        combinedAddress = combinedAddress.trim();
-        const CityStatePostCode = (await this.billingFormCityStatePostCode(addresForm).textContent())?.replace(/\s+/g, ' ').trim();;
-        const Country = await this.billingFormCountry(addresForm).textContent();
-        const PhoneNumber = await this.billingFormPhoneNumber(addresForm).textContent();
+            clickRegisterAndLoginButton: async () => {
+                await expect(await this.locators.modalContentLocator).toBeVisible();
+                await expect(await this.locators.modalContentRegisterAndLoginButtonLocator(await this.locators.modalContentLocator)).toBeVisible({timeout: 20000});
+                await this.locators.modalContentRegisterAndLoginButtonLocator(await this.locators.modalContentLocator).click();
+            },
 
-        const expectedName = `${originalTitle} ${originalFirstName} ${originalLastName}`;
-        const expectedAddress = `${originalCompanyName} ${originalAddress} ${originalAddress2}`;
-        const expectedCityStatePostcode = `${originalCity} ${originalState} ${originalZipcode}`;
+            clickDeleteButtonByProduct: async (product: Locator) => {
+                if (await product.count() === 0) {
+                    throw new Error('Product does not exist, cannot click delete.');
+                }
+                await expect(async () => {
+                    await this.locators.productDeleteButtonLocator(product).click();
+                    await expect(product).toHaveCount(0, { timeout: 10000 });
+                }).toPass();
+            },
 
-        await expect(Name).toBe(expectedName);
-        await expect(combinedAddress).toBe(expectedAddress);
-        await expect(CityStatePostCode).toBe(expectedCityStatePostcode);
-        await expect(Country).toBe(originalCountry);
-        await expect(PhoneNumber).toBe(originalMobileNumber);
-    }
+            deleteProductByName: async (name: string) => {
+                const product = await this.actions.getProductByName(name);
+                await expect(product).not.toBe(null);
+                if (product) await this.actions.clickDeleteButtonByProduct(product);
+            },
 
-    async verifyAddress(addressName: string, originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string,originalAddress2: string,originalCountry: string
-        ,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string){
-        const adressLocator = addressName === "billing" ? await this.billingAdressLocator : await this.deliveryAdressLocator;
-        await expect(adressLocator).toBeVisible();
-        await this.verifyAddressFormInformation(adressLocator,originalTitle, originalFirstName,originalLastName,originalAddress,originalAddress2,originalCountry,originalState,originalCity,originalZipcode,originalCompanyName,originalMobileNumber);
-    }
+            inputDescriptionMessage: async (message: string) => {
+                await this.locators.descriptionInputLocator.fill(message);
+            },
 
-    async inputDescriptionMessage(message: string){
-        await this.descriptionInputLocator.fill(message);
-    }
+            clickPlaceOrderButton: async () => {
+                await this.locators.placeOrderButtonLocator.click();
+            },
 
-    async clickPlaceOrderButton(){
-        await this.placeOrderButtonLocator.click();
-    }
-
-    async getProductsCount(){
-        return await (await await this.productsListLocator).count();
-    }
-
-    async gotoSignUpAndLoginPage(){
-        await this.signUpAndLoginPageLocator.click();
+            getProductsCount: async () => {
+                return await (await await this.locators.productsListLocator).count();
+            },
+        };
     }
 }

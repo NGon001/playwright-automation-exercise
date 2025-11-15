@@ -4,7 +4,7 @@ test.describe("E2E UI & Navigation", () => {
   test.beforeEach(async ({homePage}) =>{
     //goto
     await homePage.goto();
-    await homePage.checkHomePageLoad();
+    await homePage.assertions.expectPageLoaded();
   });
 
   /*
@@ -16,7 +16,7 @@ test.describe("E2E UI & Navigation", () => {
   */
 
   test('C48 Verify Test Cases Page', async ({ homePage,testCasesPage }) => {
-    await homePage.gotoTestCasesPage();
+    await homePage.actions.gotoTestCasesPage();
     await testCasesPage.assertions.expectTestCasePageTextVisible();
   });
 

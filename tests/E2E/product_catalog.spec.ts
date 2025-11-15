@@ -5,7 +5,7 @@ test.describe("E2E Product & Catalog", () =>{
   test.beforeEach(async ({ homePage }) =>{
     //goto
     await homePage.goto();
-    await homePage.checkHomePageLoad();
+    await homePage.assertions.expectPageLoaded();
   });
 
   /*
@@ -21,7 +21,7 @@ test.describe("E2E Product & Catalog", () =>{
    */
 
   test('C45 Verify All Products and product detail page', async ({ homePage, productsPage, productPage }) => {
-    await homePage.gotoProductsPage();
+    await homePage.actions.clickProductsPageButton();
     await productsPage.assertions.expectProductsTextIsVissible();
     await productsPage.assertions.expectProductsExist();
     await productsPage.actions.clickViewProductButtonByIndex(0);
@@ -55,7 +55,7 @@ test.describe("E2E Product & Catalog", () =>{
     //go through all productsNames
     for(const productsName of productsNames){
       //open ProductsPage
-      await homePage.gotoProductsPage();
+      await homePage.actions.clickProductsPageButton();
 
       //Verefying page loaded and search products by products name (keyWord)
       await productsPage.assertions.expectProductsTextIsVissible();
@@ -91,9 +91,9 @@ test.describe("E2E Product & Catalog", () =>{
     const KidstCategory = { category: "Kids", subCategory: "Tops & Shirts" };
     const MentCategory = { category: "Men", subCategory: "Tshirts" };
 
-    await homePage.clickSubCategoryOfCategory(WomantCategory.category,WomantCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
-    await homePage.clickSubCategoryOfCategory(KidstCategory.category, KidstCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
-    await homePage.clickSubCategoryOfCategory(MentCategory.category, MentCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
+    await homePage.actions.clickSubCategoryOfCategory(WomantCategory.category,WomantCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
+    await homePage.actions.clickSubCategoryOfCategory(KidstCategory.category, KidstCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
+    await homePage.actions.clickSubCategoryOfCategory(MentCategory.category, MentCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
   });
 
   /*
@@ -115,7 +115,7 @@ test.describe("E2E Product & Catalog", () =>{
     const MentCategory = { category: "Men", subCategory: "Tshirts" };
 
 
-    await homePage.gotoProductsPage();
+    await homePage.actions.clickProductsPageButton();
     await productsPage.actions.clickSubCategoryOfCategory(WomantCategory.category,WomantCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
     await productsPage.actions.clickSubCategoryOfCategory(KidstCategory.category, KidstCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
     await productsPage.actions.clickSubCategoryOfCategory(MentCategory.category, MentCategory.subCategory); // verify text like "WOMEN - TOPS PRODUCTS" is inside of function
@@ -137,7 +137,7 @@ test.describe("E2E Product & Catalog", () =>{
   test('C50 Add review on product', async ({ homePage,productsPage,productPage}) => {
     const message = "Test review message.";
 
-    await homePage.gotoProductsPage();
+    await homePage.actions.clickProductsPageButton();
     await productsPage.assertions.expectProductsTextIsVissible();
     await productsPage.assertions.expectProductsExist();
     await productsPage.actions.clickViewProductButtonByIndex(0);

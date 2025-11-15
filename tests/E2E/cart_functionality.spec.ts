@@ -5,7 +5,7 @@ test.describe("E2E Cart Functionality", () =>{
   test.beforeEach(async ({ homePage }) =>{
     //goto
     await homePage.goto();
-    await homePage.checkHomePageLoad();
+    await homePage.assertions.expectPageLoaded();
   });
 
   /*
@@ -24,7 +24,7 @@ test.describe("E2E Cart Functionality", () =>{
 
   test('C34 Add Products in Cart', async ({ homePage,productsPage,cartPage }) => {
     //goto
-    await homePage.gotoProductsPage();
+    await homePage.actions.clickProductsPageButton();
 
     await productsPage.assertions.expectProductsTextIsVissible();
     await productsPage.assertions.expectProductsExist();
@@ -33,8 +33,8 @@ test.describe("E2E Cart Functionality", () =>{
     const secondProductInfo = await productsPage.actions.clickProductAddToCartButtonByIndex(1);
     await productsPage.actions.clickViewCartButton();
 
-    await cartPage.checkProductInfoByIndex(0,firstProductInfo.Name,firstProductInfo.Price,firstProductInfo.Quantity);
-    await cartPage.checkProductInfoByIndex(1,secondProductInfo.Name,secondProductInfo.Price,secondProductInfo.Quantity);
+    await cartPage.assertions.expectProductInfoByIndex(0,firstProductInfo.Name,firstProductInfo.Price,firstProductInfo.Quantity);
+    await cartPage.assertions.expectProductInfoByIndex(1,secondProductInfo.Name,secondProductInfo.Price,secondProductInfo.Quantity);
   });
 
   /*
@@ -56,14 +56,14 @@ test.describe("E2E Cart Functionality", () =>{
     const productIndex = 0;
 
 
-    const productInfo = await homePage.clickViewProductButtonByIndex(productIndex);
+    const productInfo = await homePage.actions.clickViewProductButtonByIndex(productIndex);
 
     await productPage.actions.setQuantity(Quantity);
     productInfo.Quantity = Quantity;
     await productPage.actions.clickAddToCartButton();
     await productPage.actions.clickViewCartButton();
 
-    await cartPage.checkProductInfoByIndex(productIndex,productInfo.Name,productInfo.Price,productInfo.Quantity);
+    await cartPage.assertions.expectProductInfoByIndex(productIndex,productInfo.Name,productInfo.Price,productInfo.Quantity);
   });
 
   /*
@@ -81,22 +81,22 @@ test.describe("E2E Cart Functionality", () =>{
   */
 
   test('C38 Remove Products From Cart', async ({ homePage,cartPage}) => {
-    const firstProductInfo = await homePage.clickProductAddToCartButtonByIndex(0);
-    await homePage.clickContinueShoppingButton();
-    const secondProductInfo = await homePage.clickProductAddToCartButtonByIndex(1);
-    await homePage.clickViewCartButton();
+    const firstProductInfo = await homePage.actions.clickProductAddToCartButtonByIndex(0);
+    await homePage.actions.clickContinueShoppingButton();
+    const secondProductInfo = await homePage.actions.clickProductAddToCartButtonByIndex(1);
+    await homePage.actions.clickViewCartButton();
 
     //delete secondProduct
-    await cartPage.checkIfProcessButtonVisisble();
-    await cartPage.verifyProductImageWasLoadedByName(secondProductInfo.Name);
-    await cartPage.deleteProductByName(secondProductInfo.Name);
-    await cartPage.verifyProductExistOrNot(false,secondProductInfo.Name);
+    await cartPage.assertions.expectProcessButtonVisisble();
+    await cartPage.assertions.expectProductImageWasLoadedByName(secondProductInfo.Name);
+    await cartPage.actions.deleteProductByName(secondProductInfo.Name);
+    await cartPage.assertions.expectProductExistOrNot(false,secondProductInfo.Name);
 
     //delete firstProduct
-    await cartPage.checkIfProcessButtonVisisble();
-    await cartPage.verifyProductImageWasLoadedByName(firstProductInfo.Name);
-    await cartPage.deleteProductByName(firstProductInfo.Name);
-    await cartPage.verifyProductExistOrNot(false,firstProductInfo.Name);
+    await cartPage.assertions.expectProcessButtonVisisble();
+    await cartPage.assertions.expectProductImageWasLoadedByName(firstProductInfo.Name);
+    await cartPage.actions.deleteProductByName(firstProductInfo.Name);
+    await cartPage.assertions.expectProductExistOrNot(false,firstProductInfo.Name);
   });
 
   /*
@@ -205,11 +205,11 @@ test('Test Case 20: Search Products and Verify Cart After Login', async ({ homeP
   */
 
   test('C39 Add to cart from Recommended items', async ({ homePage, cartPage }) => {
-    await homePage.verifyRecomendedItemsTextVisible();
-    const productInfo = await homePage.clickAddToCartRecomendedItemsByIndex(0);
-    await homePage.clickViewCartButton();
+    await homePage.assertions.expectRecomendedItemsTextVisible();
+    const productInfo = await homePage.actions.clickAddToCartRecomendedItemsByIndex(0);
+    await homePage.actions.clickViewCartButton();
 
-    await cartPage.checkProductExistByName(productInfo.Name);
+    await cartPage.assertions.expectProductExistByName(productInfo.Name);
   });
   
 });
