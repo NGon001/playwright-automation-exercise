@@ -2,57 +2,78 @@ import { Locator, Page, expect } from "@playwright/test";
 import { BasePage } from "../Helper/BasePage";
 
 export class PaymentPage extends BasePage{
-    readonly paymentTextLocator: Locator;
-    readonly nameOnCardInputLocator: Locator;
-    readonly cardNumberInputLocator: Locator;
-    readonly cardCVCInputLocator: Locator;
-    readonly expiryMonthInputLocator: Locator;
-    readonly expiryYearInputLocator: Locator;
-    readonly payButtonInputLocator: Locator;
-    readonly orderPlacedTextLocator: Locator;
-    readonly continueButtonLocator: Locator;
-    readonly paymentMessageLocator: Locator;
+    readonly locators: {
+        paymentTextLocator: Locator;
+        nameOnCardInputLocator: Locator;
+        cardNumberInputLocator: Locator;
+        cardCVCInputLocator: Locator;
+        expiryMonthInputLocator: Locator;
+        expiryYearInputLocator: Locator;
+        payButtonInputLocator: Locator;
+        orderPlacedTextLocator: Locator;
+        continueButtonLocator: Locator;
+        paymentMessageLocator: Locator;
+    };
+
+    readonly actions: {
+        fillPaymentForm: (firstName: string,lastName: string,cardNumber: string,CVC: string,expiryMonth: string,expiryYear: string) => Promise<void>;
+        clickPayButton: () => Promise<void>;
+        clickContinueButton: () => Promise<void>;
+    };
+
+    readonly assertions: {
+        expectPageLoaded: () => Promise<void>;
+        expectOrderPlaced: () => Promise<void>;
+        expectPaymentMessage: () => Promise<void>;
+    };
 
     constructor(page: Page){
         super(page);
-        this.paymentTextLocator = this.page.getByText("Name on Card");
-        this.nameOnCardInputLocator = this.page.locator('input[data-qa="name-on-card"]');
-        this.cardNumberInputLocator = this.page.locator('input[data-qa="card-number"]');
-        this.cardCVCInputLocator = this.page.locator('input[data-qa="cvc"]');
-        this.expiryMonthInputLocator = this.page.locator('input[data-qa="expiry-month"]');
-        this.expiryYearInputLocator = this.page.locator('input[data-qa="expiry-year"]');
-        this.payButtonInputLocator = this.page.getByRole("button",{name: "Pay and Confirm Order"});
-        this.orderPlacedTextLocator = this.page.getByText("Order Placed!");
-        this.continueButtonLocator = this.page.getByRole("link",{name: "Continue"});
-        this.paymentMessageLocator = this.page.getByText("Your order has been placed successfully!");
-    }
 
-    async verifyPageLoaded(){
-        await expect(await this.paymentTextLocator).toBeVisible();
-    }
+        this.locators = {
+            paymentTextLocator : this.page.getByText("Name on Card"),
+            nameOnCardInputLocator : this.page.locator('input[data-qa="name-on-card"]'),
+            cardNumberInputLocator : this.page.locator('input[data-qa="card-number"]'),
+            cardCVCInputLocator : this.page.locator('input[data-qa="cvc"]'),
+            expiryMonthInputLocator : this.page.locator('input[data-qa="expiry-month"]'),
+            expiryYearInputLocator : this.page.locator('input[data-qa="expiry-year"]'),
+            payButtonInputLocator : this.page.getByRole("button",{name: "Pay and Confirm Order"}),
+            orderPlacedTextLocator : this.page.getByText("Order Placed!"),
+            continueButtonLocator : this.page.getByRole("link",{name: "Continue"}),
+            paymentMessageLocator : this.page.getByText("Your order has been placed successfully!"),
+        };
 
-    async fillPaymentForm(firstName: string,lastName: string,cardNumber: string,CVC: string,expiryMonth: string,expiryYear: string){
-        await this.verifyPageLoaded();
-        await this.nameOnCardInputLocator.fill((firstName + ' ' + lastName));
-        await this.cardNumberInputLocator.fill(cardNumber);
-        await this.cardCVCInputLocator.fill(CVC);
-        await this.expiryMonthInputLocator.fill(expiryMonth);
-        await this.expiryYearInputLocator.fill(expiryYear);
-    }
+        this.assertions = {
+            expectPageLoaded: async () => {
+                await expect(await this.locators.paymentTextLocator).toBeVisible();
+            },
 
-    async clickPayButton(){
-        await this.payButtonInputLocator.click();
-    }
+            expectOrderPlaced: async () => {
+                await expect(await this.locators.orderPlacedTextLocator).toBeVisible();
+            },
 
-    async verifyOrderPlaced(){
-        await expect(await this.orderPlacedTextLocator).toBeVisible();
-    }
+            expectPaymentMessage: async () => {
+                await expect(await this.locators.paymentMessageLocator).toBeVisible();
+            }
+        };
 
-    async verifyPaymentMessage(){
-        await expect(await this.paymentMessageLocator).toBeVisible();
-    }
+        this.actions = {
+            fillPaymentForm: async (firstName: string,lastName: string,cardNumber: string,CVC: string,expiryMonth: string,expiryYear: string) => {
+                await this.assertions.expectPageLoaded();
+                await this.locators.nameOnCardInputLocator.fill((firstName + ' ' + lastName));
+                await this.locators.cardNumberInputLocator.fill(cardNumber);
+                await this.locators.cardCVCInputLocator.fill(CVC);
+                await this.locators.expiryMonthInputLocator.fill(expiryMonth);
+                await this.locators.expiryYearInputLocator.fill(expiryYear);
+            },
 
-    async clickContinueButton(){
-        await this.continueButtonLocator.click();
+            clickPayButton: async () => {
+                await this.locators.payButtonInputLocator.click();
+            },
+
+            clickContinueButton: async () => {
+                await this.locators.continueButtonLocator.click();
+            }
+        };
     }
 }

@@ -15,7 +15,7 @@ test.describe("API Product & Catalog tests", () => {
     test('C25 POST /api/searchProduct returns products for valid keywords', async ({ productsAPI }) => {
         const productsNames = ["dress","top","tshirt"]; //keyWords
         for(const productsName of productsNames){
-            await productsAPI.searchProduct(Methods.POST,Status.success,undefined,productsName);
+            await productsAPI.searchProduct(Methods.POST,Status.success,"",productsName);
         }
     });
 
@@ -27,10 +27,10 @@ test.describe("API Product & Catalog tests", () => {
     });
 
     test('C29 POST /api/searchProduct returns empty result for non-existent product', async ({ productsAPI }) => {
-        await productsAPI.searchProduct(Methods.POST,Status.success,undefined,"top1231");
+        await productsAPI.searchProduct(Methods.POST,Status.success,"","top1231");
     });
 
     test('C30 POST /api/searchProduct returns 400 Bad Request when keyword is missing', async ({ productsAPI }) => {
-        await productsAPI.searchProduct(Methods.POST,Status.badReq,badRequestParameterMessage(Methods.POST,"search_product"),undefined);
+        await productsAPI.searchProduct(Methods.POST,Status.badReq,badRequestParameterMessage(Methods.POST,"search_product"),"");
     });
 });

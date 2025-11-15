@@ -26,12 +26,12 @@ test.describe("E2E Cart Functionality", () =>{
     //goto
     await homePage.gotoProductsPage();
 
-    await productsPage.checkIfAllProductsTextIsVissible();
-    await productsPage.checkIfProductsExist();
-    const firstProductInfo = await productsPage.clickProductAddToCartButtonByIndex(0);
-    await productsPage.clickContinueShoppingButton();
-    const secondProductInfo = await productsPage.clickProductAddToCartButtonByIndex(1);
-    await productsPage.clickViewCartButton();
+    await productsPage.assertions.expectProductsTextIsVissible();
+    await productsPage.assertions.expectProductsExist();
+    const firstProductInfo = await productsPage.actions.clickProductAddToCartButtonByIndex(0);
+    await productsPage.actions.clickContinueShoppingButton();
+    const secondProductInfo = await productsPage.actions.clickProductAddToCartButtonByIndex(1);
+    await productsPage.actions.clickViewCartButton();
 
     await cartPage.checkProductInfoByIndex(0,firstProductInfo.Name,firstProductInfo.Price,firstProductInfo.Quantity);
     await cartPage.checkProductInfoByIndex(1,secondProductInfo.Name,secondProductInfo.Price,secondProductInfo.Quantity);
@@ -58,10 +58,10 @@ test.describe("E2E Cart Functionality", () =>{
 
     const productInfo = await homePage.clickViewProductButtonByIndex(productIndex);
 
-    await productPage.setQuantity(Quantity);
+    await productPage.actions.setQuantity(Quantity);
     productInfo.Quantity = Quantity;
-    await productPage.clickAddToCartButton();
-    await productPage.clickViewCartButton();
+    await productPage.actions.clickAddToCartButton();
+    await productPage.actions.clickViewCartButton();
 
     await cartPage.checkProductInfoByIndex(productIndex,productInfo.Name,productInfo.Price,productInfo.Quantity);
   });
@@ -124,8 +124,8 @@ test('Test Case 20: Search Products and Verify Cart After Login', async ({ homeP
   const productsNames = ["dress"]; //keyWords
 
   //data login
-  const email = process.env.VALID_EMAIL || '';
-  const password = process.env.VALID_PASSWORD || '';
+  const email = await getEnv("VALID_EMAIL") || '';
+  const password = await getEnv("VALID_PASSWORD") || '';
   const name = ["vlad", "Petrov"];
 
 

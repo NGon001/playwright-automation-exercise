@@ -1,11 +1,11 @@
-
+import { getEnv } from "./tools";
 const { execSync } = require('child_process');
 const dotenv = require('dotenv');
 dotenv.config();
 
-const host = process.env.TRCLI_HOST;
-const user = process.env.TRCLI_USER;
-const key = process.env.TRCLI_KEY;
+const host = await getEnv("TRCLI_HOST");
+const user = await getEnv("TRCLI_USER");
+const key = await getEnv("TRCLI_KEY");
 
 if (!host || !user || !key) {
   console.error('Missing TRCLI_* environment variables');

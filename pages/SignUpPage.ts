@@ -2,80 +2,98 @@ import { Locator, Page, expect } from "@playwright/test";
 import { BasePage } from "../Helper/BasePage.ts";
 
 export class SignUpPage extends BasePage {
-    readonly nameFieldLocator: Locator;
-    readonly emailFieldLocator: Locator;
-    readonly createAccountButton:Locator;
-    readonly RadioTitleLocator: (Title: string) => Locator;
-    readonly PasswordInputLocator: Locator;
-    readonly DayOptionLocator: Locator;
-    readonly MonthOptionLocator: Locator;
-    readonly YearOptionLocator: Locator;
-    readonly SignUpNewsletterCheckLocator: Locator;
-    readonly SignUpOffersChrckLocator: Locator;
-    readonly FirstNameInputLocator: Locator;
-    readonly LastNameInputLocator: Locator;
-    readonly CompanyInputLocator: Locator;
-    readonly Address1InputLocator: Locator;
-    readonly Address2InputLocator: Locator;
-    readonly CountryOptionLocator: Locator;
-    readonly StateInputLocator: Locator;
-    readonly CityInputLocator: Locator;
-    readonly ZipcodeInputLocator: Locator;
-    readonly MobileNumberInputLocator: Locator;
+    readonly locators: {
+        nameFieldLocator: Locator;
+        emailFieldLocator: Locator;
+        createAccountButton:Locator;
+        RadioTitleLocator: (Title: string) => Locator;
+        PasswordInputLocator: Locator;
+        DayOptionLocator: Locator;
+        MonthOptionLocator: Locator;
+        YearOptionLocator: Locator;
+        SignUpNewsletterCheckLocator: Locator;
+        SignUpOffersChrckLocator: Locator;
+        FirstNameInputLocator: Locator;
+        LastNameInputLocator: Locator;
+        CompanyInputLocator: Locator;
+        Address1InputLocator: Locator;
+        Address2InputLocator: Locator;
+        CountryOptionLocator: Locator;
+        StateInputLocator: Locator;
+        CityInputLocator: Locator;
+        ZipcodeInputLocator: Locator;
+        MobileNumberInputLocator: Locator;
+    };
+
+    readonly assertions: {
+        expectFormToBeVisible: (firstName: string, email: string) => Promise<void>;
+    };
+
+    readonly actions: {
+        fillSignUpForm: (Title: string,firstName: string,lastName: string,password: string,BirthDay: string ,BirthMonth: string ,BirthYear: string ,companyName: string, Address: string ,Address2: string ,Country: string ,State: string ,City: string ,Zipcode: string ,mobileNumber: string ) => Promise<void>;
+        clickCreateAccountButton: () => Promise<void>;
+    };
 
     constructor(page: Page){
         super(page);
-        this.nameFieldLocator = this.page.locator("#name");
-        this.emailFieldLocator = this.page.locator("#email");
-        this.createAccountButton = this.page.getByRole('button', { name: 'Create Account' });
-        this.RadioTitleLocator = (Title: string) => this.page.getByRole('radio', { name: Title });
-        this.PasswordInputLocator = this.page.locator('#password');
-        this.DayOptionLocator = this.page.locator('#days');
-        this.MonthOptionLocator = this.page.locator('#months');
-        this.YearOptionLocator = this.page.locator('#years');
-        this.SignUpNewsletterCheckLocator = this.page.getByRole('checkbox', { name: 'Sign up for our newsletter!' });
-        this.SignUpOffersChrckLocator = this.page.getByRole('checkbox', { name: 'Receive special offers from our partners!' });
-        this.FirstNameInputLocator = this.page.locator('#first_name');
-        this.LastNameInputLocator = this.page.locator('#last_name');
-        this.CompanyInputLocator = this.page.locator('#company');
-        this.Address1InputLocator = this.page.locator('#address1');
-        this.Address2InputLocator = this.page.locator('#address2');
-        this.CountryOptionLocator = this.page.getByRole('combobox', { name: 'Country' });
-        this.StateInputLocator = this.page.locator('#state');
-        this.CityInputLocator = this.page.locator('#city');
-        this.ZipcodeInputLocator = this.page.locator('#zipcode');
-        this.MobileNumberInputLocator = this.page.locator('#mobile_number');
-    }
 
-    async checkDataInForm(firstName: string | unknown, email: string | unknown){
-        await expect(await this.page.getByText('Enter Account Information')).toBeVisible();
-        await expect(await this.nameFieldLocator.getAttribute('value')).toBe(firstName);
-        await expect(await this.emailFieldLocator.getAttribute('value')).toBe(email);   
-    }
+        this.locators = {
+            nameFieldLocator : this.page.locator("#name"),
+            emailFieldLocator : this.page.locator("#email"),
+            createAccountButton : this.page.getByRole('button', { name: 'Create Account' }),
+            RadioTitleLocator : (Title: string) => this.page.getByRole('radio', { name: Title }),
+            PasswordInputLocator : this.page.locator('#password'),
+            DayOptionLocator : this.page.locator('#days'),
+            MonthOptionLocator : this.page.locator('#months'),
+            YearOptionLocator : this.page.locator('#years'),
+            SignUpNewsletterCheckLocator : this.page.getByRole('checkbox', { name: 'Sign up for our newsletter!' }),
+            SignUpOffersChrckLocator : this.page.getByRole('checkbox', { name: 'Receive special offers from our partners!' }),
+            FirstNameInputLocator : this.page.locator('#first_name'),
+            LastNameInputLocator : this.page.locator('#last_name'),
+            CompanyInputLocator : this.page.locator('#company'),
+            Address1InputLocator : this.page.locator('#address1'),
+            Address2InputLocator : this.page.locator('#address2'),
+            CountryOptionLocator : this.page.getByRole('combobox', { name: 'Country' }),
+            StateInputLocator : this.page.locator('#state'),
+            CityInputLocator : this.page.locator('#city'),
+            ZipcodeInputLocator : this.page.locator('#zipcode'),
+            MobileNumberInputLocator : this.page.locator('#mobile_number'),
+        };
 
-    async fillSignUpForm(Title: string,firstName: string,lastName: string,password: string,BirthDay: string ,BirthMonth: string ,BirthYear: string ,companyName: string 
-        ,Address: string ,Address2: string ,Country: string ,State: string ,City: string ,Zipcode: string ,mobileNumber: string 
-    ){
-        await this.RadioTitleLocator(Title).check();
-        await this.PasswordInputLocator.fill(password);
-        await this.DayOptionLocator.selectOption({ label: BirthDay });
-        await this.MonthOptionLocator.selectOption({ label: BirthMonth });
-        await this.YearOptionLocator.selectOption({ label: BirthYear });
-        await this.SignUpNewsletterCheckLocator.check();
-        await this.SignUpOffersChrckLocator.check();
-        await this.FirstNameInputLocator.fill(firstName);
-        await this.LastNameInputLocator.fill(lastName);
-        await this.CompanyInputLocator.fill(companyName);
-        await this.Address1InputLocator.fill(Address);
-        await this.Address2InputLocator.fill(Address2);
-        await this.CountryOptionLocator.selectOption({ label: Country });
-        await this.StateInputLocator.fill(State);
-        await this.CityInputLocator.fill(City);
-        await this.ZipcodeInputLocator.fill(Zipcode);
-        await this.MobileNumberInputLocator.fill(mobileNumber);
-    }
+        this.assertions = {
+            expectFormToBeVisible: async (firstName: string, email: string) => {
+                await expect(await this.page.getByText('Enter Account Information')).toBeVisible();
+                await expect(await this.locators.nameFieldLocator.getAttribute('value')).toBe(firstName);
+                await expect(await this.locators.emailFieldLocator.getAttribute('value')).toBe(email);  
+            }
+        };
 
-    async clickCreateAccountButton(){
-        await this.createAccountButton.click();
+        this.actions = {
+            fillSignUpForm: async (Title: string,firstName: string,lastName: string,password: string,BirthDay: string ,BirthMonth: string ,BirthYear: string ,companyName: string 
+                ,Address: string ,Address2: string ,Country: string ,State: string ,City: string ,Zipcode: string ,mobileNumber: string 
+            ) => {
+                await this.locators.RadioTitleLocator(Title).check();
+                await this.locators.PasswordInputLocator.fill(password);
+                await this.locators.DayOptionLocator.selectOption({ label: BirthDay });
+                await this.locators.MonthOptionLocator.selectOption({ label: BirthMonth });
+                await this.locators.YearOptionLocator.selectOption({ label: BirthYear });
+                await this.locators.SignUpNewsletterCheckLocator.check();
+                await this.locators.SignUpOffersChrckLocator.check();
+                await this.locators.FirstNameInputLocator.fill(firstName);
+                await this.locators.LastNameInputLocator.fill(lastName);
+                await this.locators.CompanyInputLocator.fill(companyName);
+                await this.locators.Address1InputLocator.fill(Address);
+                await this.locators.Address2InputLocator.fill(Address2);
+                await this.locators.CountryOptionLocator.selectOption({ label: Country });
+                await this.locators.StateInputLocator.fill(State);
+                await this.locators.CityInputLocator.fill(City);
+                await this.locators.ZipcodeInputLocator.fill(Zipcode);
+                await this.locators.MobileNumberInputLocator.fill(mobileNumber);
+            },
+
+            clickCreateAccountButton: async () => {
+                await this.locators.createAccountButton.click();
+            }
+        };
     }
 }

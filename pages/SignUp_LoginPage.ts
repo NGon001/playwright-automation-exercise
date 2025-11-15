@@ -2,68 +2,98 @@ import { Locator, Page, expect } from "@playwright/test";
 import { BasePage } from "../Helper/BasePage";
 
 export class SignUp_LoginPage extends BasePage{
-    readonly signUpFormLocator: Locator;
-    readonly loginFormLocator: Locator;
-    readonly loginButtonLocator: Locator;
-    readonly signUpButtonLocator: Locator;
-    readonly loginTextLocator: Locator;
-    readonly singUpTextLocator: Locator;
-    readonly incorectDataMessageLocator: Locator;
-    readonly exestedDataMessageLocator: Locator;
-    readonly signUpAndLoginPageLocator: Locator;
-    readonly FormNameInputLocator: (signUpForm: Locator) => Locator;
-    readonly FormEmailInputLocator: (signUpForm: Locator) => Locator;
-    readonly FormPasswordnputLocator: (signUpForm: Locator) => Locator;
+    readonly locators: {
+        signUpFormLocator: Locator;
+        loginFormLocator: Locator;
+        loginButtonLocator: Locator;
+        signUpButtonLocator: Locator;
+        loginTextLocator: Locator;
+        singUpTextLocator: Locator;
+        incorectDataMessageLocator: Locator;
+        exestedDataMessageLocator: Locator;
+        signUpAndLoginPageLocator: Locator;
+        FormNameInputLocator: (signUpForm: Locator) => Locator;
+        FormEmailInputLocator: (signUpForm: Locator) => Locator;
+        FormPasswordnputLocator: (signUpForm: Locator) => Locator;
+    };
+
+    readonly assertions: {
+        expectPageIsVissible: () => Promise<void>;
+        expectLoginTextVisible: () => Promise<void>;
+        expectSignUpTextVisible: () => Promise<void>;
+        expectIncorectDataMessageVisible: () => Promise<void>;
+        expectExistedDataMessageVisible: () => Promise<void>;
+    };
+
+    readonly actions: {
+        fillStartSignUpForm: (firstName: string, email: string) => Promise<void>;
+        fillLoginForm: (email: string,password: string) => Promise<void>;
+        clickLoginButton: () => Promise<void>;
+        clickSignUpButton: () => Promise<void>;
+    };
 
     constructor(page: Page){
         super(page);
-        this.signUpFormLocator = this.page.locator('form[action="/signup"]');
-        this.loginFormLocator = this.page.locator('form[action="/login"]');
-        this.loginButtonLocator = this.loginFormLocator.getByRole('button', { name: 'Login' });
-        this.signUpButtonLocator = this.signUpFormLocator.getByRole('button', { name: 'Signup' });
-        this.loginTextLocator = this.page.getByText('Login to your account');
-        this.singUpTextLocator = this.page.getByText('New User Signup!');
-        this.incorectDataMessageLocator = this.page.getByText("Your email or password is incorrect!");
-        this.exestedDataMessageLocator = this.page.getByText("Email Address already exist!");
-        this.signUpAndLoginPageLocator = this.page.getByRole('link', { name: 'Signup / Login' });
-        this.FormNameInputLocator = (Form: Locator) => Form.getByPlaceholder('Name');
-        this.FormEmailInputLocator = (Form: Locator) => Form.getByPlaceholder('Email Address');
-        this.FormPasswordnputLocator = (Form: Locator) => Form.getByPlaceholder('Password');
-    }
 
-    async checkThatSignUpAndLoginButtonIsVissible(){
-        await expect(await this.signUpAndLoginPageLocator).toBeVisible();
-    }
+        this.locators = {
+            signUpFormLocator : this.page.locator('form[action="/signup"]'),
+            loginFormLocator : this.page.locator('form[action="/login"]'),
+            get loginButtonLocator() {
+                return this.loginFormLocator.getByRole('button', { name: 'Login' });
+            },
+            get signUpButtonLocator() {
+                return this.signUpFormLocator.getByRole('button', { name: 'Signup' });
+            },
+            loginTextLocator : this.page.getByText('Login to your account'),
+            singUpTextLocator : this.page.getByText('New User Signup!'),
+            incorectDataMessageLocator : this.page.getByText("Your email or password is incorrect!"),
+            exestedDataMessageLocator : this.page.getByText("Email Address already exist!"),
+            signUpAndLoginPageLocator : this.page.getByRole('link', { name: 'Signup / Login' }),
+            FormNameInputLocator : (Form: Locator) => Form.getByPlaceholder('Name'),
+            FormEmailInputLocator : (Form: Locator) => Form.getByPlaceholder('Email Address'),
+            FormPasswordnputLocator : (Form: Locator) => Form.getByPlaceholder('Password'),
+        };
 
-    async fillStartSignUpForm(firstName: string, email: string){
-        await this.FormNameInputLocator(await this.signUpFormLocator).fill(firstName);
-        await this.FormEmailInputLocator(await this.signUpFormLocator).fill(email);
-    }
+        this.assertions = {
+            expectPageIsVissible: async () => {
+                await expect(await this.locators.signUpAndLoginPageLocator).toBeVisible();
+            },
 
-    async fillLoginForm(email: string,password: string){
-        await this.FormEmailInputLocator(await this.loginFormLocator).fill(email);
-        await this.FormPasswordnputLocator(await this.loginFormLocator).fill(password);
-    }
+            expectLoginTextVisible: async () => {
+                await expect(await this.locators.loginTextLocator).toBeVisible();
+            },
 
-    async checkLoginText(){
-        await expect(await this.loginTextLocator).toBeVisible();
-    }
+            expectSignUpTextVisible: async () => {
+                await expect(await this.locators.singUpTextLocator).toBeVisible();
+            },
 
-    async checkSignUpText(){
-        await expect(await this.singUpTextLocator).toBeVisible();
-    }
+            expectIncorectDataMessageVisible: async () => {
+                await expect(await this.locators.incorectDataMessageLocator).toBeVisible();
+            },
 
-    async checkIncorectDataMessage(){
-        await expect(await this.incorectDataMessageLocator).toBeVisible();
-    }
-    async checkExistedDataMessage(){
-        await expect(await this.exestedDataMessageLocator).toBeVisible();
-    }
+            expectExistedDataMessageVisible: async () => {
+                await expect(await this.locators.exestedDataMessageLocator).toBeVisible();
+            }
+        };
 
-    async clickLoginButton(){
-        await this.loginButtonLocator.click();
-    }
-    async clickSignUpButton(){
-        await this.signUpButtonLocator.click();
+        this.actions = {
+            fillStartSignUpForm: async (firstName: string, email: string) => {
+                await this.locators.FormNameInputLocator(await this.locators.signUpFormLocator).fill(firstName);
+                await this.locators.FormEmailInputLocator(await this.locators.signUpFormLocator).fill(email);
+            },
+
+            fillLoginForm: async (email: string,password: string) => {
+                await this.locators.FormEmailInputLocator(await this.locators.loginFormLocator).fill(email);
+                await this.locators.FormPasswordnputLocator(await this.locators.loginFormLocator).fill(password);
+            },
+
+            clickLoginButton: async () => {
+                await this.locators.loginButtonLocator.click();
+            },
+
+            clickSignUpButton: async () => {
+                await this.locators.signUpButtonLocator.click();
+            }
+        };
     }
 }

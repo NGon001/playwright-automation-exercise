@@ -2,20 +2,38 @@ import { Locator, Page, expect } from "@playwright/test";
 import { BasePage } from "../Helper/BasePage";
 
 export class AccountDeletePage extends BasePage{
-    readonly accountDeletedTextLocator: Locator;
-    readonly continueButtonLocator: Locator;
+
+    readonly locators: {
+        accountDeletedTextLocator: Locator;
+        continueButtonLocator: Locator;
+    };
+
+    readonly actions: {
+        clickContinueButton: () => Promise<void>;
+    };
+
+    readonly assertions: {
+        expectAccountDeletedTextVisible: () => Promise<void>;
+    };
 
     constructor(page: Page){
         super(page);
-        this.accountDeletedTextLocator = this.page.getByText('Account Deleted!');
-        this.continueButtonLocator = this.page.getByRole('link', { name: 'Continue' });
-    }
 
-    async checkAccountDeletedMessage(){
-        await expect(await this.accountDeletedTextLocator).toBeVisible();
-    }
+        this.locators = {
+            accountDeletedTextLocator: this.page.getByText('Account Deleted!'),
+            continueButtonLocator: this.page.getByRole('link', { name: 'Continue' }),
+        };
 
-    async clickContinueButton(){
-        await this.continueButtonLocator.click();
+        this.assertions = {
+            expectAccountDeletedTextVisible: async () => {
+                await expect(await this.locators.accountDeletedTextLocator).toBeVisible();
+            }
+        };
+
+        this.actions = {
+            clickContinueButton: async () => {
+                await this.locators.continueButtonLocator.click();
+            }
+        };
     }
 }

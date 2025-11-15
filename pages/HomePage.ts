@@ -96,7 +96,7 @@ export class HomePage extends BasePage {
         return new ProductInfo(productName, productPrice,1);
     }
 
-    async checkLoggedInName(firstName: string | undefined){
+    async checkLoggedInName(firstName: string){
         const expectedMessage = `Logged in as ${firstName}`;
         const loggedInMessage = await this.textLoggedInUserLocator.textContent();
         await expect(await this.textLoggedInUserLocator).toBeVisible();

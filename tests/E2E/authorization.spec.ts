@@ -1,5 +1,5 @@
 import { test } from '../../Helper/base.ts';
-import { generateRandomEmail } from '../../Helper/tools.js';
+import { generateRandomEmail, getEnv } from '../../Helper/tools.js';
 
 test.describe("E2E Authorization tests", () => {
   test.beforeEach(async ({ homePage, signUp_LoginPage }) => {
@@ -7,8 +7,8 @@ test.describe("E2E Authorization tests", () => {
     await homePage.goto();
     await homePage.checkHomePageLoad();
     await homePage.clickSignUpAndLoginLink();
-    await signUp_LoginPage.checkSignUpText();
-    await signUp_LoginPage.checkLoginText();
+    await signUp_LoginPage.assertions.expectSignUpTextVisible();
+    await signUp_LoginPage.assertions.expectLoginTextVisible();
   });
 
   /*
@@ -34,39 +34,39 @@ test.describe("E2E Authorization tests", () => {
   test('C32 Register User', async ({ homePage, signUp_LoginPage,signUpPage,accountCreatedPage,accountDeletePage },testInfo) => {
     const email = await generateRandomEmail();
     //Step 1: Fill signup form
-    await signUp_LoginPage.fillStartSignUpForm(process.env.REGISTER_NAME_FIRST,email);
-    await signUp_LoginPage.clickSignUpButton();
+    await signUp_LoginPage.actions.fillStartSignUpForm(await getEnv("REGISTER_NAME_FIRST"),email);
+    await signUp_LoginPage.actions.clickSignUpButton();
 
     //Step 2: Fill detailed signup form
-    await signUpPage.checkDataInForm(process.env.REGISTER_NAME_FIRST,email);
-    await signUpPage.fillSignUpForm(
-      process.env.REGISTER_TITLE,
-      process.env.REGISTER_NAME_FIRST,
-      process.env.REGISTER_NAME_LAST,
-      process.env.REGISTER_PASSWORD,
-      process.env.REGISTER_BIRTH_DAY,
-      process.env.REGISTER_BIRTH_MONTH,
-      process.env.REGISTER_BIRTH_YEAR,
-      process.env.REGISTER_COMPANY_NAME,
-      process.env.REGISTER_ADDRESS,
-      process.env.REGISTER_ADDRESS2,
-      process.env.REGISTER_COUNTRY,
-      process.env.REGISTER_STATE,
-      process.env.REGISTER_CITY,
-      process.env.REGISTER_ZIPCODE,
-      process.env.REGISTER_MOBILE_NUMBER
+    await signUpPage.assertions.expectFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
+    await signUpPage.actions.fillSignUpForm(
+      await getEnv("REGISTER_TITLE"),
+      await getEnv("REGISTER_NAME_FIRST"),
+      await getEnv("REGISTER_NAME_LAST"),
+      await getEnv("REGISTER_PASSWORD"),
+      await getEnv("REGISTER_BIRTH_DAY"),
+      await getEnv("REGISTER_BIRTH_MONTH"),
+      await getEnv("REGISTER_BIRTH_YEAR"),
+      await getEnv("REGISTER_COMPANY_NAME"),
+      await getEnv("REGISTER_ADDRESS"),
+      await getEnv("REGISTER_ADDRESS2"),
+      await getEnv("REGISTER_COUNTRY"),
+      await getEnv("REGISTER_STATE"),
+      await getEnv("REGISTER_CITY"),
+      await getEnv("REGISTER_ZIPCODE"),
+      await getEnv("REGISTER_MOBILE_NUMBER")
     );
-    await signUpPage.clickCreateAccountButton();
+    await signUpPage.actions.clickCreateAccountButton();
 
     //Step 3: verift account was created
-    await accountCreatedPage.checkAccountCreationMessage();
-    await accountCreatedPage.clickContinueButton();
-    await homePage.checkLoggedInName(process.env.REGISTER_NAME_FIRST);
+    await accountCreatedPage.assertions.expectAccountCreatedTextVisible();
+    await accountCreatedPage.actions.clickContinueButton();
+    await homePage.checkLoggedInName(await getEnv("REGISTER_NAME_FIRST"));
 
     //Step 4: delete account and Verify it
     await homePage.clickDeleteAccount();
-    await accountDeletePage.checkAccountDeletedMessage();
-    await accountDeletePage.clickContinueButton();
+    await accountDeletePage.assertions.expectAccountDeletedTextVisible();
+    await accountDeletePage.actions.clickContinueButton();
     await homePage.checkHomePageLoad();
   });
 
@@ -83,11 +83,11 @@ test.describe("E2E Authorization tests", () => {
 
   test('C36 Login User with correct email and password', async ({ homePage, signUp_LoginPage }) => {
     //fill login form
-    await signUp_LoginPage.fillLoginForm(process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD);
-    await signUp_LoginPage.clickLoginButton();
+    await signUp_LoginPage.actions.fillLoginForm(await getEnv("VALID_LOGIN_EMAIL"),await getEnv("VALID_LOGIN_PASSWORD"));
+    await signUp_LoginPage.actions.clickLoginButton();
 
     //verify login
-    await homePage.checkLoggedInName(process.env.VALID_LOGIN_NAME_FIRST);
+    await homePage.checkLoggedInName(await getEnv("VALID_LOGIN_NAME_FIRST"));
   });
 
   /*
@@ -106,10 +106,10 @@ test.describe("E2E Authorization tests", () => {
     const incorrectEmail = 'max12341@gmail.com';
 
     //fill login form
-    await signUp_LoginPage.fillLoginForm(incorrectEmail,process.env.VALID_LOGIN_PASSWORD);
-    await signUp_LoginPage.clickLoginButton();
+    await signUp_LoginPage.actions.fillLoginForm(incorrectEmail,await getEnv("VALID_LOGIN_PASSWORD"));
+    await signUp_LoginPage.actions.clickLoginButton();
 
-    await signUp_LoginPage.checkIncorectDataMessage();
+    await signUp_LoginPage.assertions.expectIncorectDataMessageVisible();
   });
 
   /*
@@ -127,16 +127,16 @@ test.describe("E2E Authorization tests", () => {
 
   test('C31 Logout User', async ({ homePage, signUp_LoginPage }) => {
     //fill login form
-    await signUp_LoginPage.fillLoginForm(process.env.VALID_LOGIN_EMAIL,process.env.VALID_LOGIN_PASSWORD);
-    await signUp_LoginPage.clickLoginButton();
+    await signUp_LoginPage.actions.fillLoginForm(await getEnv("VALID_LOGIN_EMAIL"),await getEnv("VALID_LOGIN_PASSWORD"));
+    await signUp_LoginPage.actions.clickLoginButton();
 
     //verify login
-    await homePage.checkLoggedInName(process.env.VALID_LOGIN_NAME_FIRST);
+    await homePage.checkLoggedInName(await getEnv("VALID_LOGIN_NAME_FIRST"));
 
     //logout
     await homePage.logout();
-    await signUp_LoginPage.checkLoginText();
-    await signUp_LoginPage.checkThatSignUpAndLoginButtonIsVissible();
+    await signUp_LoginPage.assertions.expectLoginTextVisible();
+    await signUp_LoginPage.assertions.expectSignUpTextVisible();
   });
 
   /*
@@ -152,10 +152,10 @@ test.describe("E2E Authorization tests", () => {
 
   test('C33 Register User with existing email', async ({ signUp_LoginPage }) => {
     //Fill signup form
-    await signUp_LoginPage.fillStartSignUpForm(process.env.REGISTER_NAME_FIRST,process.env.VALID_LOGIN_EMAIL);
-    await signUp_LoginPage.clickSignUpButton();
+    await signUp_LoginPage.actions.fillStartSignUpForm(await getEnv("REGISTER_NAME_FIRST"),await getEnv("VALID_LOGIN_EMAIL"));
+    await signUp_LoginPage.actions.clickSignUpButton();
 
-    await signUp_LoginPage.checkExistedDataMessage();
+    await signUp_LoginPage.assertions.expectExistedDataMessageVisible();
   });
 
 });

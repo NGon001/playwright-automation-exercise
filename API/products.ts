@@ -5,8 +5,8 @@ import { Status } from '../Helper/base';
 
 export class ProductsAPI{
     readonly request: APIRequestContext;
-    readonly GET_brandsList: (method) => Promise<APIResponse>;
-    readonly POST_searchProduct: (method,productName: string) => Promise<APIResponse>;
+    readonly GET_brandsList: (method: string) => Promise<APIResponse>;
+    readonly POST_searchProduct: (method: string, productName: string) => Promise<APIResponse>;
 
     constructor(request: APIRequestContext){
         this.request = request;
@@ -17,12 +17,12 @@ export class ProductsAPI{
         this.POST_searchProduct = (method,productName: string) => {
             expect(method).not.toBe(undefined);
             const form: Record<string, string> = {};
-            if (productName !== undefined) form.search_product = productName;
+            if (productName !== "") form.search_product = productName;
             return makeRequest(this.request ,'/api/searchProduct',method,form);
         };
     }
 
-    async brandsList(method, ExpectedCode, ExpectedMessage){
+    async brandsList(method: string, ExpectedCode: number, ExpectedMessage: string = ""){
         let schema;
         if(ExpectedCode !== Status.success){
             schema = z.object({
@@ -45,7 +45,7 @@ export class ProductsAPI{
         await verifyResponseSchema(response,schema);
     }
 
-    async searchProduct(method, ExpectedCode, ExpectedMessage, productName){
+    async searchProduct(method: string, ExpectedCode: number, ExpectedMessage: string, productName: string){
         let schema;
         if(ExpectedCode !== Status.success){
             schema = z.object({
