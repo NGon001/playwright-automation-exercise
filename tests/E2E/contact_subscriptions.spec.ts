@@ -4,8 +4,8 @@ import { getEnv } from '../../Helper/tools.ts';
 test.describe("E2E Contact & Subscriptions", () => {
   test.beforeEach(async ({ homePage }) =>{
     await homePage.goto();
-    await homePage.checkHomePageLoad();
-    await homePage.verifySubscriptionText();
+    await homePage.assertions.expectPageLoaded();
+    await homePage.assertions.expectSubscriptionText();
   });
   /*
   1. Launch browser
@@ -28,7 +28,7 @@ test.describe("E2E Contact & Subscriptions", () => {
     const filePath = './README.md';
 
     //goto
-    await homePage.clickContactUs();
+    await homePage.actions.clickContactUs();
     await contactUsPage.assertions.expectGetInTouchTextVisible();
 
     //fill contact us form
@@ -47,7 +47,7 @@ test.describe("E2E Contact & Subscriptions", () => {
     await contactUsPage.assertions.expectSuccessMessageVisible();
     await contactUsPage.actions.clickReturnHomeButton();
 
-    await homePage.checkHomePageLoad();
+    await homePage.assertions.expectPageLoaded();
   });
 
   /*
@@ -62,8 +62,8 @@ test.describe("E2E Contact & Subscriptions", () => {
   */
 
   test('C44 Verify Subscription in home page', async ({ homePage }) => {
-    await homePage.inputValueToSubscriptionEmailField(await getEnv("VALID_LOGIN_EMAIL"));
-    await homePage.checkSuccessSubscriptionMessage();
+    await homePage.actions.inputValueToSubscriptionEmailField(await getEnv("VALID_LOGIN_EMAIL"));
+    await homePage.assertions.expectSuccessSubscriptionMessage();
   });
 
   /*
@@ -80,9 +80,9 @@ test.describe("E2E Contact & Subscriptions", () => {
 
   test('C42 Verify Subscription in Cart page', async ({ homePage,cartPage }) => {
     //goto
-    await homePage.gotoCart();
-    await cartPage.verifySubscriptionText();
+    await homePage.actions.clickCartButton();
+    await cartPage.assertions.expectSubscriptionText();
 
-    await cartPage.inputValueToSubscriptionEmailField(await getEnv("VALID_LOGIN_EMAIL"));
+    await cartPage.actions.inputValueToSubscriptionEmailField(await getEnv("VALID_LOGIN_EMAIL"));
   });
 });

@@ -9,7 +9,7 @@ test.describe("E2E Checkout Flow", () => {
   test.beforeEach(async ({ homePage }) => {
     //goto
     await homePage.goto();
-    await homePage.checkHomePageLoad();   
+    await homePage.assertions.expectPageLoaded();   
   });
 
   /*
@@ -39,15 +39,15 @@ test.describe("E2E Checkout Flow", () => {
     const email = await generateRandomEmail();
     let authorized = false;
 
-    await homePage.gotoProductsPage();
+    await homePage.actions.clickProductsPageButton();
     await productsPage.assertions.expectProductsTextIsVissible();
     await productsPage.assertions.expectProductsExist();
     const ProductInfo = await productsPage.actions.clickProductAddToCartButtonByIndex(productIndex);
     await productsPage.actions.clickViewCartButton();
 
-    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
-    await cartPage.clickProcessButton(authorized);
-    await cartPage.clickRegisterAndLoginButton();
+    await cartPage.assertions.expectProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
+    await cartPage.actions.clickProcessButton(authorized);
+    await cartPage.actions.clickRegisterAndLoginButton();
 
     //Fill signup form
     await signUp_LoginPage.actions.fillStartSignUpForm(await getEnv("REGISTER_NAME_FIRST"),email);
@@ -79,13 +79,13 @@ test.describe("E2E Checkout Flow", () => {
     await accountCreatedPage.actions.clickContinueButton();
     authorized = true;
 
-    await homePage.verifyHomePageItemsLoaded();
-    await homePage.checkLoggedInName(await getEnv("REGISTER_NAME_FIRST"));
-    await homePage.gotoCart();
+    await homePage.assertions.expectPageLoaded();
+    await homePage.assertions.expectLoggedInNameIsVisible(await getEnv("REGISTER_NAME_FIRST"));
+    await homePage.actions.clickCartButton();
 
-    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
-    await cartPage.clickProcessButton(authorized);
-    await cartPage.verifyAddress(
+    await cartPage.assertions.expectProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
+    await cartPage.actions.clickProcessButton(authorized);
+    await cartPage.assertions.expectAddress(
       "delivery",
       await getEnv("REGISTER_TITLE"),
       await getEnv("REGISTER_NAME_FIRST"),
@@ -99,7 +99,7 @@ test.describe("E2E Checkout Flow", () => {
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_MOBILE_NUMBER")
     );
-    await cartPage.verifyAddress(
+    await cartPage.assertions.expectAddress(
       "billing",
       await getEnv("REGISTER_TITLE"),
       await getEnv("REGISTER_NAME_FIRST"),
@@ -113,8 +113,8 @@ test.describe("E2E Checkout Flow", () => {
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_MOBILE_NUMBER")
     );
-    await cartPage.inputDescriptionMessage(descriptionMessage);
-    await cartPage.clickPlaceOrderButton();
+    await cartPage.actions.inputDescriptionMessage(descriptionMessage);
+    await cartPage.actions.clickPlaceOrderButton();
 
     await paymentPage.assertions.expectPageLoaded();
     await paymentPage.actions.fillPaymentForm(
@@ -130,11 +130,11 @@ test.describe("E2E Checkout Flow", () => {
     await paymentPage.actions.clickContinueButton();
 
     //delete account and verify it
-    await homePage.verifyHomePageItemsLoaded();
-    await homePage.clickDeleteAccount();
+    await homePage.assertions.expectHomePageItemsLoaded();
+    await homePage.actions.clickDeleteAccount();
     await accountDeletePage.assertions.expectAccountDeletedTextVisible();
     await accountDeletePage.actions.clickContinueButton();
-    await homePage.checkHomePageLoad();
+    await homePage.assertions.expectPageLoaded();
   });
 
   /*
@@ -164,7 +164,7 @@ test.describe("E2E Checkout Flow", () => {
     let authorized = false;
 
     //goto
-    await homePage.clickSignUpAndLoginLink();
+    await homePage.actions.clickSignUpAndLoginLink();
     await signUp_LoginPage.assertions.expectSignUpTextVisible();
 
     //Fill signup form
@@ -195,19 +195,19 @@ test.describe("E2E Checkout Flow", () => {
     //verift account was created
     await accountCreatedPage.assertions.expectAccountCreatedTextVisible();
     await accountCreatedPage.actions.clickContinueButton();
-    await homePage.checkLoggedInName(await getEnv("REGISTER_NAME_FIRST"));
+    await homePage.assertions.expectLoggedInNameIsVisible(await getEnv("REGISTER_NAME_FIRST"));
     authorized = true;
 
-    await homePage.gotoProductsPage();
+    await homePage.actions.clickProductsPageButton();
 
     await productsPage.assertions.expectProductsTextIsVissible();
     await productsPage.assertions.expectProductsExist();
     const ProductInfo = await productsPage.actions.clickProductAddToCartButtonByIndex(productIndex);
     await productsPage.actions.clickViewCartButton();
 
-    await cartPage.checkProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
-    await cartPage.clickProcessButton(authorized);
-    await cartPage.verifyAddress(
+    await cartPage.assertions.expectProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
+    await cartPage.actions.clickProcessButton(authorized);
+    await cartPage.assertions.expectAddress(
       "delivery",
       await getEnv("REGISTER_TITLE"),
       await getEnv("REGISTER_NAME_FIRST"),
@@ -221,7 +221,7 @@ test.describe("E2E Checkout Flow", () => {
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_MOBILE_NUMBER")
     );
-    await cartPage.verifyAddress(
+    await cartPage.assertions.expectAddress(
       "billing",
       await getEnv("REGISTER_TITLE"),
       await getEnv("REGISTER_NAME_FIRST"),
@@ -235,8 +235,8 @@ test.describe("E2E Checkout Flow", () => {
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_MOBILE_NUMBER")
     );
-    await cartPage.inputDescriptionMessage(descriptionMessage);
-    await cartPage.clickPlaceOrderButton();
+    await cartPage.actions.inputDescriptionMessage(descriptionMessage);
+    await cartPage.actions.clickPlaceOrderButton();
 
     await paymentPage.assertions.expectPageLoaded();
     await paymentPage.actions.fillPaymentForm(
@@ -252,10 +252,10 @@ test.describe("E2E Checkout Flow", () => {
     await paymentPage.actions.clickContinueButton();
 
     //delete account and verify it
-    await homePage.verifyHomePageItemsLoaded();
-    await homePage.clickDeleteAccount();
+    await homePage.assertions.expectHomePageItemsLoaded();
+    await homePage.actions.clickDeleteAccount();
     await accountDeletePage.assertions.expectAccountDeletedTextVisible();
     await accountDeletePage.actions.clickContinueButton();
-    await homePage.checkHomePageLoad();
+    await homePage.assertions.expectPageLoaded();
   });
 });

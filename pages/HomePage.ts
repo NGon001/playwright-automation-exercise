@@ -4,287 +4,327 @@ import { BasePage } from "../Helper/BasePage";
 import { ProductInfo } from "../Helper/base";
 
 export class HomePage extends BasePage {
-    readonly signUpAndLoginPageLocator: Locator;
-    readonly deleteButtonLocator: Locator;
-    readonly logoutButtonLocator: Locator;
-    readonly textLoggedInUserLocator: Locator;
-    readonly contactUsButtonLocator: Locator;
-    readonly featuredItemsTextLocator: Locator;
-    readonly testCasesButtonLocator: Locator;
-    readonly menuLocator: Locator;
-    readonly productsButtonLocator: Locator;
-    readonly subscriptionTextLocator: Locator;
-    readonly subscriptionEmailInputLocator: Locator;
-    readonly subscribeButtonLocator: Locator;
-    readonly subscribeMessage: Locator;
-    readonly cartButtonLocator: Locator;
-    readonly allProductsItemsLocator: Locator;
-    readonly modalContentLocator: Locator;
-    readonly categoriesLeftPanelLocator: Locator;
-    readonly recomendedItemsTextLocator: Locator;
-    readonly recomendedItemsActiveLocator: Locator;
+    readonly locators: {
+        signUpAndLoginPageLocator: Locator;
+        deleteButtonLocator: Locator;
+        logoutButtonLocator: Locator;
+        textLoggedInUserLocator: Locator;
+        contactUsButtonLocator: Locator;
+        featuredItemsTextLocator: Locator;
+        testCasesButtonLocator: Locator;
+        menuLocator: Locator;
+        productsButtonLocator: Locator;
+        subscriptionTextLocator: Locator;
+        subscriptionEmailInputLocator: Locator;
+        subscribeButtonLocator: Locator;
+        subscribeMessage: Locator;
+        cartButtonLocator: Locator;
+        allProductsItemsLocator: Locator;
+        modalContentLocator: Locator;
+        categoriesLeftPanelLocator: Locator;
+        recomendedItemsTextLocator: Locator;
+        recomendedItemsActiveLocator: Locator;
+        productViewProductButtonLocator: (product: Locator) => Locator;
+        productNameTextLocator: (product: Locator) => Locator;
+        productPriceTextLocator: (product: Locator) => Locator;
+        productImageLocator: (product: Locator) => Locator;
+        overlayContentAddProductButtonLocator: (overlayContent: Locator) => Locator;
+        cartModelContinueShoppingButton: (modalContent: Locator) => Locator;
+        cartModelViewCartButton: (modalContent: Locator) => Locator;
+        categoriesLocator: (categoriesLeftPanelLocator: Locator) => Locator;
+        categoryWithNameLocator: (category: Locator, categoryName: string) => Locator;
+        panelDefaultClass: (link: Locator) => Locator;
+        productsTextSearchByCategoryLocator: (text: string) => Locator;
+        subCategoryCollabseOrInLocator: (panelCategory: Locator,option: string) => Locator;
+        recomendedItemsAddToCartButtonLocator: (product: Locator) => Locator;
+    };
 
-    readonly productViewProductButtonLocator: (product: Locator) => Locator;
-    readonly productNameTextLocator: (product: Locator) => Locator;
-    readonly productPriceTextLocator: (product: Locator) => Locator;
-    readonly productImageLocator: (product: Locator) => Locator;
-    readonly overlayContentAddProductButtonLocator: (overlayContent: Locator) => Locator;
-    readonly cartModelContinueShoppingButton: (modalContent: Locator) => Locator;
-    readonly cartModelViewCartButton: (modalContent: Locator) => Locator;
-    readonly categoriesLocator: (categoriesLeftPanelLocator: Locator) => Locator;
-    readonly categoryWithNameLocator: (category: Locator, categoryName: string) => Locator;
-    readonly panelDefaultClass: (link: Locator) => Locator;
-    readonly productsTextSearchByCategoryLocator: (text: string) => Locator;
-    readonly subCategoryCollabseOrInLocator: (panelCategory: Locator,option: string) => Locator;
-    readonly recomendedItemsAddToCartButtonLocator: (product: Locator) => Locator;
+    readonly assertions: {
+        expectPageLoaded: () => Promise<void>;
+        expectLoggedInNameIsVisible: (firstName: string) => Promise<void>;
+        expectRecomendedItemsTextVisible: () => Promise<void>;
+        expectCategoryLeftPanelVisisble: () => Promise<void>;
+        expectSearchByGroupTextIsVissible: (categoryName: string, subCategoryName: string) => Promise<void>;
+        expectHomePageItemsLoaded: () => Promise<void>;
+        expectSubscriptionText: () => Promise<void>;
+        expectSuccessSubscriptionMessage: () => Promise<void>;
+    };
+
+    readonly actions: {
+        clickSignUpAndLoginLink: () => Promise<void>;
+        clickContactUs: () => Promise<void>;
+        clickViewProductButton: (product: Locator) => Promise<void>;
+        clickViewProductButtonByIndex: (index: number) => Promise<ProductInfo>;
+        getAllCategories: () => Promise<Locator>;
+        clickCategoryByName: (name: string) => Promise<Locator>;
+        clickSubCategoryOfCategory: (categoryName: string, subCategoryName: string) => Promise<void>;
+        clickDeleteAccount: () => Promise<void>;
+        gotoTestCasesPage: () => Promise<void>;
+        clickProductsPageButton: () => Promise<void>;
+        logout: () => Promise<void>;
+        inputValueToSubscriptionEmailField: (email: string) => Promise<void>;
+        clickProductAddToCartButtonByIndex: (index: number) => Promise<ProductInfo>;
+        getActiveRecomendedItems: () => Promise<Locator>;
+        clickAddToCartRecomendedItemsByIndex: (index: number) => Promise<ProductInfo>;
+        clickCartButton: () => Promise<void>;
+        clickContinueShoppingButton: () => Promise<void>;
+        clickViewCartButton: () => Promise<void>;
+    };
+
 
 
     constructor(page: Page) {
         super(page);
-        this.signUpAndLoginPageLocator = this.page.getByRole('link', { name: 'Signup / Login' });
-        this.deleteButtonLocator = this.page.getByRole("link",{name: " Delete Account"});
-        this.logoutButtonLocator = this.page.getByRole('link', { name: 'Logout' });
-        this.textLoggedInUserLocator = this.page.getByText('Logged in as', { exact: false });
-        this.contactUsButtonLocator = this.page.getByRole('link', { name: 'Contact us' });
-        this.featuredItemsTextLocator = this.page.getByText('Features Items');
-        this.testCasesButtonLocator = this.page.getByRole("link",{name: "Test Cases"});
-        this.menuLocator = this.page.locator(".col-sm-8");
-        this.productsButtonLocator = this.page.getByRole("link",{name: "Products"});
-        this.subscriptionTextLocator = this.page.getByText("Subscription");
-        this.subscriptionEmailInputLocator = this.page.getByPlaceholder("Your email address");
-        this.subscribeButtonLocator = this.page.locator("#subscribe");
-        this.subscribeMessage = this.page.getByText("You have been successfully subscribed!");
-        this.recomendedItemsTextLocator = this.page.getByText("recommended items");
-        this.cartButtonLocator = this.page.locator('.col-sm-8 a[href="/view_cart"]');
-        this.allProductsItemsLocator = this.page.locator(".features_items .col-sm-4");
-        this.modalContentLocator = this.page.locator(".modal-content");
-        this.categoriesLeftPanelLocator = this.page.locator(".panel-group.category-products");
-        this.recomendedItemsActiveLocator = this.page.locator("#recommended-item-carousel .item.active .col-sm-4");
-        this.recomendedItemsAddToCartButtonLocator = (product: Locator) => product.locator(".btn.btn-default.add-to-cart");
-        this.productViewProductButtonLocator = (product: Locator) => product.getByRole("link",{name: "View Product"});
-        this.productNameTextLocator = (product: Locator) => product.locator("p").first();
-        this.productPriceTextLocator = (product: Locator) => product.locator("h2").first();
-        this.productImageLocator = (product: Locator) => product.locator("img");
-        this.overlayContentAddProductButtonLocator = (product: Locator) => product.locator(".product-overlay a");    
-        this.cartModelContinueShoppingButton = (modalContent: Locator) => modalContent.getByRole("button",{name: "Continue Shopping"});
-        this.cartModelViewCartButton = (modalContent: Locator) => modalContent.getByRole("link",{name: "View Cart"});
-        this.categoriesLocator = (categoriesLeftPanelLocator: Locator) => categoriesLeftPanelLocator.locator(".panel.panel-default");
-        this.categoryWithNameLocator = (category: Locator, categoryName: string) => category.getByRole('link', { name: categoryName });
-        this.panelDefaultClass = (link: Locator) => link.locator('xpath=ancestor::div[contains(@class,"panel") and contains(@class,"panel-default")]');
-        this.productsTextSearchByCategoryLocator = (text: string) => this.page.getByText(text);
-        this.subCategoryCollabseOrInLocator = (panelCategory: Locator,option: string) => panelCategory.locator((".panel-collapse" + option));
-    }
 
-    async clickSignUpAndLoginLink(){
-        await this.signUpAndLoginPageLocator.click();
-    }
+        this.locators = {
+            signUpAndLoginPageLocator : this.page.getByRole('link', { name: 'Signup / Login' }),
+            deleteButtonLocator : this.page.getByRole("link",{name: " Delete Account"}),
+            logoutButtonLocator : this.page.getByRole('link', { name: 'Logout' }),
+            textLoggedInUserLocator : this.page.getByText('Logged in as', { exact: false }),
+            contactUsButtonLocator : this.page.getByRole('link', { name: 'Contact us' }),
+            featuredItemsTextLocator : this.page.getByText('Features Items'),
+            testCasesButtonLocator : this.page.getByRole("link",{name: "Test Cases"}),
+            menuLocator : this.page.locator(".col-sm-8"),
+            productsButtonLocator : this.page.getByRole("link",{name: "Products"}),
+            subscriptionTextLocator : this.page.getByText("Subscription"),
+            subscriptionEmailInputLocator : this.page.getByPlaceholder("Your email address"),
+            subscribeButtonLocator : this.page.locator("#subscribe"),
+            subscribeMessage : this.page.getByText("You have been successfully subscribed!"),
+            recomendedItemsTextLocator : this.page.getByText("recommended items"),
+            cartButtonLocator : this.page.locator('.col-sm-8 a[href="/view_cart"]'),
+            allProductsItemsLocator : this.page.locator(".features_items .col-sm-4"),
+            modalContentLocator : this.page.locator(".modal-content"),
+            categoriesLeftPanelLocator : this.page.locator(".panel-group.category-products"),
+            recomendedItemsActiveLocator : this.page.locator("#recommended-item-carousel .item.active .col-sm-4"),
+            recomendedItemsAddToCartButtonLocator : (product: Locator) => product.locator(".btn.btn-default.add-to-cart"),
+            productViewProductButtonLocator : (product: Locator) => product.getByRole("link",{name: "View Product"}),
+            productNameTextLocator : (product: Locator) => product.locator("p").first(),
+            productPriceTextLocator : (product: Locator) => product.locator("h2").first(),
+            productImageLocator : (product: Locator) => product.locator("img"),
+            overlayContentAddProductButtonLocator : (product: Locator) => product.locator(".product-overlay a"),    
+            cartModelContinueShoppingButton : (modalContent: Locator) => modalContent.getByRole("button",{name: "Continue Shopping"}),
+            cartModelViewCartButton : (modalContent: Locator) => modalContent.getByRole("link",{name: "View Cart"}),
+            categoriesLocator : (categoriesLeftPanelLocator: Locator) => categoriesLeftPanelLocator.locator(".panel.panel-default"),
+            categoryWithNameLocator : (category: Locator, categoryName: string) => category.getByRole('link', { name: categoryName }),
+            panelDefaultClass : (link: Locator) => link.locator('xpath=ancestor::div[contains(@class,"panel") and contains(@class,"panel-default")]'),
+            productsTextSearchByCategoryLocator : (text: string) => this.page.getByText(text),
+            subCategoryCollabseOrInLocator : (panelCategory: Locator,option: string) => panelCategory.locator((".panel-collapse" + option)),
+        };
 
-    async clickContactUs(){
-        await this.contactUsButtonLocator.click();
-    }
-  
-    async clickViewProductButton(product: Locator){
-        await this.productViewProductButtonLocator(product).click();
-    }
+        this.assertions = {
+            expectPageLoaded: async () => {
+                await expect(await this.locators.featuredItemsTextLocator).toBeVisible();
+            },
+            
+            expectLoggedInNameIsVisible: async (firstName: string) => {
+                const expectedMessage = `Logged in as ${firstName}`;
+                const loggedInMessage = await this.locators.textLoggedInUserLocator.textContent();
+                await expect(await this.locators.textLoggedInUserLocator).toBeVisible();
+                await expect(await loggedInMessage?.trim()).toBe(expectedMessage);
+            },
 
-    async clickViewProductButtonByIndex(index: number): Promise<ProductInfo>{
-        const products = await this.allProductsItemsLocator;
-        const product = await products.nth(index);
-        const productName = await this.productNameTextLocator(product).textContent() ?? "";
-        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
-        await this.clickViewProductButton(product);
-        return new ProductInfo(productName, productPrice,1);
-    }
+            expectRecomendedItemsTextVisible: async () => {
+                await expect(this.locators.recomendedItemsTextLocator).toBeVisible();
+            },
 
-    async checkLoggedInName(firstName: string){
-        const expectedMessage = `Logged in as ${firstName}`;
-        const loggedInMessage = await this.textLoggedInUserLocator.textContent();
-        await expect(await this.textLoggedInUserLocator).toBeVisible();
-        await expect(await loggedInMessage?.trim()).toBe(expectedMessage);
-    }
+            expectCategoryLeftPanelVisisble: async () => {
+                await expect(await this.locators.categoriesLeftPanelLocator).toBeVisible();
+            }, 
 
-    async verifyRecomendedItemsTextVisible(){
-        await expect(this.recomendedItemsTextLocator).toBeVisible();
-    }
+            expectSearchByGroupTextIsVissible: async (categoryName: string, subCategoryName: string) => {
+                await expect(await this.locators.productsTextSearchByCategoryLocator((categoryName + " - " + subCategoryName + " Products"))).toBeVisible();
+            },
 
-    async verifyCategoryLeftPanelVisisble(){
-        await expect(await this.categoriesLeftPanelLocator).toBeVisible();
-    }
+            expectHomePageItemsLoaded: async () => {
+                await expect(await this.locators.featuredItemsTextLocator).toBeVisible();
+            },
 
-    async getAllCategories(){
-        await this.verifyCategoryLeftPanelVisisble();
-        return await this.categoriesLocator(await this.categoriesLeftPanelLocator);
-    }
+            expectSubscriptionText: async () => {
+                await expect(await this.locators.subscriptionTextLocator).toBeVisible();
+            },
 
-    async verifySearchByGroupTextIsVissible(categoryName: string, subCategoryName: string){
-        await expect(await this.productsTextSearchByCategoryLocator((categoryName + " - " + subCategoryName + " Products"))).toBeVisible();
-    }
+            expectSuccessSubscriptionMessage: async () => {
+                await expect(await this.locators.subscribeMessage).toBeVisible();
+            },
+        };
 
-    // exact option is not working here, beasuse of spaces
-    private async clickCategoryByName(name: string): Promise<Locator> {
-        await this.categoriesLeftPanelLocator.scrollIntoViewIfNeeded();
-        await this.verifyCategoryLeftPanelVisisble();
-        const categories = await this.getAllCategories();
-        const categoryLinks: Locator[] = [];
-        for(const category of await categories.all()){
-            const link = await this.categoryWithNameLocator(category,name);
-            if(await link.count() > 0)
-                categoryLinks.push(link);
-        }
-        if(categoryLinks.length === 0)
-            throw new Error(`Category with name "${name}" not found`);
+        this.actions = {
+            clickSignUpAndLoginLink: async () => {
+                await this.locators.signUpAndLoginPageLocator.click();
+            },
 
-        if(categoryLinks.length > 1){
-            for(const potentialCategoryLink of await categoryLinks){
-                const text = (await potentialCategoryLink.textContent() ?? '').trim();
-                if (text === name.trim()) {
-                    const panelCategory = await this.panelDefaultClass(potentialCategoryLink);
-                    await expect(async () => {
-                        await potentialCategoryLink.click();
-                        await this.page.waitForTimeout(500); //wait for animation
-                        const subCategoryIn = await this.subCategoryCollabseOrInLocator(panelCategory,".in");
-                        await expect(await subCategoryIn.count()).not.toBe(0);
-                    }).toPass();         
-                    return panelCategory;
+            clickContactUs: async () => {
+                await this.locators.contactUsButtonLocator.click();
+            },
+
+            clickViewProductButton: async (product: Locator) => {
+                await this.locators.productViewProductButtonLocator(product).click();
+            },
+
+            clickViewProductButtonByIndex: async (index: number): Promise<ProductInfo> => {
+                const products = await this.locators.allProductsItemsLocator;
+                const product = await products.nth(index);
+                const productName = await this.locators.productNameTextLocator(product).textContent() ?? "";
+                const productPrice = await textPriceToFloat(await this.locators.productPriceTextLocator(product).textContent() ?? "");
+                await this.actions.clickViewProductButton(product);
+                return new ProductInfo(productName, productPrice,1);
+            },
+
+            getAllCategories: async (): Promise<Locator> => {
+                await this.assertions.expectCategoryLeftPanelVisisble();
+                return await this.locators.categoriesLocator(await this.locators.categoriesLeftPanelLocator);
+            },
+
+            clickCategoryByName: async (name: string): Promise<Locator> => {
+                await this.locators.categoriesLeftPanelLocator.scrollIntoViewIfNeeded();
+                await this.assertions.expectCategoryLeftPanelVisisble();
+                const categories = await this.actions.getAllCategories();
+                const categoryLinks: Locator[] = [];
+                for(const category of await categories.all()){
+                    const link = await this.locators.categoryWithNameLocator(category,name);
+                    if(await link.count() > 0)
+                        categoryLinks.push(link);
                 }
-            }
-            throw new Error(`Link with name "${name}" not found`);
-        }
-        else{
-            if(categoryLinks.length === 0) throw new Error(`Link with name "${name}" not found`);
-            const link = categoryLinks[0];
-            const panelCategory = await this.panelDefaultClass(link);   
-            await expect(async () => {
-                await link.click();
-                await this.page.waitForTimeout(500); //wait for animation
-                const subCategoryIn = await this.subCategoryCollabseOrInLocator(panelCategory,".in");       
-                await expect(await subCategoryIn.count()).not.toBe(0);
-            }).toPass();  
-            return await this.panelDefaultClass(link);
-        }
-    }
+                if(categoryLinks.length === 0)
+                    throw new Error(`Category with name "${name}" not found`);
+            
+                if(categoryLinks.length > 1){
+                    for(const potentialCategoryLink of await categoryLinks){
+                        const text = (await potentialCategoryLink.textContent() ?? '').trim();
+                        if (text === name.trim()) {
+                            const panelCategory = await this.locators.panelDefaultClass(potentialCategoryLink);
+                            await expect(async () => {
+                                await potentialCategoryLink.click();
+                                await this.page.waitForTimeout(500); //wait for animation
+                                const subCategoryIn = await this.locators.subCategoryCollabseOrInLocator(panelCategory,".in");
+                                await expect(await subCategoryIn.count()).not.toBe(0);
+                            }).toPass();         
+                            return panelCategory;
+                        }
+                    }
+                    throw new Error(`Link with name "${name}" not found`);
+                }
+                else{
+                    if(categoryLinks.length === 0) throw new Error(`Link with name "${name}" not found`);
+                    const link = categoryLinks[0];
+                    const panelCategory = await this.locators.panelDefaultClass(link);   
+                    await expect(async () => {
+                        await link.click();
+                        await this.page.waitForTimeout(500); //wait for animation
+                        const subCategoryIn = await this.locators.subCategoryCollabseOrInLocator(panelCategory,".in");       
+                        await expect(await subCategoryIn.count()).not.toBe(0);
+                    }).toPass();  
+                    return await this.locators.panelDefaultClass(link);
+                }
+            },
 
-    async clickSubCategoryOfCategory(categoryName: string, subCategoryName: string){
-        const categoty = await this.clickCategoryByName(categoryName);
-        const subCategory = await categoty.getByRole("link", {name: subCategoryName});
-        await subCategory.click();  
-        await this.verifySearchByGroupTextIsVissible(categoryName, subCategoryName); 
-    }
+            clickSubCategoryOfCategory: async (categoryName: string, subCategoryName: string) => {
+                const categoty = await this.actions.clickCategoryByName(categoryName);
+                const subCategory = await categoty.getByRole("link", {name: subCategoryName});
+                await subCategory.click();  
+                await this.assertions.expectSearchByGroupTextIsVissible(categoryName, subCategoryName); 
+            },
 
-    async clickDeleteAccount(){
-        await this.deleteButtonLocator.click();
-    }
+            clickDeleteAccount: async () => {
+                await this.locators.deleteButtonLocator.click();
+            },
 
-    async gotoTestCasesPage(){
-        const menu = await this.menuLocator;
-        await menu.locator(this.testCasesButtonLocator).click();
-    }
+            gotoTestCasesPage: async () => {
+                const menu = await this.locators.menuLocator;
+                await menu.locator(this.locators.testCasesButtonLocator).click();
+            },
 
-    async verifyHomePageItemsLoaded(){
-        await expect(await this.featuredItemsTextLocator).toBeVisible();
-    }
+            clickProductsPageButton: async () => {
+                await this.locators.productsButtonLocator.click();
+            },
 
-    async checkHomePageLoad(){
-        await expect(await this.featuredItemsTextLocator).toBeVisible();
-        await expect(await this.signUpAndLoginPageLocator).toBeVisible();
-    }
+            logout: async () => {
+                await this.locators.logoutButtonLocator.click();
+            },
 
-    async gotoProductsPage(){
-        await this.productsButtonLocator.click();
-    }
+            inputValueToSubscriptionEmailField: async (email: string) => {
+                await this.locators.subscriptionEmailInputLocator.fill(email);
+                await this.locators.subscribeButtonLocator.click();
+            },
 
-    async logout(){
-       await this.logoutButtonLocator.click();
-    }
+            clickProductAddToCartButtonByIndex: async (index: number): Promise<ProductInfo> => {
+                const products = await this.locators.allProductsItemsLocator;
+                const product = await products.nth(index);
+                const productImage = await this.locators.productImageLocator(product);
 
-    async verifySubscriptionText(){
-        await expect(await this.subscriptionTextLocator).toBeVisible();
-    }
+                //Get product data
+                const productName = await this.locators.productNameTextLocator(product).textContent() ?? "";
+                const productPrice = await textPriceToFloat(await this.locators.productPriceTextLocator(product).textContent() ?? "");
+                await expect(productPrice).not.toBe(0 || "");
 
-    async inputValueToSubscriptionEmailField(email: string){
-        await this.subscriptionEmailInputLocator.fill(email);
-        await this.subscribeButtonLocator.click();
-    }
+                //for all images in page
+                /*await this.page.waitForFunction(() => {
+                    const images = Array.from(document.images);
+                    return images.length === 0 || images.every(img => img.complete && img.naturalWidth > 0);
+                });*/
 
-    async clickProductAddToCartButtonByIndex(index: number): Promise<ProductInfo>{
-        const products = await this.allProductsItemsLocator;
-        const product = await products.nth(index);
-        const productImage = await this.productImageLocator(product);
+                // wait image to load, because it will depend on hover
+                //----
+                await this.page.waitForFunction(
+                    (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,
+                    await productImage.elementHandle()
+                );
+                //----
+            
+                //scroll to element (better then scrollIntoViewIfNeeded, because it will scroll element to the top)
+                //----
+                await this.page.evaluate((element) => {
+                     element?.scrollIntoView({ behavior: 'smooth', block: 'start' }); //same as "((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({behavior: 'smooth', block: 'start'});", element);"
+                }, await productImage.elementHandle());
+                //----
 
-        //Get product data
-        const productName = await this.productNameTextLocator(product).textContent() ?? "";
-        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
-        await expect(productPrice).not.toBe(0 || "");
+                this.page.waitForTimeout(300);
+            
+                await product.hover();
+                await this.page.waitForTimeout(600);
+            
+                const overlayContentAddProductButton = await this.locators.overlayContentAddProductButtonLocator(product);
+                await expect(overlayContentAddProductButton).toBeVisible();
+                await expect(overlayContentAddProductButton).toBeInViewport();
+                await expect(await overlayContentAddProductButton.isEnabled()).toBeTruthy();
+                await overlayContentAddProductButton.hover();
+                await overlayContentAddProductButton.click();
+            
+                return new ProductInfo(productName, productPrice,1);
+            },
 
-        //for all images in page
-        /*await this.page.waitForFunction(() => {
-            const images = Array.from(document.images);
-            return images.length === 0 || images.every(img => img.complete && img.naturalWidth > 0);
-        });*/
-        
-        // wait image to load, because it will depend on hover
-        //----
-        await this.page.waitForFunction(
-            (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,
-            await productImage.elementHandle()
-        );
-        //----
+            getActiveRecomendedItems: async (): Promise<Locator> => {
+                return await this.locators.recomendedItemsActiveLocator;
+            },
 
-        //scroll to element (better then scrollIntoViewIfNeeded, because it will scroll element to the top)
-        //----
-        await this.page.evaluate((element) => {
-             element?.scrollIntoView({ behavior: 'smooth', block: 'start' }); //same as "((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({behavior: 'smooth', block: 'start'});", element);"
-        }, await productImage.elementHandle());
-        //----
-        
-        this.page.waitForTimeout(300);
+            clickAddToCartRecomendedItemsByIndex: async (index: number): Promise<ProductInfo> => {
+                const products = await this.actions.getActiveRecomendedItems();
+                const product = await products.nth(index);
 
-        await product.hover();
-        await this.page.waitForTimeout(600);
+                //Get product data
+                const productName = await this.locators.productNameTextLocator(product).textContent() ?? "";
+                const productPrice = await textPriceToFloat(await this.locators.productPriceTextLocator(product).textContent() ?? "");
 
-        const overlayContentAddProductButton = await this.overlayContentAddProductButtonLocator(product);
-        await expect(overlayContentAddProductButton).toBeVisible();
-        await expect(overlayContentAddProductButton).toBeInViewport();
-        await expect(await overlayContentAddProductButton.isEnabled()).toBeTruthy();
-        await overlayContentAddProductButton.hover();
-        await overlayContentAddProductButton.click();
+                await this.locators.recomendedItemsAddToCartButtonLocator(product).click();
+                return new ProductInfo(productName, productPrice,1);
+            },
 
-        return new ProductInfo(productName, productPrice,1);
-    }
+            clickCartButton: async () => {
+                await this.locators.cartButtonLocator.click();
+            },
 
-    async getActiveRecomendedItems(){
-        return await this.recomendedItemsActiveLocator;
-    }
+            clickContinueShoppingButton: async () => {
+                await expect(await this.locators.modalContentLocator).toBeVisible();
+                await expect(await this.locators.cartModelContinueShoppingButton(await this.locators.modalContentLocator)).toBeVisible({timeout: 20000});
+                await this.locators.cartModelContinueShoppingButton(await this.locators.modalContentLocator).click();
+            },
 
-    async clickAddToCartRecomendedItemsByIndex(index: number): Promise<ProductInfo>{
-        const products = await this.getActiveRecomendedItems();
-        const product = await products.nth(index);
+            clickViewCartButton: async () => {
+                await expect(await this.locators.modalContentLocator).toBeVisible();
+                await expect(await this.locators.cartModelViewCartButton(await this.locators.modalContentLocator)).toBeVisible({timeout: 20000});
+                await this.locators.cartModelViewCartButton(await this.locators.modalContentLocator).click();
+            },
+        };
 
-        //Get product data
-        const productName = await this.productNameTextLocator(product).textContent() ?? "";
-        const productPrice = await textPriceToFloat(await this.productPriceTextLocator(product).textContent() ?? "");
-        
-        await this.recomendedItemsAddToCartButtonLocator(product).click();
-        return new ProductInfo(productName, productPrice,1);
-    }
-
-    async checkSuccessSubscriptionMessage(){
-        await expect(await this.subscribeMessage).toBeVisible();
-    }
-
-    async gotoCart(){
-        await this.cartButtonLocator.click();
-    }
-
-    async clickContinueShoppingButton(){
-        await expect(await this.modalContentLocator).toBeVisible();
-        await expect(await this.cartModelContinueShoppingButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
-        await this.cartModelContinueShoppingButton(await this.modalContentLocator).click();
-    }
-
-    async clickViewCartButton(){
-        await expect(await this.modalContentLocator).toBeVisible();
-        await expect(await this.cartModelViewCartButton(await this.modalContentLocator)).toBeVisible({timeout: 20000});
-        await this.cartModelViewCartButton(await this.modalContentLocator).click();
     }
 }
