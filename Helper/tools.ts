@@ -1,4 +1,4 @@
-import { expect, APIResponse, APIRequestContext } from "@playwright/test";
+import { expect, type APIRequestContext, type APIResponse } from "@playwright/test";
 import fs from 'fs/promises';
 import { z } from 'zod';
 
