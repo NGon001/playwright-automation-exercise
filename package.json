@@ -3,9 +3,9 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "pretest": "node ./Helper/clean-results.js",
+    "pretest": "node ./Helper/clean-results.ts",
     "testonly": "npx playwright test",
-    "trcli": "dotenv -e .env -- node ./Helper/trcli-runner.js",
+    "trcli": "dotenv -e .env -- node ./Helper/trcli-runner.ts",
     "test": "npm-run-all --continue-on-error -s testonly trcli"
   },
   "keywords": [
