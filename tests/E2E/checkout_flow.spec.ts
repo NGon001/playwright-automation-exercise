@@ -54,7 +54,7 @@ test.describe("E2E Checkout Flow", () => {
     await signUp_LoginPage.actions.clickSignUpButton();
 
     //Fill detailed signup formr
-    await signUpPage.assertions.expectFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
+    await signUpPage.assertions.expectExtendedFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
     await signUpPage.actions.fillSignUpForm(
       await getEnv("REGISTER_TITLE"),
       await getEnv("REGISTER_NAME_FIRST"),
@@ -172,7 +172,7 @@ test.describe("E2E Checkout Flow", () => {
     await signUp_LoginPage.actions.clickSignUpButton();
 
     //Fill detailed signup formr
-    await signUpPage.assertions.expectFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
+    await signUpPage.assertions.expectExtendedFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
     await signUpPage.actions.fillSignUpForm(
       await getEnv("REGISTER_TITLE"),
       await getEnv("REGISTER_NAME_FIRST"),

@@ -61,7 +61,7 @@ export class HomePage extends BasePage {
         clickDeleteAccount: () => Promise<void>;
         gotoTestCasesPage: () => Promise<void>;
         clickProductsPageButton: () => Promise<void>;
-        logout: () => Promise<void>;
+        clickLogoutButton: () => Promise<void>;
         inputValueToSubscriptionEmailField: (email: string) => Promise<void>;
         clickProductAddToCartButtonByIndex: (index: number) => Promise<ProductInfo>;
         getActiveRecomendedItems: () => Promise<Locator>;
@@ -238,7 +238,7 @@ export class HomePage extends BasePage {
                 await this.locators.productsButtonLocator.click();
             },
 
-            logout: async () => {
+            clickLogoutButton: async () => {
                 await this.locators.logoutButtonLocator.click();
             },
 

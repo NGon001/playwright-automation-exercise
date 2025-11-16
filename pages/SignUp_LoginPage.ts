@@ -10,7 +10,7 @@ export class SignUp_LoginPage extends BasePage{
         loginTextLocator: Locator;
         singUpTextLocator: Locator;
         incorectDataMessageLocator: Locator;
-        exestedDataMessageLocator: Locator;
+        exestedEmailMessageLocator: Locator;
         signUpAndLoginPageLocator: Locator;
         FormNameInputLocator: (signUpForm: Locator) => Locator;
         FormEmailInputLocator: (signUpForm: Locator) => Locator;
@@ -22,7 +22,7 @@ export class SignUp_LoginPage extends BasePage{
         expectLoginTextVisible: () => Promise<void>;
         expectSignUpTextVisible: () => Promise<void>;
         expectIncorectDataMessageVisible: () => Promise<void>;
-        expectExistedDataMessageVisible: () => Promise<void>;
+        expectExistedEmailMessageVisible: () => Promise<void>;
     };
 
     readonly actions: {
@@ -47,7 +47,7 @@ export class SignUp_LoginPage extends BasePage{
             loginTextLocator : this.page.getByText('Login to your account'),
             singUpTextLocator : this.page.getByText('New User Signup!'),
             incorectDataMessageLocator : this.page.getByText("Your email or password is incorrect!"),
-            exestedDataMessageLocator : this.page.getByText("Email Address already exist!"),
+            exestedEmailMessageLocator : this.page.getByText("Email Address already exist!"),
             signUpAndLoginPageLocator : this.page.getByRole('link', { name: 'Signup / Login' }),
             FormNameInputLocator : (Form: Locator) => Form.getByPlaceholder('Name'),
             FormEmailInputLocator : (Form: Locator) => Form.getByPlaceholder('Email Address'),
@@ -71,8 +71,8 @@ export class SignUp_LoginPage extends BasePage{
                 await expect(await this.locators.incorectDataMessageLocator).toBeVisible();
             },
 
-            expectExistedDataMessageVisible: async () => {
-                await expect(await this.locators.exestedDataMessageLocator).toBeVisible();
+            expectExistedEmailMessageVisible: async () => {
+                await expect(await this.locators.exestedEmailMessageLocator).toBeVisible();
             }
         };
 

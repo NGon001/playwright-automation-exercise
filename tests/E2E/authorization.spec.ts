@@ -2,6 +2,7 @@ import { test } from '../../Helper/base.ts';
 import { generateRandomEmail, getEnv } from '../../Helper/tools.js';
 
 test.describe("E2E Authorization tests", () => {
+  const incorrectEmail = 'max12341@gmail.com';
   test.beforeEach(async ({ homePage, signUp_LoginPage }) => {
     //goto
     await homePage.goto();
@@ -38,7 +39,7 @@ test.describe("E2E Authorization tests", () => {
     await signUp_LoginPage.actions.clickSignUpButton();
 
     //Step 2: Fill detailed signup form
-    await signUpPage.assertions.expectFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
+    await signUpPage.assertions.expectExtendedFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
     await signUpPage.actions.fillSignUpForm(
       await getEnv("REGISTER_TITLE"),
       await getEnv("REGISTER_NAME_FIRST"),
@@ -54,8 +55,8 @@ test.describe("E2E Authorization tests", () => {
       await getEnv("REGISTER_STATE"),
       await getEnv("REGISTER_CITY"),
       await getEnv("REGISTER_ZIPCODE"),
-      await getEnv("REGISTER_MOBILE_NUMBER")
-    );
+      await getEnv("REGISTER_MOBILE_NUMBER"),
+    ); //newsletter and offers are checked by default, to not check them, pass false as last 2 arguments
     await signUpPage.actions.clickCreateAccountButton();
 
     //Step 3: verift account was created
@@ -102,9 +103,6 @@ test.describe("E2E Authorization tests", () => {
    */
 
   test('C35 Login User with incorrect email and password', async ({signUp_LoginPage }) => {
-    //data
-    const incorrectEmail = 'max12341@gmail.com';
-
     //fill login form
     await signUp_LoginPage.actions.fillLoginForm(incorrectEmail,await getEnv("VALID_LOGIN_PASSWORD"));
     await signUp_LoginPage.actions.clickLoginButton();
@@ -134,7 +132,7 @@ test.describe("E2E Authorization tests", () => {
     await homePage.assertions.expectLoggedInNameIsVisible(await getEnv("VALID_LOGIN_NAME_FIRST"));
 
     //logout
-    await homePage.actions.logout();
+    await homePage.actions.clickLogoutButton();
     await signUp_LoginPage.assertions.expectLoginTextVisible();
     await signUp_LoginPage.assertions.expectSignUpTextVisible();
   });
@@ -155,7 +153,7 @@ test.describe("E2E Authorization tests", () => {
     await signUp_LoginPage.actions.fillStartSignUpForm(await getEnv("REGISTER_NAME_FIRST"),await getEnv("VALID_LOGIN_EMAIL"));
     await signUp_LoginPage.actions.clickSignUpButton();
 
-    await signUp_LoginPage.assertions.expectExistedDataMessageVisible();
+    await signUp_LoginPage.assertions.expectExistedEmailMessageVisible();
   });
 
 });
