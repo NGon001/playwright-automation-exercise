@@ -6,20 +6,20 @@ import { Status } from '../Helper/base';
 export class AuthorizationAPI{
     readonly Title = {Mr: "Mr", Mrs: "Mrs", Miss: "Miss"};
     readonly request: APIRequestContext;
-    readonly POST_verifyLogin: (method: string, email: string | undefined, password: string | undefined) => Promise<APIResponse>;
-    readonly POST_createAccount: (method: string, name: string | undefined, email: string | undefined, password: string | undefined, title: string | undefined, birth_date: string | undefined, birth_month: string | undefined, birth_year: string | undefined, firstname: string | undefined, lastname: string | undefined, company: string | undefined, address1: string | undefined, address2: string | undefined, country: string | undefined, zipcode: string | undefined, state: string | undefined, city: string | undefined, mobile_number: string | undefined) => Promise<APIResponse>;
-    readonly POST_deleteAccount: (method: string, email: string | undefined, password: string | undefined) => Promise<APIResponse>;
-    readonly GET_getUserDetailByEmail: (method: string, email: string | undefined) => Promise<APIResponse>;
+    readonly POST_verifyLogin: (method: string, email: string, password: string ) => Promise<APIResponse>;
+    readonly POST_createAccount: (method: string, name: string, email: string , password: string , title: string , birth_date: string , birth_month: string , birth_year: string , firstname: string , lastname: string , company: string , address1: string , address2: string , country: string , zipcode: string , state: string , city: string , mobile_number: string ) => Promise<APIResponse>;
+    readonly POST_deleteAccount: (method: string, email: string, password: string ) => Promise<APIResponse>;
+    readonly GET_getUserDetailByEmail: (method: string, email: string) => Promise<APIResponse>;
     constructor(request: APIRequestContext){
         this.request = request;
-        this.POST_verifyLogin = (method, email: string | undefined, password: string | undefined) => {
+        this.POST_verifyLogin = (method, email: string , password: string ) => {
             expect(method).not.toBe(undefined);
             const form: Record<string, string> = {};
             if (email !== undefined) form.email = email;
             if (password !== undefined) form.password = password;
             return makeRequest(this.request ,'/api/verifyLogin',method, form);
         };
-        this.POST_createAccount = (method, name: string | undefined, email: string | undefined, password: string | undefined, title: string | undefined, birth_date: string | undefined, birth_month: string | undefined, birth_year: string | undefined, firstname: string | undefined, lastname: string | undefined, company: string | undefined, address1: string | undefined, address2: string | undefined, country: string | undefined, zipcode: string | undefined, state: string | undefined, city: string | undefined, mobile_number: string | undefined) => {
+        this.POST_createAccount = (method, name: string , email: string , password: string , title: string , birth_date: string , birth_month: string , birth_year: string , firstname: string , lastname: string , company: string , address1: string , address2: string , country: string , zipcode: string , state: string , city: string , mobile_number: string ) => {
             expect(method).not.toBe(undefined);
             const form: Record<string, string> = {};
             if (name !== undefined) form.name = name;
@@ -41,14 +41,14 @@ export class AuthorizationAPI{
             if (mobile_number !== undefined) form.mobile_number = mobile_number;
             return makeRequest(this.request, '/api/createAccount', method, form);
         };
-        this.POST_deleteAccount = (method, email: string | undefined, password: string | undefined) => {
+        this.POST_deleteAccount = (method, email: string , password: string ) => {
             expect(method).not.toBe(undefined);
             const form: Record<string, string> = {};
             if (email !== undefined) form.email = email;
             if (password !== undefined) form.password = password;
             return makeRequest(this.request ,'/api/deleteAccount',method, form);
         };
-        this.GET_getUserDetailByEmail = (method, email: string | undefined) => {
+        this.GET_getUserDetailByEmail = (method, email: string ) => {
             expect(method).not.toBe(undefined);
             const form: Record<string, string> = {};
             if (email !== undefined) form.email = email;
@@ -79,7 +79,7 @@ export class AuthorizationAPI{
         await verifyResponseSchema(response,schema);
     }
 
-    async createAccount(method: string, ExpectedCode: number, ExpectedMessage:string , name: string | undefined, email: string | undefined, password: string | undefined, title: string | undefined, birth_date: string | undefined, birth_month: string | undefined, birth_year: string | undefined, firstname: string | undefined, lastname: string | undefined, company: string | undefined, address1: string | undefined, address2: string | undefined, country: string | undefined, zipcode: string | undefined, state: string | undefined, city: string | undefined, mobile_number: string | undefined){
+    async createAccount(method: string, ExpectedCode: number, ExpectedMessage:string , name: string , email: string , password: string , title: string , birth_date: string , birth_month: string , birth_year: string , firstname: string , lastname: string , company: string , address1: string , address2: string , country: string , zipcode: string , state: string , city: string , mobile_number: string ){
         const response = await this.POST_createAccount(
             method,
             name,
@@ -110,7 +110,7 @@ export class AuthorizationAPI{
         await this.verifyLoginAPISchema(response,ExpectedCode,ExpectedMessage);
     }
 
-    async verifyUserDetailSchema(response: APIResponse, expectedCode: number, expectedMessage: string | undefined){
+    async verifyUserDetailSchema(response: APIResponse, expectedCode: number, expectedMessage: string ){
         const responseBody = await response.json();
         let schema;
         if(responseBody.responseCode !== Status.success)
@@ -153,7 +153,7 @@ export class AuthorizationAPI{
         await this.verifyLoginAPISchema(response,expectedCode,expectedMessage);
     }
 
-    async getUserDetailByEmail(method: string, email: string, ExpectedCode: number, ExpectedMessage: string | undefined){
+    async getUserDetailByEmail(method: string, email: string, ExpectedCode: number, ExpectedMessage: string ){
         const response = await this.GET_getUserDetailByEmail(method,email);
         await verifyResponseCode(response,ExpectedCode);
         await this.verifyUserDetailSchema(response,ExpectedCode,ExpectedMessage);

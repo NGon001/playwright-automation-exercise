@@ -87,16 +87,16 @@ test.describe("E2E Cart Functionality", () =>{
     await homePage.actions.clickViewCartButton();
 
     //delete secondProduct
-    await cartPage.assertions.expectProcessButtonVisisble();
+    await cartPage.assertions.expectCheckOutButtonVisisble();
     await cartPage.assertions.expectProductImageWasLoadedByName(secondProductInfo.Name);
     await cartPage.actions.deleteProductByName(secondProductInfo.Name);
-    await cartPage.assertions.expectProductExistOrNot(false,secondProductInfo.Name);
+    await cartPage.assertions.expectProductExistence(false,secondProductInfo.Name);
 
     //delete firstProduct
-    await cartPage.assertions.expectProcessButtonVisisble();
+    await cartPage.assertions.expectCheckOutButtonVisisble();
     await cartPage.assertions.expectProductImageWasLoadedByName(firstProductInfo.Name);
     await cartPage.actions.deleteProductByName(firstProductInfo.Name);
-    await cartPage.assertions.expectProductExistOrNot(false,firstProductInfo.Name);
+    await cartPage.assertions.expectProductExistence(false,firstProductInfo.Name);
   });
 
   /*

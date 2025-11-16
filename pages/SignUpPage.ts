@@ -26,11 +26,11 @@ export class SignUpPage extends BasePage {
     };
 
     readonly assertions: {
-        expectFormToBeVisible: (firstName: string, email: string) => Promise<void>;
+        expectExtendedFormToBeVisible: (firstName: string, email: string) => Promise<void>;
     };
 
     readonly actions: {
-        fillSignUpForm: (Title: string,firstName: string,lastName: string,password: string,BirthDay: string ,BirthMonth: string ,BirthYear: string ,companyName: string, Address: string ,Address2: string ,Country: string ,State: string ,City: string ,Zipcode: string ,mobileNumber: string ) => Promise<void>;
+        fillSignUpForm: (Title: string,firstName: string,lastName: string,password: string,BirthDay: string ,BirthMonth: string ,BirthYear: string ,companyName: string, Address: string ,Address2: string ,Country: string ,State: string ,City: string ,Zipcode: string ,mobileNumber: string, SignUpNewsletter?: boolean, SignUpOffers?: boolean ) => Promise<void>;
         clickCreateAccountButton: () => Promise<void>;
     };
 
@@ -61,7 +61,7 @@ export class SignUpPage extends BasePage {
         };
 
         this.assertions = {
-            expectFormToBeVisible: async (firstName: string, email: string) => {
+            expectExtendedFormToBeVisible: async (firstName: string, email: string) => {
                 await expect(await this.page.getByText('Enter Account Information')).toBeVisible();
                 await expect(await this.locators.nameFieldLocator.getAttribute('value')).toBe(firstName);
                 await expect(await this.locators.emailFieldLocator.getAttribute('value')).toBe(email);  
@@ -70,15 +70,17 @@ export class SignUpPage extends BasePage {
 
         this.actions = {
             fillSignUpForm: async (Title: string,firstName: string,lastName: string,password: string,BirthDay: string ,BirthMonth: string ,BirthYear: string ,companyName: string 
-                ,Address: string ,Address2: string ,Country: string ,State: string ,City: string ,Zipcode: string ,mobileNumber: string 
+                ,Address: string ,Address2: string ,Country: string ,State: string ,City: string ,Zipcode: string ,mobileNumber: string, SignUpNewsletter: boolean = true, SignUpOffers: boolean = true 
             ) => {
                 await this.locators.RadioTitleLocator(Title).check();
                 await this.locators.PasswordInputLocator.fill(password);
                 await this.locators.DayOptionLocator.selectOption({ label: BirthDay });
                 await this.locators.MonthOptionLocator.selectOption({ label: BirthMonth });
                 await this.locators.YearOptionLocator.selectOption({ label: BirthYear });
-                await this.locators.SignUpNewsletterCheckLocator.check();
-                await this.locators.SignUpOffersChrckLocator.check();
+                if (SignUpNewsletter)
+                    await this.locators.SignUpNewsletterCheckLocator.check();
+                if (SignUpOffers)
+                    await this.locators.SignUpOffersChrckLocator.check();
                 await this.locators.FirstNameInputLocator.fill(firstName);
                 await this.locators.LastNameInputLocator.fill(lastName);
                 await this.locators.CompanyInputLocator.fill(companyName);

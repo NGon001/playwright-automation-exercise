@@ -13,7 +13,7 @@ export class CartPage extends BasePage{
         productNameTextLocator: (product: Locator) => Locator;
         productPriceTextLocator: (product: Locator) => Locator;
         productPriceTotalTextLocator: (product: Locator) => Locator;
-        processToCheckoutButtonLocator: Locator;
+        CheckoutButtonLocator: Locator;
         modalContentLocator: Locator;
         modalContentRegisterAndLoginButtonLocator: (modalContent: Locator) => Locator;
         billingFormName: (form: Locator) => Locator;
@@ -38,12 +38,12 @@ export class CartPage extends BasePage{
         expectProductImageWasLoaded(product: Locator): Promise<void>;
         expectProductImageWasLoadedByName(name: string): Promise<void>;
         expectProductInfoByIndex(index: number, name: string, price: number, quantity: number): Promise<void>;
-        expectProductExistOrNot(exist: boolean, name: string): Promise<void>;
+        expectProductExistence(exist: boolean, name: string): Promise<void>;
         expectAddress(addressName: string, originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string,originalAddress2: string,originalCountry: string
             ,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string): Promise<void>;
 
         expectProductExistByName(name: string): Promise<boolean>;
-        expectProcessButtonVisisble(): Promise<void>;
+        expectCheckOutButtonVisisble(): Promise<void>;
         expectAddressFormInformation(addresForm: Locator,originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string
             ,originalAddress2: string,originalCountry: string,originalState: string,originalCity: string,originalZipcode: string,originalCompanyName: string,originalMobileNumber: string): Promise<void>;
     };
@@ -74,7 +74,7 @@ export class CartPage extends BasePage{
             productNameTextLocator : (product: Locator) => product.locator("h4"),
             productPriceTextLocator : (product: Locator) => product.locator(".cart_price p"),
             productPriceTotalTextLocator : (product: Locator) => product.locator(".cart_total_price"),
-            processToCheckoutButtonLocator : this.page.locator(".btn.btn-default.check_out"),
+            CheckoutButtonLocator : this.page.locator(".btn.btn-default.check_out"),
             modalContentLocator : this.page.locator(".modal-content"),
             modalContentRegisterAndLoginButtonLocator : (modalContent: Locator) => modalContent.getByRole("link",{name: "Register / Login"}),
             billingFormName : (form: Locator) => form.locator(".address_firstname.address_lastname"),
@@ -132,7 +132,7 @@ export class CartPage extends BasePage{
                 await expect(productPriceTotal).toBe((productPrice * quantity));
             },
 
-            expectProductExistOrNot: async (exist: boolean, name: string) => {
+            expectProductExistence: async (exist: boolean, name: string) => {
                 await expect(await this.assertions.expectProductExistByName(name)).toBe(exist);
             },
 
@@ -151,8 +151,8 @@ export class CartPage extends BasePage{
                 return true;
             },
 
-            expectProcessButtonVisisble: async () => {
-                await expect(await this.locators.processToCheckoutButtonLocator).toBeVisible();
+            expectCheckOutButtonVisisble: async () => {
+                await expect(await this.locators.CheckoutButtonLocator).toBeVisible();
             },
 
             expectAddressFormInformation: async (addresForm: Locator,originalTitle: string, originalFirstName: string,originalLastName: string,originalAddress: string
@@ -212,7 +212,7 @@ export class CartPage extends BasePage{
                 await this.assertions.expectImageWasLoaded(await this.locators.productImageLocator(await products.nth(0)));
 
                 await expect(async () => {
-                    await this.locators.processToCheckoutButtonLocator.click();
+                    await this.locators.CheckoutButtonLocator.click();
                     if (authorized) {
                         await expect(await this.locators.deliveryTextLocator).toBeVisible();
                     } else {
