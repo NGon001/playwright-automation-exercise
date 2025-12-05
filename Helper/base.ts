@@ -45,6 +45,12 @@ export const apiTest = apiBaseTest.extend<MyFixtures>({
 });
 
 export const test = baseTest.extend<MyFixtures>({
+    authorizationAPI: async({request},use) => {
+        await use(new AuthorizationAPI(request));
+    },
+    productsAPI: async({request},use) => {
+        await use(new ProductsAPI(request));
+    },
     homePage: async ({page}, use) => {
         await use(new HomePage(page));
     },
@@ -129,13 +135,15 @@ export class ProductInfo{
     }
 }
 
-export const userFoundMessage = "User exists!";
-export const userNotFoundMessage = "User not found!";
-export const userCreatedMessage = "User created!";
-export const userDeletedMessage = "Account deleted!";
-export const accountNotFoundMessage = "Account not found with this email, try another email!";
-export const badRequestMessage = (method: string) => `Bad request, email or password parameter is missing in ${method} request.`;
-export const badRequestParameterMessage = (method: string, parameter: string) => `Bad request, ${parameter} parameter is missing in ${method} request.`;
-export const notSupportedReqMethodMessage = "This request method is not supported.";
-export const emailAlreadyExistsMessage = "Email already exists!";
-export const methodNotAllowedMessage = (method: string) => `Method \"${method}\" not allowed.`;
+export const Messages = {
+    userFoundMessage: "User exists!",
+    userNotFoundMessage: "User not found!",
+    userCreatedMessage: "User created!",
+    userDeletedMessage: "Account deleted!",
+    accountNotFoundMessage: "Account not found with this email, try another email!",
+    badRequestMessage: (method: string) => `Bad request, email or password parameter is missing in ${method} request.`,
+    badRequestParameterMessage: (method: string, parameter: string) => `Bad request, ${parameter} parameter is missing in ${method} request.`,
+    notSupportedReqMethodMessage: "This request method is not supported.",
+    emailAlreadyExistsMessage: "Email already exists!",
+    methodNotAllowedMessage: (method: string) => `Method \"${method}\" not allowed.`,
+}

@@ -38,7 +38,7 @@ export default defineConfig({
       use: {},                              // no browser/device
     },
     {
-      name: 'chromium',
+      name: 'ui-tests',
       testIgnore: /.*\.api\.spec\.js$/,     // ignore API tests
       use: { ...devices['Desktop Chrome'] },
     },

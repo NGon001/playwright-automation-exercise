@@ -1,4 +1,4 @@
-import { test } from '../../Helper/base.ts';
+import { test, Methods } from '../../Helper/base.ts';
 import { generateRandomEmail, getEnv } from '../../Helper/tools.js';
 
 test.describe("E2E Checkout Flow", () => {
@@ -159,42 +159,36 @@ test.describe("E2E Checkout Flow", () => {
   18. Verify 'ACCOUNT DELETED!' and click 'Continue' button
   */
 
-  test('C41 Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  test('C41 Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage, authorizationAPI}) => {
     const email = await generateRandomEmail();
     let authorized = false;
 
-    //goto
-    await homePage.actions.clickSignUpAndLoginLink();
-    await signUp_LoginPage.assertions.expectSignUpTextVisible();
-
-    //Fill signup form
-    await signUp_LoginPage.actions.fillStartSignUpForm(await getEnv("REGISTER_NAME_FIRST"),email);
-    await signUp_LoginPage.actions.clickSignUpButton();
-
-    //Fill detailed signup formr
-    await signUpPage.assertions.expectExtendedFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
-    await signUpPage.actions.fillSignUpForm(
-      await getEnv("REGISTER_TITLE"),
+    await authorizationAPI.POST_createAccount(
+      Methods.POST,
       await getEnv("REGISTER_NAME_FIRST"),
-      await getEnv("REGISTER_NAME_LAST"),
+      email,
       await getEnv("REGISTER_PASSWORD"),
+      await getEnv("REGISTER_TITLE"),
       await getEnv("REGISTER_BIRTH_DAY"),
       await getEnv("REGISTER_BIRTH_MONTH"),
       await getEnv("REGISTER_BIRTH_YEAR"),
+      await getEnv("REGISTER_NAME_FIRST"),
+      await getEnv("REGISTER_NAME_LAST"),
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_ADDRESS"),
       await getEnv("REGISTER_ADDRESS2"),
       await getEnv("REGISTER_COUNTRY"),
+      await getEnv("REGISTER_ZIPCODE"),
       await getEnv("REGISTER_STATE"),
       await getEnv("REGISTER_CITY"),
-      await getEnv("REGISTER_ZIPCODE"),
       await getEnv("REGISTER_MOBILE_NUMBER")
-    );
-    await signUpPage.actions.clickCreateAccountButton();
+    )
 
-    //verift account was created
-    await accountCreatedPage.assertions.expectAccountCreatedTextVisible();
-    await accountCreatedPage.actions.clickContinueButton();
+    await homePage.actions.clickSignUpAndLoginLink();
+
+    await signUp_LoginPage.actions.fillLoginForm(email,await getEnv("REGISTER_PASSWORD"));
+    await signUp_LoginPage.actions.clickLoginButton();
+
     await homePage.assertions.expectLoggedInNameIsVisible(await getEnv("REGISTER_NAME_FIRST"));
     authorized = true;
 
