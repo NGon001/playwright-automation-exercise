@@ -60,6 +60,7 @@ test.describe("API Authorization tests", () => {
             await authorizationAPI.verifyLogin(method,Status.methodNotAllowed,Messages.notSupportedReqMethodMessage,await getEnv("VALID_LOGIN_EMAIL"),await getEnv("VALID_LOGIN_PASSWORD"));
         }
     });
+    
     test('C15 POST (/api/createAccount) Successful registration with valid data', async ({ authorizationAPI }) => {
         const email = await generateRandomEmail();
         await authorizationAPI.createAccount(

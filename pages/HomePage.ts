@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { textPriceToFloat } from "../Helper/tools";
 import { BasePage } from "../Helper/BasePage";
-import { ProductInfo } from "../Helper/base";
+import { ProductInfo } from "../Helper/ProductInfo";
 
 export class HomePage extends BasePage {
     readonly locators: {
