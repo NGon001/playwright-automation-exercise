@@ -1,4 +1,4 @@
-import { apiTest as test, Methods, Status,notSupportedReqMethodMessage, badRequestParameterMessage  } from '../../Helper/base.ts';
+import { apiTest as test, Methods, Status, Messages } from '../../Helper/base.ts';
 
 test.describe("API Product & Catalog tests", () => {
     test('C28 GET /api/brandsList returns valid brand list', async ({ productsAPI }) => {
@@ -8,7 +8,7 @@ test.describe("API Product & Catalog tests", () => {
     test('C27 POST, PUT, DELETE (/api/brandsList) Incorrect req method', async({ productsAPI }) => {
         for (const method of Object.values(Methods)) {
             if(method === "GET") continue;
-            await productsAPI.brandsList(method,Status.methodNotAllowed,notSupportedReqMethodMessage);
+            await productsAPI.brandsList(method,Status.methodNotAllowed,Messages.notSupportedReqMethodMessage);
         }
     });
 
@@ -22,7 +22,7 @@ test.describe("API Product & Catalog tests", () => {
     test('C26 GET, PUT, DELETE (/api/searchProduct) Incorrect req method', async({ productsAPI }) => {
         for (const method of Object.values(Methods)) {
             if(method === "POST") continue;
-            await productsAPI.searchProduct(method,Status.methodNotAllowed,notSupportedReqMethodMessage,"top");
+            await productsAPI.searchProduct(method,Status.methodNotAllowed,Messages.notSupportedReqMethodMessage,"top");
         }
     });
 
@@ -31,6 +31,6 @@ test.describe("API Product & Catalog tests", () => {
     });
 
     test('C30 POST /api/searchProduct returns 400 Bad Request when keyword is missing', async ({ productsAPI }) => {
-        await productsAPI.searchProduct(Methods.POST,Status.badReq,badRequestParameterMessage(Methods.POST,"search_product"),"");
+        await productsAPI.searchProduct(Methods.POST,Status.badReq,Messages.badRequestParameterMessage(Methods.POST,"search_product"),"");
     });
 });

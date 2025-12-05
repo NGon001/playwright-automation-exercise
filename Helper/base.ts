@@ -45,6 +45,17 @@ export const apiTest = apiBaseTest.extend<MyFixtures>({
 });
 
 export const test = baseTest.extend<MyFixtures>({
+
+    //Didnt found better way to do it without dublication, if you have idea please share
+    //--------------------------------
+    authorizationAPI: async({request},use) => {
+        await use(new AuthorizationAPI(request));
+    },
+    productsAPI: async({request},use) => {
+        await use(new ProductsAPI(request));
+    },
+    //--------------------------------
+
     homePage: async ({page}, use) => {
         await use(new HomePage(page));
     },
@@ -92,20 +103,26 @@ export const test = baseTest.extend<MyFixtures>({
         await context.tracing.start({ screenshots: true, snapshots: true, sources: true });
 
         await use();
+        testInfo.setTimeout(30000);
 
-        // Stop tracing and save it
-        const tracePath = `test-resultsSave/traces/trace-${randomUUID()}.zip`;
-        await context.tracing.stop({ path: tracePath });
-        testInfo.annotations.push({ type: 'testrail_attachment', description: tracePath });
-
-        let screenshotPath = `test-resultsSave/screenshots/screenshot-${randomUUID()}.png`;
-        const videoPath = `test-resultsSave/videos/video-${randomUUID()}.webm`;
-        await page.screenshot({ path: screenshotPath, fullPage: true });
-        await page.close();
-        testInfo.annotations.push({ type: 'testrail_attachment', description: screenshotPath });
-        if (page.video()) {
-            await page.video()?.saveAs(videoPath);
-            testInfo.annotations.push({ type: 'testrail_attachment', description: videoPath });
+        try{
+            const testTitle = testInfo.title.replace(/[^a-zA-Z0-9-_]/g, '_');
+            // Stop tracing and save it
+            const tracePath = `test-resultsSave/traces/trace-${testTitle}.zip`;
+            await context.tracing.stop({ path: tracePath });
+            testInfo.annotations.push({ type: 'testrail_attachment', description: tracePath });
+            
+            let screenshotPath = `test-resultsSave/screenshots/screenshot-${testTitle}.png`;
+            const videoPath = `test-resultsSave/videos/video-${testTitle}.webm`;
+            await page.screenshot({ path: screenshotPath, fullPage: true });
+            await page.close();
+            testInfo.annotations.push({ type: 'testrail_attachment', description: screenshotPath });
+            if (page.video()) {
+                await page.video()?.saveAs(videoPath);
+                testInfo.annotations.push({ type: 'testrail_attachment', description: videoPath });
+            }
+        }catch(err){
+            console.error("Error during saving attachments:", err);
         }
 
     }, { auto: true }],
@@ -117,25 +134,24 @@ export {expect} from '@playwright/test';
 export const Status = { success: 200, resourceCreated: 201, badReq: 400, notFound: 404, methodNotAllowed: 405, serverError: 500};
 export const Methods = { GET: 'GET', POST: 'POST', PUT: 'PUT', DELETE: 'DELETE'};
 
-export class ProductInfo{
-    Name: string;
-    Price: number;
-    Quantity: number;
+export const APIEndPoints = {
+    verifyLogin: '/api/verifyLogin',
+    createAccount: '/api/createAccount',
+    deleteAccount: '/api/deleteAccount',
+    getUserDetailByEmail: '/api/getUserDetailByEmail',
+    brandList: '/api/brandsList',
+    searchProduct: '/api/searchProduct',
+};
 
-    constructor(name: string, price: number, quantity: number){
-        this.Name = name;
-        this.Price = price;
-        this.Quantity = quantity;
-    }
+export const Messages = {
+    userFoundMessage: "User exists!",
+    userNotFoundMessage: "User not found!",
+    userCreatedMessage: "User created!",
+    userDeletedMessage: "Account deleted!",
+    accountNotFoundMessage: "Account not found with this email, try another email!",
+    badRequestMessage: (method: string) => `Bad request, email or password parameter is missing in ${method} request.`,
+    badRequestParameterMessage: (method: string, parameter: string) => `Bad request, ${parameter} parameter is missing in ${method} request.`,
+    notSupportedReqMethodMessage: "This request method is not supported.",
+    emailAlreadyExistsMessage: "Email already exists!",
+    methodNotAllowedMessage: (method: string) => `Method \"${method}\" not allowed.`,
 }
-
-export const userFoundMessage = "User exists!";
-export const userNotFoundMessage = "User not found!";
-export const userCreatedMessage = "User created!";
-export const userDeletedMessage = "Account deleted!";
-export const accountNotFoundMessage = "Account not found with this email, try another email!";
-export const badRequestMessage = (method: string) => `Bad request, email or password parameter is missing in ${method} request.`;
-export const badRequestParameterMessage = (method: string, parameter: string) => `Bad request, ${parameter} parameter is missing in ${method} request.`;
-export const notSupportedReqMethodMessage = "This request method is not supported.";
-export const emailAlreadyExistsMessage = "Email already exists!";
-export const methodNotAllowedMessage = (method: string) => `Method \"${method}\" not allowed.`;

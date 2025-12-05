@@ -1,7 +1,7 @@
 import { APIRequestContext, APIResponse,expect } from '@playwright/test';
 import { verifyResponseSchema, verifyResponseCode, makeRequest } from '../Helper/tools';
 import { z } from 'zod';
-import { Status } from '../Helper/base';
+import { Status, APIEndPoints } from '../Helper/base';
 
 export class ProductsAPI{
     readonly request: APIRequestContext;
@@ -12,13 +12,13 @@ export class ProductsAPI{
         this.request = request;
         this.GET_brandsList = (method) => {
             expect(method).not.toBe(undefined);
-            return makeRequest(this.request ,'/api/brandsList',method);
+            return makeRequest(this.request , APIEndPoints.brandList, method);
         };
         this.POST_searchProduct = (method,productName: string) => {
             expect(method).not.toBe(undefined);
             const form: Record<string, string> = {};
             if (productName !== "") form.search_product = productName;
-            return makeRequest(this.request ,'/api/searchProduct',method,form);
+            return makeRequest(this.request, APIEndPoints.searchProduct, method, form);
         };
     }
 

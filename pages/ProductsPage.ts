@@ -1,7 +1,7 @@
 import { Locator, Page, expect } from "@playwright/test";
 import { textPriceToFloat } from "../Helper/tools";
 import { BasePage } from "../Helper/BasePage";
-import { ProductInfo } from "../Helper/base";
+import { ProductInfo } from "../Helper/ProductInfo";
 
 export class ProductsPage extends BasePage{
     readonly locators: {
@@ -191,12 +191,9 @@ export class ProductsPage extends BasePage{
                 }, await productImage.elementHandle());
                 //----
 
-                this.page.waitForTimeout(300);
-            
-                await product.hover();
-                await this.page.waitForTimeout(600);
-            
-                const overlayContentAddProductButton = await this.locators.overlayContentAddProductButtonLocator(product);
+                await product.hover({ trial: true });
+
+                const overlayContentAddProductButton = this.locators.overlayContentAddProductButtonLocator(product);
                 await expect(overlayContentAddProductButton).toBeVisible();
                 await expect(overlayContentAddProductButton).toBeInViewport();
                 await expect(await overlayContentAddProductButton.isEnabled()).toBeTruthy();

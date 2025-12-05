@@ -14,8 +14,4 @@ export class BasePage{
     async goBack(){
         this.page.goBack();
     }
-
-    async checkValues(value1: any, value2: any){
-        await expect(value1).toBe(value2);
-    }
 };

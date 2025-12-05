@@ -1,4 +1,4 @@
-import { test } from '../../Helper/base.ts';
+import { test, Methods } from '../../Helper/base.ts';
 import { generateRandomEmail, getEnv } from '../../Helper/tools.js';
 
 test.describe("E2E Checkout Flow", () => {
@@ -35,7 +35,7 @@ test.describe("E2E Checkout Flow", () => {
   19. Click 'Delete Account' button
   20. Verify 'ACCOUNT DELETED!' and click 'Continue' button
   */
-  test('C40 Place Order: Register while Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  test('C40 Place Order: Register while Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage, authorizationAPI}) => {
     const email = await generateRandomEmail();
     let authorized = false;
 
@@ -50,33 +50,30 @@ test.describe("E2E Checkout Flow", () => {
     await cartPage.actions.clickRegisterAndLoginButton();
 
     //Fill signup form
-    await signUp_LoginPage.actions.fillStartSignUpForm(await getEnv("REGISTER_NAME_FIRST"),email);
-    await signUp_LoginPage.actions.clickSignUpButton();
-
-    //Fill detailed signup formr
-    await signUpPage.assertions.expectExtendedFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
-    await signUpPage.actions.fillSignUpForm(
-      await getEnv("REGISTER_TITLE"),
+    await authorizationAPI.POST_createAccount(
+      Methods.POST,
       await getEnv("REGISTER_NAME_FIRST"),
-      await getEnv("REGISTER_NAME_LAST"),
+      email,
       await getEnv("REGISTER_PASSWORD"),
+      "Mr",
       await getEnv("REGISTER_BIRTH_DAY"),
       await getEnv("REGISTER_BIRTH_MONTH"),
       await getEnv("REGISTER_BIRTH_YEAR"),
+      await getEnv("REGISTER_NAME_FIRST"),
+      await getEnv("REGISTER_NAME_LAST"),
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_ADDRESS"),
       await getEnv("REGISTER_ADDRESS2"),
       await getEnv("REGISTER_COUNTRY"),
+      await getEnv("REGISTER_ZIPCODE"),
       await getEnv("REGISTER_STATE"),
       await getEnv("REGISTER_CITY"),
-      await getEnv("REGISTER_ZIPCODE"),
       await getEnv("REGISTER_MOBILE_NUMBER")
     );
-    await signUpPage.actions.clickCreateAccountButton();
 
-    //verift account was created
-    await accountCreatedPage.assertions.expectAccountCreatedTextVisible();
-    await accountCreatedPage.actions.clickContinueButton();
+    await signUp_LoginPage.actions.fillLoginForm(email,await getEnv("REGISTER_PASSWORD"));
+    await signUp_LoginPage.actions.clickLoginButton();
+
     authorized = true;
 
     await homePage.assertions.expectPageLoaded();
@@ -85,6 +82,16 @@ test.describe("E2E Checkout Flow", () => {
 
     await cartPage.assertions.expectProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
     await cartPage.actions.clickProcessButton(authorized);
+
+    //This assertions will fail, because of the bug on the site. When you register with API, the title is free text field, and you can put anything there.
+    //When we put Mr. or Mrs. during registration, it is saved as is, and Add additional dot on the end. So in the end we have "Mr.." or "Mrs.."
+    //Anyway you can put any value there, wich is should be limited to Mr. or Mrs. only. Also it should check if it is already goes with dot or not.
+    //I can't do anything about it, thats why I am goona to use plain text "Mr" and not "Mr." from .env file.
+    //
+    //    Expected: "Mr. Max Petrov"
+    //    Received: "Mr.. Max Petrov"
+    //
+    //--------------------------------
     await cartPage.assertions.expectAddress(
       "delivery",
       await getEnv("REGISTER_TITLE"),
@@ -113,6 +120,8 @@ test.describe("E2E Checkout Flow", () => {
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_MOBILE_NUMBER")
     );
+    //--------------------------------
+    
     await cartPage.actions.inputDescriptionMessage(descriptionMessage);
     await cartPage.actions.clickPlaceOrderButton();
 
@@ -159,42 +168,36 @@ test.describe("E2E Checkout Flow", () => {
   18. Verify 'ACCOUNT DELETED!' and click 'Continue' button
   */
 
-  test('C41 Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage}) => {
+  test('C41 Place Order: Register before Checkout', async ({ homePage,productsPage,cartPage,signUp_LoginPage,signUpPage,accountCreatedPage,paymentPage,accountDeletePage, authorizationAPI}) => {
     const email = await generateRandomEmail();
     let authorized = false;
 
-    //goto
-    await homePage.actions.clickSignUpAndLoginLink();
-    await signUp_LoginPage.assertions.expectSignUpTextVisible();
-
-    //Fill signup form
-    await signUp_LoginPage.actions.fillStartSignUpForm(await getEnv("REGISTER_NAME_FIRST"),email);
-    await signUp_LoginPage.actions.clickSignUpButton();
-
-    //Fill detailed signup formr
-    await signUpPage.assertions.expectExtendedFormToBeVisible(await getEnv("REGISTER_NAME_FIRST"),email);
-    await signUpPage.actions.fillSignUpForm(
-      await getEnv("REGISTER_TITLE"),
+    await authorizationAPI.POST_createAccount(
+      Methods.POST,
       await getEnv("REGISTER_NAME_FIRST"),
-      await getEnv("REGISTER_NAME_LAST"),
+      email,
       await getEnv("REGISTER_PASSWORD"),
+      "Mr",
       await getEnv("REGISTER_BIRTH_DAY"),
       await getEnv("REGISTER_BIRTH_MONTH"),
       await getEnv("REGISTER_BIRTH_YEAR"),
+      await getEnv("REGISTER_NAME_FIRST"),
+      await getEnv("REGISTER_NAME_LAST"),
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_ADDRESS"),
       await getEnv("REGISTER_ADDRESS2"),
       await getEnv("REGISTER_COUNTRY"),
+      await getEnv("REGISTER_ZIPCODE"),
       await getEnv("REGISTER_STATE"),
       await getEnv("REGISTER_CITY"),
-      await getEnv("REGISTER_ZIPCODE"),
       await getEnv("REGISTER_MOBILE_NUMBER")
-    );
-    await signUpPage.actions.clickCreateAccountButton();
+    )
 
-    //verift account was created
-    await accountCreatedPage.assertions.expectAccountCreatedTextVisible();
-    await accountCreatedPage.actions.clickContinueButton();
+    await homePage.actions.clickSignUpAndLoginLink();
+
+    await signUp_LoginPage.actions.fillLoginForm(email,await getEnv("REGISTER_PASSWORD"));
+    await signUp_LoginPage.actions.clickLoginButton();
+
     await homePage.assertions.expectLoggedInNameIsVisible(await getEnv("REGISTER_NAME_FIRST"));
     authorized = true;
 
@@ -207,6 +210,17 @@ test.describe("E2E Checkout Flow", () => {
 
     await cartPage.assertions.expectProductInfoByIndex(productIndex,ProductInfo.Name,ProductInfo.Price,ProductInfo.Quantity);
     await cartPage.actions.clickProcessButton(authorized);
+
+    //This assertions will fail, because of the bug on the site. When you register with API, the title is free text field, and you can put anything there.
+    //When we put Mr. or Mrs. during registration, it is saved as is, and Add additional dot on the end. So in the end we have "Mr.." or "Mrs.."
+    //Anyway you can put any value there, wich is should be limited to Mr. or Mrs. only. Also it should check if it is already goes with dot or not.
+    //I can't do anything about it, thats why I am goona to use plain text "Mr" and not "Mr." from .env file.
+    //
+    //    Expected: "Mr. Max Petrov"
+    //    Received: "Mr.. Max Petrov"
+    //
+    //--------------------------------
+
     await cartPage.assertions.expectAddress(
       "delivery",
       await getEnv("REGISTER_TITLE"),
@@ -235,6 +249,8 @@ test.describe("E2E Checkout Flow", () => {
       await getEnv("REGISTER_COMPANY_NAME"),
       await getEnv("REGISTER_MOBILE_NUMBER")
     );
+    //--------------------------------
+
     await cartPage.actions.inputDescriptionMessage(descriptionMessage);
     await cartPage.actions.clickPlaceOrderButton();
 

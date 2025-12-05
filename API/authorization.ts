@@ -1,7 +1,7 @@
 import { APIRequestContext, APIResponse,expect } from '@playwright/test';
 import { verifyResponseSchema, verifyResponseCode, makeRequest, getEnv } from '../Helper/tools';
 import { z } from 'zod';
-import { Status } from '../Helper/base';
+import { Status, APIEndPoints } from '../Helper/base';
 
 export class AuthorizationAPI{
     readonly Title = {Mr: "Mr", Mrs: "Mrs", Miss: "Miss"};
@@ -17,7 +17,7 @@ export class AuthorizationAPI{
             const form: Record<string, string> = {};
             if (email !== undefined) form.email = email;
             if (password !== undefined) form.password = password;
-            return makeRequest(this.request ,'/api/verifyLogin',method, form);
+            return makeRequest(this.request ,APIEndPoints.verifyLogin,method, form);
         };
         this.POST_createAccount = (method, name: string , email: string , password: string , title: string , birth_date: string , birth_month: string , birth_year: string , firstname: string , lastname: string , company: string , address1: string , address2: string , country: string , zipcode: string , state: string , city: string , mobile_number: string ) => {
             expect(method).not.toBe(undefined);
@@ -39,20 +39,20 @@ export class AuthorizationAPI{
             if (state !== undefined) form.state = state;
             if (city !== undefined) form.city = city;
             if (mobile_number !== undefined) form.mobile_number = mobile_number;
-            return makeRequest(this.request, '/api/createAccount', method, form);
+            return makeRequest(this.request, APIEndPoints.createAccount, method, form);
         };
         this.POST_deleteAccount = (method, email: string , password: string ) => {
             expect(method).not.toBe(undefined);
             const form: Record<string, string> = {};
             if (email !== undefined) form.email = email;
             if (password !== undefined) form.password = password;
-            return makeRequest(this.request ,'/api/deleteAccount',method, form);
+            return makeRequest(this.request ,APIEndPoints.deleteAccount, method, form);
         };
         this.GET_getUserDetailByEmail = (method, email: string ) => {
             expect(method).not.toBe(undefined);
             const form: Record<string, string> = {};
             if (email !== undefined) form.email = email;
-            return makeRequest(this.request ,'/api/getUserDetailByEmail',method, form); 
+            return makeRequest(this.request , APIEndPoints.getUserDetailByEmail, method, form); 
         };
     }
 
