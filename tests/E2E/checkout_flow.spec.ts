@@ -55,7 +55,7 @@ test.describe("E2E Checkout Flow", () => {
       await getEnv("REGISTER_NAME_FIRST"),
       email,
       await getEnv("REGISTER_PASSWORD"),
-      await getEnv("REGISTER_TITLE"),
+      "Mr",
       await getEnv("REGISTER_BIRTH_DAY"),
       await getEnv("REGISTER_BIRTH_MONTH"),
       await getEnv("REGISTER_BIRTH_YEAR"),
@@ -86,6 +86,7 @@ test.describe("E2E Checkout Flow", () => {
     //This assertions will fail, because of the bug on the site. When you register with API, the title is free text field, and you can put anything there.
     //When we put Mr. or Mrs. during registration, it is saved as is, and Add additional dot on the end. So in the end we have "Mr.." or "Mrs.."
     //Anyway you can put any value there, wich is should be limited to Mr. or Mrs. only. Also it should check if it is already goes with dot or not.
+    //I can't do anything about it, thats why I am goona to use plain text "Mr" and not "Mr." from .env file.
     //
     //    Expected: "Mr. Max Petrov"
     //    Received: "Mr.. Max Petrov"
@@ -176,7 +177,7 @@ test.describe("E2E Checkout Flow", () => {
       await getEnv("REGISTER_NAME_FIRST"),
       email,
       await getEnv("REGISTER_PASSWORD"),
-      await getEnv("REGISTER_TITLE"),
+      "Mr",
       await getEnv("REGISTER_BIRTH_DAY"),
       await getEnv("REGISTER_BIRTH_MONTH"),
       await getEnv("REGISTER_BIRTH_YEAR"),
@@ -213,6 +214,7 @@ test.describe("E2E Checkout Flow", () => {
     //This assertions will fail, because of the bug on the site. When you register with API, the title is free text field, and you can put anything there.
     //When we put Mr. or Mrs. during registration, it is saved as is, and Add additional dot on the end. So in the end we have "Mr.." or "Mrs.."
     //Anyway you can put any value there, wich is should be limited to Mr. or Mrs. only. Also it should check if it is already goes with dot or not.
+    //I can't do anything about it, thats why I am goona to use plain text "Mr" and not "Mr." from .env file.
     //
     //    Expected: "Mr. Max Petrov"
     //    Received: "Mr.. Max Petrov"
