@@ -1,4 +1,4 @@
-import { test } from '../../Helper/base.ts';
+import { test } from '../../Helper/Fixtures.ts';
 
 
 test.describe("E2E Cart Functionality", () =>{

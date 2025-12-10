@@ -1,7 +1,7 @@
 import { APIRequestContext, APIResponse,expect } from '@playwright/test';
-import { verifyResponseSchema, verifyResponseCode, makeRequest } from '../Helper/tools';
+import { verifyResponseSchema, verifyResponseCode, makeRequest } from '../Helper/Tools';
 import { z } from 'zod';
-import { Status, APIEndPoints } from '../Helper/base';
+import { APIEndPoints, Status } from '../Helper/API_Helper';
 
 export class ProductsAPI{
     readonly request: APIRequestContext;

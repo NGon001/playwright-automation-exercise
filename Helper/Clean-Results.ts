@@ -1,4 +1,4 @@
-import {emptyDir} from './tools.ts';
+import {emptyDir} from './Tools.ts';
 
 await emptyDir('test-resultsSave/screenshots');
 await emptyDir('test-resultsSave/videos');

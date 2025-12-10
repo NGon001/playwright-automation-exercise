@@ -1,5 +1,5 @@
-import { test } from '../../Helper/base.ts';
-import { generateRandomEmail, getEnv } from '../../Helper/tools.js';
+import { test } from '../../Helper/Fixtures.ts';
+import { generateRandomEmail, getEnv } from '../../Helper/Tools.ts';
 
 test.describe("E2E Authorization tests", () => {
   const incorrectEmail = 'max12341@gmail.com';

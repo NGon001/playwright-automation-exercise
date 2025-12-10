@@ -1,4 +1,5 @@
-import { apiTest as test, Methods, Status, Messages } from '../../Helper/base.ts';
+import { apiTest as test } from '../../Helper/Fixtures.ts';
+import { Methods, Status, Messages } from '../../Helper/API_Helper.ts';
 
 test.describe("API Product & Catalog tests", () => {
     test('C28 GET /api/brandsList returns valid brand list', async ({ productsAPI }) => {
