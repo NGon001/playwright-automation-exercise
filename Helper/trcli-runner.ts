@@ -1,4 +1,4 @@
-import { getEnv } from "./tools";
+import { getEnv } from "./Tools";
 const { execSync } = require('child_process');
 const dotenv = require('dotenv');
 dotenv.config();

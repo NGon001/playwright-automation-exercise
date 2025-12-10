@@ -1,5 +1,6 @@
-import { apiTest as test, Methods, Status, Messages } from '../../Helper/base.ts';
-import { generateRandomEmail, getEnv } from '../../Helper/tools.js';
+import { apiTest as test } from '../../Helper/Fixtures';
+import { Methods, Status, Messages } from '../../Helper/API_Helper'
+import { generateRandomEmail, getEnv } from '../../Helper/Tools';
 
 test.describe("API Authorization tests", () => {
     test('C8 POST (/api/verifyLogin) User exists with valid credentials', async({ authorizationAPI }) => {

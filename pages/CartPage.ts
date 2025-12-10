@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test";
-import { textPriceToFloat } from "../Helper/tools";
+import { textPriceToFloat } from "../Helper/Tools.ts";
 import { BasePage } from "../Helper/BasePage";
 
 export class CartPage extends BasePage{

@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test";
-import { textPriceToFloat } from "../Helper/tools";
+import { textPriceToFloat } from "../Helper/Tools";
 import { BasePage } from "../Helper/BasePage";
 import { ProductInfo } from "../Helper/ProductInfo";
 
@@ -263,20 +263,9 @@ export class HomePage extends BasePage {
                     return images.length === 0 || images.every(img => img.complete && img.naturalWidth > 0);
                 });*/
 
-                // wait image to load, because it will depend on hover
-                //----
-                await this.page.waitForFunction(
-                    (img) => (img instanceof HTMLImageElement) && img.complete && img.naturalWidth > 0,
-                    await productImage.elementHandle()
-                );
-                //----
-            
-                //scroll to element (better then scrollIntoViewIfNeeded, because it will scroll element to the top)
-                //----
-                await this.page.evaluate((element) => {
-                     element?.scrollIntoView({ behavior: 'smooth', block: 'start' }); //same as "((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({behavior: 'smooth', block: 'start'});", element);"
-                }, await productImage.elementHandle());
-                //----
+                await this.waitForImageToLoad(productImage);
+                
+                await this.scrollToElement(productImage);
 
                 this.page.waitForTimeout(300);
             

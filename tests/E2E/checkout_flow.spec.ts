@@ -1,5 +1,6 @@
-import { test, Methods } from '../../Helper/base.ts';
-import { generateRandomEmail, getEnv } from '../../Helper/tools.js';
+import { test } from '../../Helper/Fixtures.ts';
+import { Methods } from '../../Helper/API_Helper.ts';
+import { generateRandomEmail, getEnv } from '../../Helper/Tools.ts';
 
 test.describe("E2E Checkout Flow", () => {
   //product data

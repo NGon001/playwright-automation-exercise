@@ -1,5 +1,5 @@
 import { Locator, Page, expect } from "@playwright/test";
-import { expectTextNotBeNull } from "../Helper/tools";
+import { expectTextNotBeNull } from "../Helper/Tools";
 import { BasePage } from "../Helper/BasePage";
 
 export class ProductPage extends BasePage{

@@ -1,5 +1,5 @@
-import { test } from '../../Helper/base.ts';
-import { getEnv } from '../../Helper/tools.ts';
+import { test } from '../../Helper/Fixtures.ts';
+import { getEnv } from '../../Helper/Tools.ts';
 
 test.describe("E2E Contact & Subscriptions", () => {
   test.beforeEach(async ({ homePage }) =>{

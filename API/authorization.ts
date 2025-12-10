@@ -1,7 +1,7 @@
 import { APIRequestContext, APIResponse,expect } from '@playwright/test';
-import { verifyResponseSchema, verifyResponseCode, makeRequest, getEnv } from '../Helper/tools';
+import { verifyResponseSchema, verifyResponseCode, makeRequest, getEnv } from '../Helper/Tools';
 import { z } from 'zod';
-import { Status, APIEndPoints } from '../Helper/base';
+import { Status, APIEndPoints } from '../Helper/API_Helper';
 
 export class AuthorizationAPI{
     readonly Title = {Mr: "Mr", Mrs: "Mrs", Miss: "Miss"};

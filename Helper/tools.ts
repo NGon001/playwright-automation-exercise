@@ -1,4 +1,4 @@
-import { expect, type APIRequestContext, type APIResponse } from "@playwright/test";
+import { expect, type APIRequestContext, type APIResponse, type BrowserContext } from "@playwright/test";
 import fs from 'fs/promises';
 import { z } from 'zod';
 
@@ -63,3 +63,30 @@ export async function getEnv(name: string): Promise<string> {
   }
   return value;
 }
+
+export async function blockAds(context: BrowserContext) {
+  await context.route("**/*", route => {
+    route.request().url().startsWith("https://googleads.") ?
+    route.abort() : route.continue();
+    return;
+  });
+}
+
+export async function saveAdditionsAttachments(context: BrowserContext, page: any, testInfo: any) {
+  // Save trace
+  const testTitle = testInfo.title.replace(/[^a-zA-Z0-9-_]/g, '_');
+  const tracePath = `test-resultsSave/traces/trace-${testTitle}.zip`;
+  await context.tracing.stop({ path: tracePath });
+  testInfo.annotations.push({ type: 'testrail_attachment', description: tracePath });
+  
+  // Save screenshot and video
+  let screenshotPath = `test-resultsSave/screenshots/screenshot-${testTitle}.png`;
+  const videoPath = `test-resultsSave/videos/video-${testTitle}.webm`;
+  await page.screenshot({ path: screenshotPath, fullPage: true });
+  await page.close();
+  testInfo.annotations.push({ type: 'testrail_attachment', description: screenshotPath });
+  if (page.video()) {
+      await page.video()?.saveAs(videoPath);
+      testInfo.annotations.push({ type: 'testrail_attachment', description: videoPath });
+  }
+};
