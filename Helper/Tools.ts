@@ -27,21 +27,6 @@ export async function emptyDir(dir: string) {
   }
 }
 
-export async function makeRequest(request: APIRequestContext, url: string, method: string, form: Record<string, string> = {}): Promise<APIResponse> {
-  switch (method) {
-    case 'POST':
-      return request.post(url, { form });
-    case 'GET':
-      return request.get(url, {  params: form });
-    case 'PUT':
-      return request.put(url, { form });
-    case 'DELETE':
-      return request.delete(url, { form });
-    default:
-      throw new Error(`Unsupported method: ${method}`);
-  }
-}
-
 export async function verifyResponseCode(response: APIResponse, expectedCode: Number){
   const responseBody = await response.json();
   //console.log(responseBody);

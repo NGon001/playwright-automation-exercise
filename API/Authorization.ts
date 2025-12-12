@@ -1,12 +1,20 @@
 import { APIRequestContext, APIResponse,expect } from '@playwright/test';
-import { verifyResponseSchema, verifyResponseCode, makeRequest, getEnv } from '../Helper/Tools';
+import { verifyResponseSchema, verifyResponseCode, getEnv } from '../Helper/Tools';
+import { buildSchema, makeRequest, Messages } from '../Helper/API_Helper';
 import { z } from 'zod';
 import { Status, APIEndPoints } from '../Helper/API_Helper';
 
 export class AuthorizationAPI{
-    readonly request: APIRequestContext;
+    private readonly request: APIRequestContext;
 
-    readonly requests: {
+    private readonly schemas: {
+        LoginSuccessSchema: z.ZodTypeAny;
+        DeleteAccountSuccessSchema: z.ZodTypeAny;
+        UserDetailSuccessSchema: () => Promise<z.ZodTypeAny>;
+        CreateAccountSchema: (expectedCode: number, expectedMessage: string) => Promise<z.ZodTypeAny>;
+   };
+
+    private readonly requests: {
         POST_verifyLogin: (method: string, email: string, password: string ) => Promise<APIResponse>;
         POST_createAccount: (method: string, name: string, email: string , password: string , title: string , birth_date: string , birth_month: string , birth_year: string , firstname: string , lastname: string , company: string , address1: string , address2: string , country: string , zipcode: string , state: string , city: string , mobile_number: string ) => Promise<APIResponse>;
         POST_deleteAccount: (method: string, email: string, password: string ) => Promise<APIResponse>;
@@ -21,7 +29,7 @@ export class AuthorizationAPI{
     };
      
     readonly assertions: {
-        verifyLoginResponseSchema: (response: APIResponse, expectedCode: number, expectedMessage: string) => Promise<void>;
+        verifyLoginResponseSchema: (response: APIResponse, expectedCode: number, expectedMessage: string, successSchema: z.ZodTypeAny) => Promise<void>;
         verifyCreateAccountResponseSchema: (response: APIResponse, expectedCode: number, expectedMessage: string) => Promise<void>;
         verifyUserDetailResponseSchema: (response: APIResponse, expectedCode: number, expectedMessage: string ) => Promise<void>;
     };
@@ -29,16 +37,65 @@ export class AuthorizationAPI{
     constructor(request: APIRequestContext){
         this.request = request;
 
+        this.schemas = {
+            LoginSuccessSchema: z.object({
+              responseCode: z.literal(Status.success),
+              message: z.literal(Messages.userFoundMessage),
+            }),
+
+            DeleteAccountSuccessSchema: z.object({
+              responseCode: z.literal(Status.success),
+              message: z.literal(Messages.userDeletedMessage),
+            }),
+
+            UserDetailSuccessSchema: async () => {
+                return z.object({
+                  responseCode: z.literal(Status.success),
+                  user: z.object({
+                        id: z.number(),
+                        name: z.literal(await getEnv("VALID_LOGIN_NAME_FIRST")),
+                        email: z.literal(await getEnv("VALID_LOGIN_EMAIL")),
+                        title: z.string(),
+                        birth_day: z.string(),
+                        birth_month: z.string(),
+                        birth_year: z.string(),
+                        first_name: z.string(),
+                        last_name: z.string(),
+                        company: z.string(),
+                        address1: z.string(),
+                        address2: z.string(),
+                        country: z.string(),
+                        state: z.string(),
+                        city: z.string(),
+                        zipcode: z.string()
+                    })
+                });
+            },
+
+            CreateAccountSchema: async (expectedCode: number, expectedMessage: string) => {
+                let schema;
+                if(expectedCode !== 405){
+                    schema = z.object({
+                      responseCode: z.literal(expectedCode),
+                      message: z.literal(expectedMessage),
+                    });
+                }else{
+                    schema = z.object({
+                      detail: z.literal(expectedMessage),
+                    });
+                }
+                return schema;
+            },
+        }
+
         this.requests = {
             POST_verifyLogin: async (method, email: string , password: string ) => {
-                expect(method).not.toBe(undefined);
                 const form: Record<string, string> = {};
                 if (email !== undefined) form.email = email;
                 if (password !== undefined) form.password = password;
                 return makeRequest(this.request ,APIEndPoints.verifyLogin,method, form);
             },
             POST_createAccount: async  (method, name: string , email: string , password: string , title: string , birth_date: string , birth_month: string , birth_year: string , firstname: string , lastname: string , company: string , address1: string , address2: string , country: string , zipcode: string , state: string , city: string , mobile_number: string ) => {
-                expect(method).not.toBe(undefined);
                 const form: Record<string, string> = {};
                 if (name !== undefined) form.name = name;
                 if (email !== undefined) form.email = email;
@@ -60,14 +117,12 @@ export class AuthorizationAPI{
                 return makeRequest(this.request, APIEndPoints.createAccount, method, form);
             },
             POST_deleteAccount: async  (method, email: string , password: string ) => {
-                expect(method).not.toBe(undefined);
                 const form: Record<string, string> = {};
                 if (email !== undefined) form.email = email;
                 if (password !== undefined) form.password = password;
                 return makeRequest(this.request ,APIEndPoints.deleteAccount, method, form);
             },
             GET_getUserDetailByEmail: async  (method, email: string ) => {
-                expect(method).not.toBe(undefined);
                 const form: Record<string, string> = {};
                 if (email !== undefined) form.email = email;
                 return makeRequest(this.request , APIEndPoints.getUserDetailByEmail, method, form); 
@@ -75,63 +130,19 @@ export class AuthorizationAPI{
         };
 
         this.assertions = {
-            verifyLoginResponseSchema: async (response: APIResponse, expectedCode: number, expectedMessage: string) => {
-                const schema = z.object({
-                  responseCode: z.literal(expectedCode),
-                  message: z.literal(expectedMessage),
-                });
+            verifyLoginResponseSchema: async (response: APIResponse, expectedCode: number, expectedMessage: string, successSchema: z.ZodTypeAny) => {
+                const schema = await buildSchema(successSchema, expectedCode, expectedMessage);
                 await verifyResponseSchema(response,schema);
             },
 
             verifyCreateAccountResponseSchema: async (response: APIResponse, expectedCode: number, expectedMessage: string) => {
-                let schema;
-                if(expectedCode !== 405){
-                    schema = z.object({
-                      responseCode: z.literal(expectedCode),
-                      message: z.literal(expectedMessage),
-                    });
-                }else{
-                    schema = z.object({
-                      detail: z.literal(expectedMessage),
-                    });
-                }
+                let schema = await this.schemas.CreateAccountSchema(expectedCode, expectedMessage);
                 await verifyResponseSchema(response,schema);
             },
 
             verifyUserDetailResponseSchema: async (response: APIResponse, expectedCode: number, expectedMessage: string ) => {
                 const responseBody = await response.json();
-                let schema;
-                if(responseBody.responseCode !== Status.success)
-                {
-                    schema = z.object({
-                      responseCode: z.literal(expectedCode),
-                      message: z.literal(expectedMessage),
-                    });
-                }
-                else{
-                    schema = z.object({
-                      responseCode: z.literal(expectedCode),
-                      user: z.object({
-                            id: z.number(),
-                            name: z.literal(await getEnv("VALID_LOGIN_NAME_FIRST")),
-                            email: z.literal(await getEnv("VALID_LOGIN_EMAIL")),
-                            title: z.string(),
-                            birth_day: z.string(),
-                            birth_month: z.string(),
-                            birth_year: z.string(),
-                            first_name: z.string(),
-                            last_name: z.string(),
-                            company: z.string(),
-                            address1: z.string(),
-                            address2: z.string(),
-                            country: z.string(),
-                            state: z.string(),
-                            city: z.string(),
-                            zipcode: z.string()
-                        })
-                    });
-                }
-
+                let schema = await buildSchema(await this.schemas.UserDetailSuccessSchema(), expectedCode, expectedMessage);
                 await verifyResponseSchema(response,schema);
             },
         };
@@ -164,13 +175,13 @@ export class AuthorizationAPI{
           deleteAccount: async (method, email, password, ExpectedCode, ExpectedMessage) => {
             const response = await this.requests.POST_deleteAccount(method,email,password);
             await verifyResponseCode(response,ExpectedCode);
-            await this.assertions.verifyLoginResponseSchema(response,ExpectedCode,ExpectedMessage);
+            await this.assertions.verifyLoginResponseSchema(response,ExpectedCode,ExpectedMessage,this.schemas.DeleteAccountSuccessSchema);
           },
 
           verifyLogin: async (method, expectedCode, expectedMessage, email, password) => {
             const response = await this.requests.POST_verifyLogin(method,email,password);
             await verifyResponseCode(response,expectedCode);
-            await this.assertions.verifyLoginResponseSchema(response,expectedCode,expectedMessage);
+            await this.assertions.verifyLoginResponseSchema(response,expectedCode,expectedMessage,this.schemas.LoginSuccessSchema);
           },
 
           getUserDetailByEmail: async (method, email, ExpectedCode, ExpectedMessage ) => {
