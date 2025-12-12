@@ -11,7 +11,7 @@ import { ProductsPage } from '../Pages/ProductsPage';
 import { ProductPage } from '../Pages/ProductPage';
 import { CartPage } from '../Pages/CartPage';
 import { PaymentPage } from '../Pages/PaymentPage';
-import { AuthorizationAPI } from '../API/Authorization';
+import { AuthorizationAPI } from '../API/Authorization.ts';
 import { ProductsAPI } from '../API/Products.ts';
 import { blockAds, saveAdditionsAttachments } from './Tools.ts';
 import dotenv from 'dotenv';
