@@ -1,5 +1,5 @@
 import { test } from '../../Helper/Fixtures.ts';
-import { Methods } from '../../Helper/API_Helper.ts';
+import { Methods, Status, Messages } from '../../Helper/API_Helper.ts';
 import { generateRandomEmail, getEnv } from '../../Helper/Tools.ts';
 
 test.describe("E2E Checkout Flow", () => {
@@ -51,8 +51,10 @@ test.describe("E2E Checkout Flow", () => {
     await cartPage.actions.clickRegisterAndLoginButton();
 
     //Fill signup form
-    await authorizationAPI.POST_createAccount(
+    await authorizationAPI.methods.createAccount(
       Methods.POST,
+      Status.resourceCreated,
+      Messages.userCreatedMessage,
       await getEnv("REGISTER_NAME_FIRST"),
       email,
       await getEnv("REGISTER_PASSWORD"),
@@ -173,8 +175,10 @@ test.describe("E2E Checkout Flow", () => {
     const email = await generateRandomEmail();
     let authorized = false;
 
-    await authorizationAPI.POST_createAccount(
+    await authorizationAPI.methods.createAccount(
       Methods.POST,
+      Status.resourceCreated,
+      Messages.userCreatedMessage,
       await getEnv("REGISTER_NAME_FIRST"),
       email,
       await getEnv("REGISTER_PASSWORD"),

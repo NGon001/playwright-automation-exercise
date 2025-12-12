@@ -22,3 +22,5 @@ export const Messages = {
     emailAlreadyExistsMessage: "Email already exists!",
     methodNotAllowedMessage: (method: string) => `Method \"${method}\" not allowed.`,
 }
+
+export const Titles = {Mr: "Mr", Mrs: "Mrs", Miss: "Miss"};
