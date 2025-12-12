@@ -27,6 +27,20 @@ export async function makeRequest(request: APIRequestContext, url: string, metho
   }
 }
 
+export async function verifyResponseCode(response: APIResponse, expectedCode: Number){
+  const responseBody = await response.json();
+  //console.log(responseBody);
+  await expect(responseBody.responseCode,`Expected: ${expectedCode}\nReceived: ${responseBody.responseCode}\nFull response: ${JSON.stringify(responseBody, null, 2)}`).toBe(expectedCode);
+  await expect((await response).ok()).toBeTruthy();
+}
+
+export async function verifyResponseSchema(response: APIResponse, schema: z.ZodTypeAny){ {
+  const responseBody = await response.json();
+  expect(() => {
+    schema.parse(responseBody);
+  }).not.toThrow();
+}}
+
 export const APIEndPoints = {
     verifyLogin: '/api/verifyLogin',
     createAccount: '/api/createAccount',

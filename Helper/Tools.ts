@@ -1,4 +1,4 @@
-import { expect, type APIRequestContext, type APIResponse, type BrowserContext } from "@playwright/test";
+import { expect, type APIResponse, type BrowserContext } from "@playwright/test";
 import fs from 'fs/promises';
 import { z } from 'zod';
 
@@ -26,20 +26,6 @@ export async function emptyDir(dir: string) {
     // Ignore errors
   }
 }
-
-export async function verifyResponseCode(response: APIResponse, expectedCode: Number){
-  const responseBody = await response.json();
-  //console.log(responseBody);
-  await expect(responseBody.responseCode,`Expected: ${expectedCode}\nReceived: ${responseBody.responseCode}\nFull response: ${JSON.stringify(responseBody, null, 2)}`).toBe(expectedCode);
-  await expect((await response).ok()).toBeTruthy();
-}
-
-export async function verifyResponseSchema(response: APIResponse, schema: z.ZodTypeAny){ {
-  const responseBody = await response.json();
-  expect(() => {
-    schema.parse(responseBody);
-  }).not.toThrow();
-}}
 
 export async function getEnv(name: string): Promise<string> {
   const value = process.env[name];
